@@ -10,7 +10,7 @@
 - Integer phases (1, 2, 3…): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde
+- [x] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde — Completed 2026-04-27
 - [ ] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup
 - [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
 - [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
@@ -34,10 +34,11 @@
 **Plans**: TBD
 
 Plans:
-- [ ] 01-01: Inicializar monorepo pnpm workspaces con apps/frontend, apps/backend, packages/shared-types, packages/shared-validation
-- [ ] 01-02: Configurar Docker Compose con servicios frontend, backend, mongodb, minio, nginx
-- [ ] 01-03: Implementar healthcheck endpoints en NestJS (Terminus) y healthcheck de contenedores
-- [ ] 01-04: Configurar GitHub Actions: PR pipeline (lint, type-check, tests, build), deploy-staging y deploy-prod
+- [x] 01-01: Monorepo init — pnpm workspaces + shared packages + tooling base
+- [x] 01-02: Frontend skeleton — Next.js 14 App Router + Tailwind + Vitest
+- [x] 01-03: Backend skeleton — NestJS + Pino + Terminus health endpoints + Jest
+- [x] 01-04: Docker Compose + Nginx + Dockerfiles para frontend y backend
+- [x] 01-05: GitHub Actions — pr.yml + deploy-staging.yml + deploy-prod.yml
 
 ### Phase 2: Auth y bases transversales
 **Goal**: Login funcional, registro de auditoría operativo, soft-delete activo, esquema dinámico disponible y backup automatizado.
@@ -177,7 +178,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Bootstrap de infraestructura | 0/4 | Not started | - |
+| 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
 | 2. Auth y bases transversales | 0/4 | Not started | - |
 | 3. Contactos | 0/3 | Not started | - |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |

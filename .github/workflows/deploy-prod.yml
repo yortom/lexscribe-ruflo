@@ -2,23 +2,123 @@ name: Deploy Production
 
 on:
   push:
-    tags: ['v*']
+    tags:
+      - 'v*'
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+  IMAGE_PREFIX: lexscribe
 
 jobs:
-  release:
+  ci:
+    name: Lint + TypeCheck + Test + Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.12.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r run lint
+      - run: pnpm -r run type-check
+      - run: pnpm -r run test
+      - run: pnpm -r --filter "./apps/*" run build
+
+  build-and-push:
+    name: Build & Push images to GHCR (prod)
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
-      # TODO:
-      # 1. Run all checks.
-      # 2. Build and tag Docker images with the git tag.
-      # 3. Push to ghcr.io.
-      # 4. Trigger production NAS webhook.
-      # 5. Notification.
+      - name: Extract version from tag
+        id: meta
+        run: echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Placeholder
-        run: echo "deploy-prod.yml — TODO see ARQUITECTURA §11.3"
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-backend:prod
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-backend:${{ steps.meta.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-frontend:prod
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-frontend:${{ steps.meta.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: infra/nginx
+          file: infra/nginx/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-nginx:prod
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-nginx:${{ steps.meta.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  notify-nas:
+    name: Notify NAS production
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger NAS prod webhook
+        run: |
+          curl --fail --show-error --silent \
+            -X POST "${{ secrets.NAS_PROD_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.NAS_PROD_WEBHOOK_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"environment":"production","version":"${{ needs.build-and-push.outputs.version }}"}'
+
+  notify-deployment:
+    name: Send deployment notification
+    needs: [build-and-push, notify-nas]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    steps:
+      - name: Post deployment status
+        if: ${{ secrets.DEPLOY_NOTIFICATION_WEBHOOK != '' }}
+        run: |
+          STATUS="${{ needs.notify-nas.result }}"
+          curl --fail --show-error --silent \
+            -X POST "${{ secrets.DEPLOY_NOTIFICATION_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\":\"Lexscribe prod deploy ${{ needs.build-and-push.outputs.version }}: ${STATUS}\"}"

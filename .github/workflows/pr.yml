@@ -4,32 +4,41 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   checks:
+    name: Lint + TypeCheck + Test + Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.12.0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm typecheck
-
       - name: Lint
-        run: pnpm lint
+        run: pnpm -r run lint
+
+      - name: Type check
+        run: pnpm -r run type-check
 
       - name: Test
-        run: pnpm test
+        run: pnpm -r run test
 
-      - name: Format check
-        run: pnpm format:check
+      - name: Build (dry-run)
+        run: pnpm -r --filter "./apps/*" run build

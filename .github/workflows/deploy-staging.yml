@@ -1,0 +1,23 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # TODO:
+      # 1. Run lint/typecheck/test (reuse pr.yml steps).
+      # 2. Build Docker images for backend and frontend.
+      # 3. Push to GitHub Container Registry (ghcr.io).
+      # 4. Trigger webhook on staging NAS to pull and re-up docker-compose.
+
+      - name: Placeholder
+        run: echo "deploy-staging.yml — TODO see ARQUITECTURA §11.2"

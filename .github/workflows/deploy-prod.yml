@@ -1,0 +1,24 @@
+name: Deploy Production
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # TODO:
+      # 1. Run all checks.
+      # 2. Build and tag Docker images with the git tag.
+      # 3. Push to ghcr.io.
+      # 4. Trigger production NAS webhook.
+      # 5. Notification.
+
+      - name: Placeholder
+        run: echo "deploy-prod.yml — TODO see ARQUITECTURA §11.3"

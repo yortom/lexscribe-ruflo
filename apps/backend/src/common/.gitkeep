@@ -1,0 +1,6 @@
+# Common building blocks (cross-module). See ARQ §5.1.
+#   decorators/   — @CurrentUser, etc.
+#   guards/       — JwtAuthGuard
+#   filters/      — exception filters
+#   interceptors/ — logging, soft-delete, usuarioId injection, auditoria
+#   pipes/        — Zod validation pipe

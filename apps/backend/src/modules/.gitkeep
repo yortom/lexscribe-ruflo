@@ -1,0 +1,24 @@
+# Placeholder. Each domain module will be created in its own subdirectory:
+#
+#   auth/           — login, refresh, JWT guards
+#   usuarios/       — preparado multi-user
+#   expedientes/    — F-001..F-008
+#   contactos/      — F-050..F-055
+#   plantillas/     — F-020..F-029 (incluye versionado)
+#   clausulas/      — F-040..F-046
+#   documentos/     — F-010..F-018
+#     ├── generation/  — pipeline docxtemplater
+#     └── storage/     — cliente MinIO/S3
+#   eventos/        — F-060..F-066
+#   facturacion/    — F-070..F-075
+#   esquemas/       — F-090..F-096 (esquema dinámico)
+#   auditoria/      — ARQ §18 (log inmutable)
+#
+# Estructura interna esperada por módulo (ARQ §5.2):
+#   {modulo}.module.ts
+#   {modulo}.controller.ts
+#   {modulo}.service.ts
+#   {modulo}.repository.ts
+#   dto/
+#   schemas/
+#   tests/

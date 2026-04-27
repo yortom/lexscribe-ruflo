@@ -1,0 +1,16 @@
+# Estructura prevista (ver ARQUITECTURA.md §4.1)
+#
+# app/
+#   (auth)/login/                — rutas públicas
+#   (app)/expedientes/           — F-001 a F-008
+#   (app)/contactos/             — F-050 a F-055
+#   (app)/plantillas/            — F-020 a F-029 (editor con CodeMirror)
+#   (app)/clausulas/             — F-040 a F-046
+#   (app)/calendario/            — F-060 a F-066
+#   (app)/facturacion/           — F-070 a F-075
+# components/                    — UI reusable
+# lib/api/                       — clientes HTTP por dominio
+# lib/auth/                      — gestión JWT + refresh
+# lib/hooks/                     — React Query hooks
+# lib/i18n/errors.ts             — mapeo error inglés → mensaje español
+# types/                         — re-export de @lexscribe/shared-types

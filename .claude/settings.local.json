@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node __TRACKED_VAR__/.claude/get-shit-done/bin/gsd-tools.cjs commit 'docs: plan phase 1 bootstrap de infraestructura \\(5 plans, 3 waves\\)' --files .planning/ROADMAP.md .planning/REQUIREMENTS.md .planning/PROJECT.md .planning/MILESTONES.md .planning/STATE.md .planning/phases/01-bootstrap-de-infraestructura/01-01-PLAN.md .planning/phases/01-bootstrap-de-infraestructura/01-02-PLAN.md .planning/phases/01-bootstrap-de-infraestructura/01-03-PLAN.md .planning/phases/01-bootstrap-de-infraestructura/01-04-PLAN.md .planning/phases/01-bootstrap-de-infraestructura/01-05-PLAN.md)",
+      "Skill(gsd:execute-phase)",
+      "Skill(gsd:execute-phase:*)"
+    ]
+  }
+}

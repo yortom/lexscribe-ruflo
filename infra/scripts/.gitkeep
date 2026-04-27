@@ -1,0 +1,2 @@
+# Operational scripts (rclone backup, mongo dump, restore, etc.)
+# See ARQUITECTURA.md §8.2 (backup) and §17 (encryption).

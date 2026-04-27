@@ -6,7 +6,7 @@
 - **Phase:** 1 — Complete (2026-04-27)
 - **Plan:** —
 - **Status:** Phase 1 "Bootstrap de infraestructura" ejecutada y completa. 5/5 planes completados con todos los criterios de aceptación verificados.
-- **Last activity:** 2026-04-27 — Phase 1 ejecutada (5 planes, 3 waves).
+- **Last activity:** 2026-04-27 — Phase 1 shipped — PR #1 abierto.
 
 ## Accumulated Context
 

@@ -12,3 +12,6 @@ coverage
 !.vscode/extensions.json
 infra/nginx/certs/*.crt
 infra/nginx/certs/*.key
+*.tsbuildinfo
+ruvector.db
+ruvector.db-*

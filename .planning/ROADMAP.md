@@ -51,13 +51,13 @@ Plans:
   4. Crear/editar/borrar cualquier recurso genera registro en `auditoria` con accion, recursoId, cambios, timestamp
   5. Backup diario de MinIO + Mongo a Google Drive verificable inspeccionando Drive
   6. Endpoints `/api/v1/esquemas/:tipoObjeto` CRUD operativos para `expediente` y `contacto`
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: Módulo auth NestJS: usuarios collection, JWT+refresh con rotación, guards, decorador @CurrentUser, frontend login/logout
-- [ ] 02-02: Bases transversales: soft-delete middleware Mongoose, ZodValidationPipe, ExceptionFilter con errores de dominio tipados
-- [ ] 02-03: Auditoría: interceptor + event listeners para create/update/delete/link/unlink/generate/login/logout
-- [ ] 02-04: Seed idempotente (usuario + esquemas vacíos) + módulo esquemas con CRUD + rclone backup en NAS
+- [ ] 02-01-auth-jwt-refresh-PLAN.md — Módulo auth NestJS (Wave 0 setup, usuarios+refresh tokens, JWT+rotación, @CurrentUser, login UI Next.js)
+- [ ] 02-02-bases-transversales-PLAN.md — Soft-delete plugin Mongoose, ZodValidationPipe global, DomainExceptionFilter con errores tipados
+- [ ] 02-03-auditoria-PLAN.md — Auditoría híbrida: AuditInterceptor + EventEmitter listeners + auth.login/logout events
+- [ ] 02-04-seed-esquemas-backup-PLAN.md — Módulo esquemas (CRUD) + pnpm seed idempotente + rclone backup-daily.sh
 
 ### Phase 3: Contactos
 **Goal**: El usuario puede gestionar la base de contactos completa con sus parámetros personalizados.

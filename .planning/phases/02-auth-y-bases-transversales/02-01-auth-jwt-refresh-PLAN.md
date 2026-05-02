@@ -286,6 +286,19 @@ Cookie attributes (decisión cerrada):
     packages/shared-validation/src/index.ts (extender export),
     apps/backend/test/setup-e2e.ts
   </read_first>
+  <scope_note>
+    Esta tarea modifica **19 archivos** (alto para un único task), pero es **internamente cohesiva**: un solo bounded context (auth) cuyo split rompería la atomicidad de los tests e2e (cualquier subset deja la suite roja). El executor DEBE commitear por sub-step para que el PR sea revisable, en este orden:
+
+    1. `commit 1` — `packages/shared-validation/src/auth.ts` + `index.ts` (LoginSchema)
+    2. `commit 2` — `common/types/jwt-payload.ts` + `common/decorators/current-user.decorator.ts`
+    3. `commit 3` — `usuarios/schemas/usuario.schema.ts` + `usuarios/usuarios.repository.ts` + `usuarios.service.ts` + `usuarios.module.ts`
+    4. `commit 4` — `auth/strategies/jwt.strategy.ts` + `auth/guards/jwt-auth.guard.ts` + `auth/dto/login.dto.ts`
+    5. `commit 5` — `auth/auth.service.ts` (login/refresh/logout + reuse detection + cookie helpers)
+    6. `commit 6` — `auth/auth.controller.ts` + `auth/auth.module.ts` + `app.module.ts` (wiring)
+    7. `commit 7` — las 4 suites e2e (`auth/{login,refresh,logout}.e2e-spec.ts` + `common/guards.e2e-spec.ts`) — quitar `.skip`
+
+    El SUMMARY de este plan debe registrar este orden de commits para futuros revisores.
+  </scope_note>
   <behavior>
     - Test login.e2e:
       · Seed user (argon2 hash de 'P@ssw0rd1234') → POST /api/v1/auth/login con creds correctas → 200 + body `{accessToken, expiresIn:900, user:{id,email,nombre}}` + Set-Cookie con flags HttpOnly, Secure, SameSite=Strict, Path=/api/v1/auth, Max-Age=604800.
@@ -460,4 +473,7 @@ Cookie attributes (decisión cerrada):
 
 <output>
 After completion, create `.planning/phases/02-auth-y-bases-transversales/02-01-SUMMARY.md`.
+
+**SUMMARY MUST include the following note verbatim under "Implementation notes":**
+> "Task 2 modifies 19 files but is internally cohesive (one bounded context: auth). Executor committed by sub-step (schema → strategy → service → controller → tests) for reviewability. See `<scope_note>` in plan for the 7-commit order."
 </output>

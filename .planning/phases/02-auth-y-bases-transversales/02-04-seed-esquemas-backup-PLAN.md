@@ -42,6 +42,7 @@ must_haves:
     - "DELETE /api/v1/esquemas/:tipoObjeto/parametros/:nombre → 501 Not Implemented (post-MVP F-095)"
     - "`infra/scripts/backup-daily.sh --dry-run` ejecuta sin error y muestra los pasos sin tocar Drive"
     - "Existe `infra/scripts/rclone.conf.example` (sin secretos) y `infra/scripts/README.md` con procedimiento de instalación cron en NAS"
+    - "Tras `POST /api/v1/esquemas/expediente/parametros` (autenticado) existe en la colección `auditoria` un documento con `accion='create'`, `recurso='esquema'` (cierre del bucle interceptor → write)"
   artifacts:
     - path: "apps/backend/scripts/seed.ts"
       provides: "Idempotent seed (NestFactory.createApplicationContext)"
@@ -191,8 +192,8 @@ Seed contract:
        - `addParametro(usuarioId, tipoObjeto, dto)` siguiendo §Code Examples 3 RESEARCH (atomic con guarda `$ne`).
     6) `esquemas/esquemas.service.ts`:
        - `getByTipo(usuarioId, tipoObjeto)` → si no encuentra, throw `NotFoundError('esquema', tipoObjeto)`.
-       - `addParametro(usuarioId, tipoObjeto, dto)` → llama repo; si retorna `null` Y existe el esquema, comprueba si el `nombre` ya existe con otro `tipoDato` → throw `ConflictError(\`Parametro ${nombre} ya existe con tipoDato distinto\`)`. Si existe con mismo `tipoDato` → idempotente, retorna el esquema actual (200).
-       - `deleteParametro(usuarioId, tipoObjeto, nombre)` → throw `new HttpException('Not Implemented (post-MVP F-095)', 501)` o (mejor, manteniendo coherencia con DomainError) crear `NotImplementedError extends DomainError {code='NOT_IMPLEMENTED', httpStatus=501}` en `common/errors/not-implemented.error.ts` y exportar. Usar éste.
+       - `addParametro(usuarioId, tipoObjeto, dto)` → llama repo; si retorna `null` Y existe el esquema, comprueba si el `nombre` ya existe con otro `tipoDato` → throw `ConflictError(\`Parameter ${nombre} already exists with different tipoDato\`)` (mensaje en inglés, coherente con §14 ARQUITECTURA y con el shape de DomainError de 02-02). Si existe con mismo `tipoDato` → idempotente, retorna el esquema actual (200).
+       - `deleteParametro(usuarioId, tipoObjeto, nombre)` → throw `new NotImplementedError('Not Implemented (post-MVP F-095)')`. Crear `NotImplementedError extends DomainError {code='NOT_IMPLEMENTED', httpStatus=501}` en `common/errors/not-implemented.error.ts` y exportar desde `errors/index.ts`.
     7) `esquemas/esquemas.controller.ts`:
        ```ts
        @UseGuards(JwtAuthGuard)
@@ -200,7 +201,7 @@ Seed contract:
        export class EsquemasController {
          @Get(':tipoObjeto')
          get(@Param('tipoObjeto') tipo: string, @CurrentUser('id') uid: string) {
-           const validated = TipoObjetoSchema.parse(tipo); // throws ZodError → 400
+           const validated = TipoObjetoSchema.parse(tipo); // throws ZodError → handle
            return this.service.getByTipo(uid, validated);
          }
          @Post(':tipoObjeto/parametros')
@@ -209,17 +210,24 @@ Seed contract:
          delete(...) { return this.service.deleteParametro(...); } // → 501
        }
        ```
-       Considerar usar `nestjs-zod` `ZodValidationPipe` también en `@Param` (con custom param pipe) — alternativa simple: `TipoObjetoSchema.parse()` dentro del handler y dejar que el filter de Zod (de nestjs-zod) capture. Si el filter de Zod no captura ZodError fuera de DTO, transformar en `ValidationError` de dominio.
+       **Pin (decisión cerrada):** Validar `tipoObjeto` con `TipoObjetoSchema.parse()` **dentro del handler** y traducir `ZodError` capturado a `ValidationError` del módulo `common/errors` (so que el `DomainExceptionFilter` global de 02-02 lo mapee a 400 con `{code:'VALIDATION', message}`). NO confiar en que el filter de `nestjs-zod` capture ZodError fuera de DTOs.
     8) `esquemas/esquemas.module.ts`: registra MongooseModule.forFeature, controller, service, repository. Exporta `EsquemasService` y `EsquemasRepository` (el seed los consume).
     9) `app.module.ts`: importar `EsquemasModule`.
     10) Aplicar `@Audited('esquema', 'create')` al método `addParametro` del controller (para registrar adiciones en auditoría usando el interceptor del Plan 02-03). Importar `AuditInterceptor` y `@UseInterceptors(AuditInterceptor)` a nivel controller.
     11) `test/esquemas/esquemas.e2e-spec.ts`: helper login + bearer; tests:
         - GET tras seed manual del esquema (preparar en `beforeAll`) → 200 + `{tipoObjeto:'expediente', parametros:[]}`.
         - POST `{nombre:'honorariosBase', tipoDato:'numero'}` → 200 + parametros.length === 1.
+        - **Cierre del bucle de auditoría:** tras el POST anterior, esperar a que `setImmediate` complete (`await new Promise(r => setImmediate(r))` o pequeño `setTimeout`) y consultar la colección `auditoria` directamente (vía `app.get(getModelToken('Auditoria'))` o conexión mongoose nativa). Asertar:
+          ```ts
+          const auditDoc = await AuditoriaModel.findOne({ recurso: 'esquema' }).sort({ timestamp: -1 });
+          expect(auditDoc).toBeTruthy();
+          expect(auditDoc.accion).toBe('create');
+          expect(auditDoc.recurso).toBe('esquema');
+          ```
         - POST mismo body → idempotente, parametros.length sigue siendo 1.
-        - POST `{nombre:'honorariosBase', tipoDato:'texto'}` (mismo nombre, tipo distinto) → 409 + `code: 'CONFLICT'`.
-        - GET `/esquemas/factura` (no en enum) → 400.
-        - DELETE `/esquemas/expediente/parametros/honorariosBase` → 501.
+        - POST `{nombre:'honorariosBase', tipoDato:'texto'}` (mismo nombre, tipo distinto) → 409 + `code: 'CONFLICT'` + `message` matching `/already exists with different tipoDato/`.
+        - GET `/esquemas/factura` (no en enum) → 400 + `code:'VALIDATION'`.
+        - DELETE `/esquemas/expediente/parametros/honorariosBase` → 501 + `code:'NOT_IMPLEMENTED'`.
         - Sin Bearer → 401.
   </action>
   <verify>
@@ -232,11 +240,16 @@ Seed contract:
     - `grep -q "\\$addToSet" apps/backend/src/modules/esquemas/esquemas.repository.ts` exits 0.
     - `grep -q "JwtAuthGuard" apps/backend/src/modules/esquemas/esquemas.controller.ts` exits 0.
     - `grep -q "501" apps/backend/src/common/errors/not-implemented.error.ts` exits 0.
+    - `grep -q "TipoObjetoSchema.parse" apps/backend/src/modules/esquemas/esquemas.controller.ts` exits 0.
+    - `grep -q "ValidationError" apps/backend/src/modules/esquemas/esquemas.controller.ts` exits 0 (traducción ZodError → DomainError).
+    - `grep -q "already exists with different tipoDato" apps/backend/src/modules/esquemas/esquemas.service.ts` exits 0 (mensaje en inglés).
+    - `! grep -q "ya existe con tipoDato" apps/backend/src/modules/esquemas/esquemas.service.ts` (mensaje español NO debe quedar).
     - `grep -RIn "softDeletePlugin" apps/backend/src/modules/esquemas/` returns NO matches.
-    - `pnpm --filter backend test:e2e -- esquemas` shows 7+ passing tests, 0 failures.
+    - `apps/backend/test/esquemas/esquemas.e2e-spec.ts` contains `expect(auditDoc.accion).toBe('create')` (literal grep).
+    - `pnpm --filter backend test:e2e -- esquemas` shows 8+ passing tests, 0 failures.
   </acceptance_criteria>
   <done>
-    AUTH-08 cumplido. CRUD operativo con idempotencia (`$addToSet`), validación enum, errores tipados (404/400/409/501).
+    AUTH-08 cumplido. CRUD operativo con idempotencia (`$addToSet`), validación enum vía `TipoObjetoSchema.parse`, errores tipados (404/400/409/501), bucle de auditoría cerrado y verificado e2e.
   </done>
 </task>
 
@@ -394,6 +407,9 @@ Seed contract:
        fi
        ```
        `chmod +x` mediante `git update-index --chmod=+x` o documentar en README. (En Windows el agente no puede chmod fácilmente — añadir nota en README "tras `git pull` ejecutar `chmod +x infra/scripts/backup-daily.sh` en el NAS").
+
+       **Nota OS / matriz de ejecución (documentar en `infra/scripts/README.md`):**
+       > "Producción: NAS Linux con cron diario; Dev (Windows): `bash -n` y `--dry-run` validan sintaxis y flujo en Git-Bash; el script no se ejecuta en CI (requiere docker compose en host + rclone con OAuth real)."
     2) `infra/scripts/rclone.conf.example`:
        ```
        # Plantilla rclone — copiar a /etc/rclone/rclone.conf en el NAS y completar con `rclone config`
@@ -415,7 +431,11 @@ Seed contract:
        endpoint = http://minio:9000
        acl = private
        ```
-    3) `infra/scripts/README.md`: procedimiento corto pero ejecutable:
+    3) `infra/scripts/README.md`: procedimiento corto pero ejecutable. **Debe incluir explícitamente la sección "Matriz de ejecución por entorno"** con el siguiente texto literal (para que la verificación post-execute pueda greparlo):
+
+       > **Matriz de ejecución por entorno:** "Producción: NAS Linux con cron diario; Dev (Windows): bash -n y --dry-run validan en Git-Bash; el script no se ejecuta en CI."
+
+       Resto del README:
        - Pre-requisitos: rclone ≥ 1.66 instalado en NAS; acceso SSH; cuenta Google Drive del despacho.
        - Pasos:
          1. `cp infra/scripts/rclone.conf.example /etc/rclone/rclone.conf`
@@ -447,18 +467,20 @@ Seed contract:
     - `grep -q "mtime" infra/scripts/backup-daily.sh` exits 0 (retención local).
     - `grep -q "rclone config" infra/scripts/README.md` exits 0.
     - `grep -q "crontab" infra/scripts/README.md` exits 0.
+    - `grep -q "Matriz de ejecución" infra/scripts/README.md` exits 0 (nota OS dev/prod/CI presente).
+    - `grep -q "no se ejecuta en CI" infra/scripts/README.md` exits 0.
     - `grep -q "scope = drive" infra/scripts/rclone.conf.example` exits 0.
     - `grep -RIn "client_secret\|access_key_id.*=.*[A-Z0-9]\{16\}" infra/scripts/rclone.conf.example` returns NO real secrets (only placeholders/env vars).
   </acceptance_criteria>
   <done>
-    INF-06 cumplido a nivel script + procedimiento. Verificación end-to-end (Drive real) requiere acción manual del operador del NAS — documentada en `Pending Todos` post-fase.
+    INF-06 cumplido a nivel script + procedimiento. Verificación end-to-end (Drive real) requiere acción manual del operador del NAS — documentada en `Pending Todos` post-fase y registrada como "Known gap" en el SUMMARY.
   </done>
 </task>
 
 </tasks>
 
 <verification>
-1. `pnpm --filter backend test && pnpm --filter backend test:e2e` — todo verde (incluye seed + esquemas).
+1. `pnpm --filter backend test && pnpm --filter backend test:e2e` — todo verde (incluye seed + esquemas + cierre del bucle de auditoría).
 2. `pnpm seed` (con .env y Mongo levantado vía docker-compose) crea 1 usuario y 2 esquemas; segunda ejecución no duplica.
 3. `bash infra/scripts/backup-daily.sh --dry-run` ejecuta sin error.
 4. Documentar en SUMMARY que la verificación end-to-end de INF-06 (subida real a Drive) requiere paso manual del operador en NAS.
@@ -466,13 +488,18 @@ Seed contract:
 
 <success_criteria>
 - AUTH-05: `pnpm seed` idempotente, password no se sobrescribe.
-- AUTH-08: GET/POST/DELETE de `/api/v1/esquemas/:tipoObjeto` operativos con validación enum + idempotencia + error tipado en conflicto + 501 en delete.
+- AUTH-08: GET/POST/DELETE de `/api/v1/esquemas/:tipoObjeto` operativos con validación enum (Zod parse + traducción a `ValidationError`) + idempotencia + error tipado en conflicto + 501 en delete + auditoría verificada e2e.
 - INF-06: script de backup con retención + dry-run + procedimiento de instalación cron en NAS.
 - Suite backend completa verde tras los 3 tasks.
 </success_criteria>
 
 <output>
 After completion, create `.planning/phases/02-auth-y-bases-transversales/02-04-SUMMARY.md`.
+
+**SUMMARY MUST include the following lines verbatim:**
+
+> **Known gap (INF-06):** "Real-Drive verification deferred to operator manual step per VALIDATION.md (rclone OAuth not testable in CI)."
+
 Add to STATE.md `Pending Todos`:
 - "User must run `rclone config` on NAS and configure `gdrive` remote (see `infra/scripts/README.md`)"
 - "User must install backup-daily.sh in cron of NAS (see `infra/scripts/README.md` step 7)"

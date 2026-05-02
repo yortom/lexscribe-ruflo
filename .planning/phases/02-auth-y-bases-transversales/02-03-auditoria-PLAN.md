@@ -50,8 +50,8 @@ must_haves:
       pattern: "writeAsync"
     - from: "apps/backend/src/modules/auth/auth.service.ts"
       to: "EventEmitter2.emit('auth.login'|'auth.logout')"
-      via: "this.events.emit(...)"
-      pattern: "events\\.emit\\('auth\\."
+      via: "this.eventEmitter.emit(...)"
+      pattern: "eventEmitter\\.emit\\('auth\\."
     - from: "apps/backend/src/modules/auditoria/listeners/audit.listener.ts"
       to: "auditoria.service.writeAsync"
       via: "@OnEvent('*.linked'|'*.unlinked'|'*.generated'|'auth.*')"
@@ -291,9 +291,9 @@ Convención de nombre: `<recurso>.<verbo_pasado>`. Ej: `expediente.contacto.link
        Convención del payload: estandarizada en este listener. Quien emita debe seguirla — documentar en JSDoc del listener.
     4) Registrar `AuditListener` como provider en `auditoria.module.ts`.
     5) Refactor `auth/auth.service.ts`:
-       - Inyectar `EventEmitter2`.
-       - En `login(...)` tras éxito: `this.events.emit('auth.login', {usuarioId: user._id.toString(), recurso: 'usuario', recursoId: user._id.toString(), contexto: null, ip, userAgent})`.
-       - En `logout(...)` tras éxito: `this.events.emit('auth.logout', {usuarioId, recurso: 'usuario', recursoId: usuarioId, contexto: null, ip, userAgent})`.
+       - **Modificar el constructor de `AuthService`** (creado en 02-01) **para inyectar** `private readonly eventEmitter: EventEmitter2` (de `@nestjs/event-emitter`) y emitir `auth.login` / `auth.logout` desde los métodos `login()` y `logout()`.
+       - En `login(...)` tras éxito: `this.eventEmitter.emit('auth.login', {usuarioId: user._id.toString(), recurso: 'usuario', recursoId: user._id.toString(), contexto: null, ip, userAgent})`.
+       - En `logout(...)` tras éxito: `this.eventEmitter.emit('auth.logout', {usuarioId, recurso: 'usuario', recursoId: usuarioId, contexto: null, ip, userAgent})`.
        - Pasar `ip` y `userAgent` desde el controller (extender la firma del método si fuera necesario; actualizar el controller para pasar `req.ip`, `req.headers['user-agent']`).
        - NO emitir en refresh (decisión: solo login/logout cuentan como eventos auditables explícitos — refresh es operacional).
     6) Tests:
@@ -309,6 +309,7 @@ Convención de nombre: `<recurso>.<verbo_pasado>`. Ej: `expediente.contacto.link
     - `grep -q "tap(" apps/backend/src/modules/auditoria/interceptors/audit.interceptor.ts` exits 0.
     - `grep -q "deep-object-diff" apps/backend/src/modules/auditoria/interceptors/audit.interceptor.ts` exits 0.
     - `grep -q "@OnEvent" apps/backend/src/modules/auditoria/listeners/audit.listener.ts` exits 0 with at least 5 matches.
+    - `grep -q "eventEmitter: EventEmitter2" apps/backend/src/modules/auth/auth.service.ts` exits 0 (inyección explícita en el constructor).
     - `grep -q "auth.login" apps/backend/src/modules/auth/auth.service.ts` exits 0.
     - `grep -q "auth.logout" apps/backend/src/modules/auth/auth.service.ts` exits 0.
     - All 3 audit test files pass.

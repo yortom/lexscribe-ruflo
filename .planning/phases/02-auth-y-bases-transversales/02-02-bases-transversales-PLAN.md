@@ -24,6 +24,7 @@ requirements:
 
 must_haves:
   truths:
+    - "El plugin `softDeletePlugin` existe, exporta `softDeletePlugin`, tiene tests unitarios que prueban que el filtro de query excluye `activo:false` por defecto y admite `?incluirInactivos=true` (vía `setOptions({withInactive:true})`). Primera aplicación a colección de negocio se difiere a Phase 3 (contactos)."
     - "Aplicar `softDeletePlugin` a un schema añade `activo` y `fechaInactivacion` y filtra `activo:false` por defecto en find/findOne/count/update"
     - "Pasando `query.setOptions({withInactive:true})` la query incluye los inactivos"
     - "`softDelete(filter)` marca `activo:false` y setea `fechaInactivacion` (no borra físicamente)"
@@ -58,8 +59,10 @@ Cementar las 3 bases transversales que toda colección/endpoint posterior asumir
 2. **ZodValidationPipe global** (vía `nestjs-zod`) — `.strict()` en todos los DTOs.
 3. **ExceptionFilter global** mapeando `DomainError` tipados → HTTP.
 
-Purpose: Garantizar que las fases 3-7 no tengan que reinventar borrado lógico, validación ni traducción de errores. Cumple AUTH-06.
+Purpose: Garantizar que las fases 3-7 no tengan que reinventar borrado lógico, validación ni traducción de errores. Cumple AUTH-06 (plugin disponible + unit-tested; primera aplicación a colección de negocio queda diferida a Phase 3 — `contactos`).
 Output: Plugin testeado + filter global activo + AuthService reescrito sobre `UnauthorizedError` (en lugar de las excepciones genéricas que metimos en 02-01).
+
+> **Nota AUTH-06 reconciliada:** En Phase 2 el plugin se entrega disponible y unit-tested. La primera aplicación productiva ocurre en Phase 3 (módulo `contactos`), donde se aplicará al schema y se verificará el filtrado por defecto end-to-end. El SUMMARY de este plan debe dejar esto explícito para evitar ambigüedad en la verificación cruzada.
 </objective>
 
 <execution_context>
@@ -216,7 +219,7 @@ Soft-delete plugin contract:
        app.useGlobalFilters(new DomainExceptionFilter());
        ```
        Verificar orden: `cookieParser` → `setGlobalPrefix('api/v1')` → `useGlobalPipes` → `useGlobalFilters` → `listen`.
-    6) Refactor `auth/auth.service.ts`: sustituir cualquier `throw new UnauthorizedException(...)` (Nest) por `throw new UnauthorizedError(...)` del módulo de errores. Verificar que las suites e2e de Plan 02-01 siguen pasando (el body cambia de `{statusCode, message}` a `{code, message}` — actualizar las aserciones de los e2e para que esperen `{code:'UNAUTHORIZED'}`).
+    6) Refactor `auth/auth.service.ts`: sustituir cualquier `throw new UnauthorizedException(...)` (Nest) por `throw new UnauthorizedError(...)` del módulo de errores. Verificar que las suites e2e de Plan 02-01 siguen pasando (el body cambia de `{statusCode, message}` a `{code, message}` — actualizar las aserciones de los e2e para que esperen `{code:'UNAUTHORIZED'}`). **Stale-assertion guard:** ningún test bajo `apps/backend/test/auth/` debe seguir aseverando sobre `statusCode` (la verificación lo enforza con un grep).
     7) `test/common/domain-exception.filter.spec.ts` (unit): construir un `Test.createTestingModule` con un controller dummy que tira las 4 excepciones, montar la app con el filter, hacer 4 supertest requests, asertar status + body.
     8) `test/common/zod-validation.e2e-spec.ts`: usa la app full montada, hace login con body `extraField` y body con email inválido, asserta 400.
     9) Documentar en `apps/backend/src/common/errors/index.ts` un comentario JSDoc 1 línea por cada error con su HTTP code, para fases siguientes.
@@ -231,6 +234,7 @@ Soft-delete plugin contract:
     - `grep -q "DomainExceptionFilter" apps/backend/src/main.ts` exits 0.
     - `grep -q "UnauthorizedError" apps/backend/src/modules/auth/auth.service.ts` exits 0.
     - `grep -RIn "UnauthorizedException" apps/backend/src/modules/auth/` returns NO matches (refactor completo).
+    - `! grep -RIn "statusCode" apps/backend/test/auth/` returns 0 matches (stale-assertion guard tras refactor de body shape).
     - `pnpm --filter backend test:e2e` (full backend e2e) all green.
     - Body shape de un error: capturado en test contiene EXACTAMENTE keys `code` y `message`, sin `stack` ni `statusCode`.
   </acceptance_criteria>
@@ -248,7 +252,7 @@ Soft-delete plugin contract:
 </verification>
 
 <success_criteria>
-- AUTH-06: plugin disponible (no aplicado aún a colecciones de negocio — fases 3+ lo aplicarán).
+- AUTH-06: plugin disponible + unit-tested (no aplicado aún a colecciones de negocio — primera aplicación productiva en Phase 3 / `contactos`). Esto se documenta explícitamente en el SUMMARY.
 - ZodValidationPipe global activo y `.strict()` rechaza props extra en `LoginDto`.
 - DomainExceptionFilter global activo; AuthService usa errores tipados.
 - Suite backend completa verde (`test` + `test:e2e`).
@@ -256,4 +260,7 @@ Soft-delete plugin contract:
 
 <output>
 After completion, create `.planning/phases/02-auth-y-bases-transversales/02-02-SUMMARY.md`.
+
+**SUMMARY MUST include the following note verbatim under "AUTH-06 status":**
+> "AUTH-06: Plugin `softDeletePlugin` implementado, exportado desde `apps/backend/src/common/plugins/soft-delete.plugin.ts`, unit-tested (6 aserciones cubriendo filter por defecto, escape hatch `withInactive`, marca `fechaInactivacion`). NO aplicado aún a ningún schema de negocio en este plan — la primera aplicación productiva ocurre en Phase 3 (módulo `contactos`), donde el filtrado se verifica end-to-end."
 </output>

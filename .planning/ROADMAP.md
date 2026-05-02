@@ -54,8 +54,8 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 02-01-auth-jwt-refresh-PLAN.md — Módulo auth NestJS (Wave 0 setup, usuarios+refresh tokens, JWT+rotación, @CurrentUser, login UI Next.js)
-- [ ] 02-02-bases-transversales-PLAN.md — Soft-delete plugin Mongoose, ZodValidationPipe global, DomainExceptionFilter con errores tipados
+- [x] 02-01-auth-jwt-refresh-PLAN.md — Módulo auth NestJS (Wave 0 setup, usuarios+refresh tokens, JWT+rotación, @CurrentUser, login UI Next.js) — Completed 2026-05-02
+- [x] 02-02-bases-transversales-PLAN.md — Soft-delete plugin Mongoose, ZodValidationPipe global, DomainExceptionFilter con errores tipados — Completed 2026-05-02
 - [ ] 02-03-auditoria-PLAN.md — Auditoría híbrida: AuditInterceptor + EventEmitter listeners + auth.login/logout events
 - [ ] 02-04-seed-esquemas-backup-PLAN.md — Módulo esquemas (CRUD) + pnpm seed idempotente + rclone backup-daily.sh
 
@@ -179,7 +179,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
-| 2. Auth y bases transversales | 0/4 | Not started | - |
+| 2. Auth y bases transversales | 1/4 | In progress | - |
 | 3. Contactos | 0/3 | Not started | - |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
 | 5. Plantillas y Editor | 0/4 | Not started | - |

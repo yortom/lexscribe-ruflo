@@ -11,7 +11,7 @@
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde — Completed 2026-04-27
-- [ ] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup
+- [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
 - [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
 - [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
 - [ ] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
@@ -56,8 +56,8 @@ Plans:
 Plans:
 - [x] 02-01-auth-jwt-refresh-PLAN.md — Módulo auth NestJS (Wave 0 setup, usuarios+refresh tokens, JWT+rotación, @CurrentUser, login UI Next.js) — Completed 2026-05-02
 - [x] 02-02-bases-transversales-PLAN.md — Soft-delete plugin Mongoose, ZodValidationPipe global, DomainExceptionFilter con errores tipados — Completed 2026-05-02
-- [x] 02-03-auditoria-PLAN.md — Auditoría híbrida: AuditInterceptor + EventEmitter listeners + auth.login/logout events
-- [ ] 02-04-seed-esquemas-backup-PLAN.md — Módulo esquemas (CRUD) + pnpm seed idempotente + rclone backup-daily.sh
+- [x] 02-03-auditoria-PLAN.md — Auditoría híbrida: AuditInterceptor + EventEmitter listeners + auth.login/logout events — Completed 2026-05-02
+- [x] 02-04-seed-esquemas-backup-PLAN.md — Módulo esquemas (CRUD) + pnpm seed idempotente + rclone backup-daily.sh — Completed 2026-05-02
 
 ### Phase 3: Contactos
 **Goal**: El usuario puede gestionar la base de contactos completa con sus parámetros personalizados.

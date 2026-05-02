@@ -62,7 +62,9 @@ export class AuthController {
       'refresh_token'
     ];
     if (plainToken) {
-      await this.auth.logout(plainToken);
+      const ip = req.ip ?? null;
+      const userAgent = req.headers['user-agent'] ?? null;
+      await this.auth.logout(plainToken, ip, userAgent);
     }
     this.auth.clearRefreshCookie(res);
   }

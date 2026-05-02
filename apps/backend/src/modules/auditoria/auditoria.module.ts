@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Auditoria, AuditoriaSchema } from './schemas/auditoria.schema';
 import { AuditoriaRepository } from './auditoria.repository';
 import { AuditoriaService } from './auditoria.service';
+import { AuditListener } from './listeners/audit.listener';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
 
 @Module({
   imports: [
@@ -10,7 +12,7 @@ import { AuditoriaService } from './auditoria.service';
       { name: Auditoria.name, schema: AuditoriaSchema },
     ]),
   ],
-  providers: [AuditoriaRepository, AuditoriaService],
-  exports: [AuditoriaService],
+  providers: [AuditoriaRepository, AuditoriaService, AuditListener, AuditInterceptor],
+  exports: [AuditoriaService, AuditInterceptor],
 })
 export class AuditoriaModule {}

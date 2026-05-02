@@ -1,15 +1,13 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 import type { Response } from 'express';
 import { UsuariosRepository } from '../usuarios/usuarios.repository';
 import { UsuarioDocument } from '../usuarios/schemas/usuario.schema';
 import { LoginDto } from './dto/login.dto';
+import { UnauthorizedError } from '../../common/errors';
 
 /**
  * Refresh token format: `<userId>:<64-char-random-hex>`
@@ -23,6 +21,7 @@ export class AuthService {
   constructor(
     private readonly usuarios: UsuariosRepository,
     private readonly jwt: JwtService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async login(
@@ -37,12 +36,12 @@ export class AuthService {
   }> {
     const user = await this.usuarios.findByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
     const ok = await argon2.verify(user.passwordHash, dto.password);
     if (!ok) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
     const accessToken = await this.jwt.signAsync(
@@ -63,11 +62,21 @@ export class AuthService {
       userAgent,
     });
 
+    const usuarioId = user._id.toString();
+    this.eventEmitter.emit('auth.login', {
+      usuarioId,
+      recurso: 'usuario',
+      recursoId: usuarioId,
+      contexto: null,
+      ip,
+      userAgent,
+    });
+
     return {
       accessToken,
       refreshPlain,
       expiresIn: 900,
-      user: { id: user._id.toString(), email: user.email, nombre: user.nombre },
+      user: { id: usuarioId, email: user.email, nombre: user.nombre },
     };
   }
 
@@ -79,13 +88,13 @@ export class AuthService {
     const userId = this._extractUserIdFromToken(plainToken);
 
     if (!userId) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     // Find user by ID from token prefix
     const user = await this.usuarios.findById(userId);
     if (!user) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     // Find matching token hash in user's refreshTokens
@@ -98,13 +107,13 @@ export class AuthService {
       this.logger.warn(
         `auth.refresh.reused userId=${user._id.toString()} ip=${ip}`,
       );
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     // Check expiry
     if (matchedToken.expiresAt < new Date()) {
       await this.usuarios.clearAllRefreshTokens(user._id);
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     // Generate new refresh token
@@ -129,7 +138,7 @@ export class AuthService {
     if (!rotated) {
       // Concurrent request already rotated this token
       await this.usuarios.clearAllRefreshTokens(user._id);
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     const accessToken = await this.jwt.signAsync(
@@ -140,7 +149,11 @@ export class AuthService {
     return { accessToken, refreshPlain: newRefreshPlain, expiresIn: 900 };
   }
 
-  async logout(plainToken: string): Promise<void> {
+  async logout(
+    plainToken: string,
+    ip?: string | null,
+    userAgent?: string | null,
+  ): Promise<void> {
     const userId = this._extractUserIdFromToken(plainToken);
     if (!userId) return;
 
@@ -151,6 +164,15 @@ export class AuthService {
     if (matchedToken) {
       await this.usuarios.pullRefreshToken(user._id, matchedToken.tokenHash);
     }
+
+    this.eventEmitter.emit('auth.logout', {
+      usuarioId: userId,
+      recurso: 'usuario',
+      recursoId: userId,
+      contexto: null,
+      ip: ip ?? null,
+      userAgent: userAgent ?? null,
+    });
     // Silently succeed even if token not found
   }
 

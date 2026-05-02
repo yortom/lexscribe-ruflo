@@ -8,6 +8,7 @@ import { AppModule } from '../../src/app.module';
 import { getModelToken } from '@nestjs/mongoose';
 import { Usuario } from '../../src/modules/usuarios/schemas/usuario.schema';
 import { Model } from 'mongoose';
+import { DomainExceptionFilter } from '../../src/common/filters/domain-exception.filter';
 
 describe('AUTH-01 login', () => {
   let app: INestApplication;
@@ -21,6 +22,7 @@ describe('AUTH-01 login', () => {
     app = moduleRef.createNestApplication();
     app.use(cookieParser());
     app.useGlobalPipes(new ZodValidationPipe());
+    app.useGlobalFilters(new DomainExceptionFilter());
     app.setGlobalPrefix('api/v1');
     await app.init();
 

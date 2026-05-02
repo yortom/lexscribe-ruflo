@@ -105,4 +105,11 @@ export class UsuariosRepository {
       )
       .exec();
   }
+
+  findAllWithRefreshTokens(): Promise<UsuarioDocument[]> {
+    return this.model
+      .find({})
+      .select('_id email nombre refreshTokens')
+      .exec();
+  }
 }

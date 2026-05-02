@@ -13,7 +13,8 @@
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "type-check": "pnpm -r run type-check",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "seed": "pnpm --filter backend seed"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

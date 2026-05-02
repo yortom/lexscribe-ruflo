@@ -14,10 +14,10 @@ class RefreshToken {
   @Prop({ default: () => new Date() })
   createdAt!: Date;
 
-  @Prop({ default: null })
+  @Prop({ type: String, default: null })
   ip!: string | null;
 
-  @Prop({ default: null })
+  @Prop({ type: String, default: null })
   userAgent!: string | null;
 }
 
@@ -42,7 +42,13 @@ export class Usuario {
   passwordHash!: string;
 
   @Prop({ type: [RefreshTokenSchema], default: [] })
-  refreshTokens!: RefreshToken[];
+  refreshTokens!: Array<{
+    tokenHash: string;
+    expiresAt: Date;
+    createdAt: Date;
+    ip: string | null;
+    userAgent: string | null;
+  }>;
 
   fechaCreacion!: Date;
   fechaActualizacion!: Date;

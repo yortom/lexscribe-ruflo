@@ -60,12 +60,13 @@ export class UsuariosRepository {
       .exec();
   }
 
-  rotateRefreshToken(
+  async rotateRefreshToken(
     userId: string | Types.ObjectId,
     oldTokenHash: string,
     newToken: RotateRefreshTokenInput,
   ): Promise<UsuarioDocument | null> {
-    return this.model
+    // Step 1: Pull old token atomically (filter ensures token exists)
+    const pulled = await this.model
       .findOneAndUpdate(
         {
           _id: userId,
@@ -73,6 +74,21 @@ export class UsuariosRepository {
         },
         {
           $pull: { refreshTokens: { tokenHash: oldTokenHash } } as any,
+        },
+        { returnDocument: 'after' },
+      )
+      .exec();
+
+    if (!pulled) {
+      // Token not found — already rotated or never existed
+      return null;
+    }
+
+    // Step 2: Push new token
+    return this.model
+      .findByIdAndUpdate(
+        userId,
+        {
           $push: {
             refreshTokens: {
               ...newToken,
@@ -80,7 +96,7 @@ export class UsuariosRepository {
             },
           },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
   }

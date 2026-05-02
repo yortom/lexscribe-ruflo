@@ -11,6 +11,11 @@ import { UsuariosRepository } from '../usuarios/usuarios.repository';
 import { UsuarioDocument } from '../usuarios/schemas/usuario.schema';
 import { LoginDto } from './dto/login.dto';
 
+/**
+ * Refresh token format: `<userId>:<64-char-random-hex>`
+ * Encoding the userId allows reuse detection even after the token is rotated.
+ */
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -45,7 +50,7 @@ export class AuthService {
       { expiresIn: '15m' },
     );
 
-    const refreshPlain = randomBytes(32).toString('hex');
+    const refreshPlain = this._generateRefreshToken(user._id.toString());
     const refreshHash = await argon2.hash(refreshPlain, {
       type: argon2.argon2id,
     });
@@ -71,32 +76,48 @@ export class AuthService {
     ip: string | null,
     userAgent: string | null,
   ): Promise<{ accessToken: string; refreshPlain: string; expiresIn: number }> {
-    const result = await this._findUserByRefreshToken(plainToken);
+    const userId = this._extractUserIdFromToken(plainToken);
 
-    if (!result) {
+    if (!userId) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const { user, matchedHash } = result;
+    // Find user by ID from token prefix
+    const user = await this.usuarios.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    // Find matching token hash in user's refreshTokens
+    const matchedToken = await this._findMatchingToken(user, plainToken);
+
+    if (!matchedToken) {
+      // Token not found — could be a reuse attack (token already rotated)
+      // Clear all tokens as a security measure
+      await this.usuarios.clearAllRefreshTokens(user._id);
+      this.logger.warn(
+        `auth.refresh.reused userId=${user._id.toString()} ip=${ip}`,
+      );
+      throw new UnauthorizedException('Invalid refresh token');
+    }
 
     // Check expiry
-    const token = user.refreshTokens.find((t) => t.tokenHash === matchedHash);
-    if (!token || token.expiresAt < new Date()) {
+    if (matchedToken.expiresAt < new Date()) {
       await this.usuarios.clearAllRefreshTokens(user._id);
       throw new UnauthorizedException('Invalid refresh token');
     }
 
     // Generate new refresh token
-    const newRefreshPlain = randomBytes(32).toString('hex');
+    const newRefreshPlain = this._generateRefreshToken(user._id.toString());
     const newRefreshHash = await argon2.hash(newRefreshPlain, {
       type: argon2.argon2id,
     });
     const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // Atomic rotate: $pull old + $push new in one operation
+    // Atomic rotate: $pull old + $push new in separate operations
     const rotated = await this.usuarios.rotateRefreshToken(
       user._id,
-      matchedHash,
+      matchedToken.tokenHash,
       {
         tokenHash: newRefreshHash,
         expiresAt: newExpiresAt,
@@ -106,11 +127,8 @@ export class AuthService {
     );
 
     if (!rotated) {
-      // Token was already rotated (race condition or reuse attack) — invalidate all
+      // Concurrent request already rotated this token
       await this.usuarios.clearAllRefreshTokens(user._id);
-      this.logger.warn(
-        `auth.refresh.reused userId=${user._id.toString()} ip=${ip}`,
-      );
       throw new UnauthorizedException('Invalid refresh token');
     }
 
@@ -123,9 +141,15 @@ export class AuthService {
   }
 
   async logout(plainToken: string): Promise<void> {
-    const result = await this._findUserByRefreshToken(plainToken);
-    if (result) {
-      await this.usuarios.pullRefreshToken(result.user._id, result.matchedHash);
+    const userId = this._extractUserIdFromToken(plainToken);
+    if (!userId) return;
+
+    const user = await this.usuarios.findById(userId);
+    if (!user) return;
+
+    const matchedToken = await this._findMatchingToken(user, plainToken);
+    if (matchedToken) {
+      await this.usuarios.pullRefreshToken(user._id, matchedToken.tokenHash);
     }
     // Silently succeed even if token not found
   }
@@ -150,24 +174,44 @@ export class AuthService {
   }
 
   /**
-   * Finds a user by iterating their refreshTokens and checking argon2.verify.
-   * For mono-usuario MVP this is acceptably efficient (1 user, ≤ ~10 tokens).
+   * Generate a refresh token with userId prefix for reuse detection.
+   * Format: `<userId>:<64-char-random-hex>`
    */
-  private async _findUserByRefreshToken(
-    plainToken: string,
-  ): Promise<{ user: UsuarioDocument; matchedHash: string } | null> {
-    const users = await this.usuarios.findAllWithRefreshTokens();
+  private _generateRefreshToken(userId: string): string {
+    const random = randomBytes(32).toString('hex');
+    return `${userId}:${random}`;
+  }
 
-    for (const user of users) {
-      for (const rt of user.refreshTokens) {
-        try {
-          const match = await argon2.verify(rt.tokenHash, plainToken);
-          if (match) {
-            return { user, matchedHash: rt.tokenHash };
-          }
-        } catch {
-          // Invalid hash format — skip
+  /**
+   * Extract userId from token prefix.
+   */
+  private _extractUserIdFromToken(plainToken: string): string | null {
+    const colonIdx = plainToken.indexOf(':');
+    if (colonIdx <= 0) return null;
+    return plainToken.substring(0, colonIdx);
+  }
+
+  /**
+   * Find the matching token hash in a user's refreshTokens array.
+   */
+  private async _findMatchingToken(
+    user: UsuarioDocument,
+    plainToken: string,
+  ): Promise<{
+    tokenHash: string;
+    expiresAt: Date;
+    createdAt: Date;
+    ip: string | null;
+    userAgent: string | null;
+  } | null> {
+    for (const rt of user.refreshTokens) {
+      try {
+        const match = await argon2.verify(rt.tokenHash, plainToken);
+        if (match) {
+          return rt;
         }
+      } catch {
+        // Invalid hash format — skip
       }
     }
     return null;

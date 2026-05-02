@@ -25,7 +25,7 @@
 - [ ] **AUTH-04** — Toda petición autenticada inyecta automáticamente el `usuarioId` desde el JWT — ningún endpoint acepta `usuarioId` en el body. *(Arquitectura §9.2)*
 - [ ] **AUTH-05** — Un script de seed crea el usuario por defecto y los esquemas vacíos (`expediente`, `contacto`) de forma idempotente. *(Arquitectura §16)*
 - [ ] **AUTH-06** — Toda colección de negocio aplica soft-delete vía middleware Mongoose: las queries por defecto excluyen `activo: false`. *(Datos §2.3)*
-- [ ] **AUTH-07** — Toda operación `create`/`update`/`delete`/`link`/`unlink`/`generate`/`login`/`logout` queda registrada en la colección `auditoria` de forma asíncrona e inmutable. *(Arquitectura §18)*
+- [x] **AUTH-07** — Toda operación `create`/`update`/`delete`/`link`/`unlink`/`generate`/`login`/`logout` queda registrada en la colección `auditoria` de forma asíncrona e inmutable. *(Arquitectura §18)*
 - [ ] **AUTH-08** — Existe el módulo `esquemas` con endpoints CRUD por `tipoObjeto`. *(Cubre F-090, F-091, F-093, F-094, F-096)*
 
 ### Contactos (`CONT`)

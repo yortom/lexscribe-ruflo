@@ -67,7 +67,7 @@ export class ContactosRepository {
       .findOneAndUpdate(
         { _id: this.toObjectId(id), usuarioId: this.toObjectId(usuarioId) },
         { $set: data },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
   }
@@ -80,7 +80,7 @@ export class ContactosRepository {
       .findOneAndUpdate(
         { _id: this.toObjectId(id), usuarioId: this.toObjectId(usuarioId) },
         { $set: { activo: false, fechaInactivacion: new Date() } },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
   }

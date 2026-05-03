@@ -30,11 +30,11 @@
 
 ### Contactos (`CONT`)
 
-- [ ] **CONT-01** — El usuario puede crear contactos como persona física o jurídica con los atributos base (nombre/razón social, NIF/CIF, DNI, dirección, email, teléfono). *(F-050, F-051)*
-- [ ] **CONT-02** — Cada contacto tiene una tipología (`cliente`, `parte_contraria`, `interesado`, `otros`). *(F-052)*
-- [ ] **CONT-03** — El usuario puede añadir parámetros personalizados a un contacto, que se registran en el esquema dinámico del tipo `contacto`. *(F-051b, F-091)*
-- [ ] **CONT-04** — El usuario puede listar, filtrar y buscar contactos por nombre o documentación fiscal. *(F-055)*
-- [ ] **CONT-05** — Desde un contacto, el usuario puede ver en qué expedientes está vinculado. *(F-054)*
+- [x] **CONT-01** — El usuario puede crear contactos como persona física o jurídica con los atributos base (nombre/razón social, NIF/CIF, DNI, dirección, email, teléfono). *(F-050, F-051)*
+- [x] **CONT-02** — Cada contacto tiene una tipología (`cliente`, `parte_contraria`, `interesado`, `otros`). *(F-052)*
+- [x] **CONT-03** — El usuario puede añadir parámetros personalizados a un contacto, que se registran en el esquema dinámico del tipo `contacto`. *(F-051b, F-091)*
+- [x] **CONT-04** — El usuario puede listar, filtrar y buscar contactos por nombre o documentación fiscal. *(F-055)*
+- [x] **CONT-05** — Desde un contacto, el usuario puede ver en qué expedientes está vinculado. *(F-054)*
 
 ### Cláusulas (`CLAU`)
 

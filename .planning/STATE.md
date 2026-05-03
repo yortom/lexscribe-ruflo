@@ -2,31 +2,31 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 02 shipped — PR #1"
-last_updated: "2026-05-03T06:39:05.248Z"
+status: executing
+last_updated: "2026-05-03T19:33:00.096Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 12
+  completed_plans: 10
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 02 (auth-y-bases-transversales) — COMPLETE
-Plan: 4 of 4 — COMPLETE
+Phase: 03 (Contactos) — EXECUTING
+Plan: 2 of 3
 
 - **Milestone:** v1.0 MVP
 - **Phase:** 3
 - **Phase:** 2 — Complete (2026-05-02)
-- **Plan:** Not started
+- **Plan:** 03-01 — Complete (2026-05-03)
 - **Plan:** 02-02 — Complete (2026-05-02)
 - **Plan:** 02-03 — Complete (2026-05-02)
 - **Plan:** 02-04 — Complete (2026-05-02)
-- **Status:** Phase 02 shipped — PR #1
+- **Status:** Executing Phase 03
 - **Last activity:** 2026-05-03
 
 ## Accumulated Context
@@ -75,6 +75,9 @@ Plan: 4 of 4 — COMPLETE
 - **NotImplementedError (501)** — DomainError subclass for post-MVP features (F-095 delete parameter)
 - **runSeed() exported** — allows e2e test import without spawning subprocess; `process.exit` only in `require.main === module` branch
 - **backup-daily.sh --dry-run** — validates script syntax and flow without touching Drive; CI runs `bash -n` only
+- **ZodValidationPipe throws BadRequestException (not DomainError)** — Zod strict() errors return 400 without `code:VALIDATION` in body; DomainExceptionFilter only catches DomainError subclasses
+- **returnDocument:'after' instead of {new:true}** — Mongoose v9 deprecates `{new:true}` in findOneAndUpdate; all contactos repository calls use `returnDocument:'after'`
+- **FilterQuery removed in Mongoose v9** — use `Record<string,unknown>` or `QueryFilter<T>` for filter types in repositories
 
 ## Pending Todos / Blockers
 
@@ -96,6 +99,7 @@ Plan: 4 of 4 — COMPLETE
 | 02 | 02 | ~6min | 2 | 15 |
 | 02 | 03 | ~45min | 2 | 15 |
 | 02 | 04 | ~45min | 3 | 18 |
+| 03 | 01 | ~30min | 3 | 13 |
 
 ## Next Up
 

@@ -6,9 +6,9 @@ import {
   Res,
   HttpCode,
   HttpStatus,
-  UnauthorizedException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { UnauthorizedError } from '../../common/errors';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -43,7 +43,7 @@ export class AuthController {
       'refresh_token'
     ];
     if (!plainToken) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedError('Invalid refresh token');
     }
     const ip = req.ip ?? null;
     const userAgent = req.headers['user-agent'] ?? null;

@@ -13,10 +13,10 @@ export type EsquemaDocument = HydratedDocument<Esquema>;
 })
 export class Esquema {
   @Prop({ type: Types.ObjectId, ref: 'Usuario', required: true, index: true })
-  usuarioId: Types.ObjectId;
+  usuarioId!: Types.ObjectId;
 
   @Prop({ required: true, type: String, enum: ['expediente', 'contacto'] })
-  tipoObjeto: TipoObjeto;
+  tipoObjeto!: TipoObjeto;
 
   @Prop({
     type: [
@@ -33,7 +33,7 @@ export class Esquema {
     ],
     default: [],
   })
-  parametros: Array<{
+  parametros!: Array<{
     nombre: string;
     tipoDato: string;
     obligatorio: boolean;

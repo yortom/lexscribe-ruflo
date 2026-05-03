@@ -16,7 +16,6 @@ import { EsquemasService } from './esquemas.service';
 import { AddParametroDto } from './dto/add-parametro.dto';
 import { TipoObjetoSchema } from './dto/tipo-objeto';
 import { ValidationError } from '../../common/errors';
-import { ZodError } from 'zod';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(AuditInterceptor)
@@ -27,13 +26,8 @@ export class EsquemasController {
   private parseTipoObjeto(tipo: string) {
     try {
       return TipoObjetoSchema.parse(tipo);
-    } catch (err) {
-      if (err instanceof ZodError) {
-        throw new ValidationError(
-          `tipoObjeto must be one of: expediente, contacto`,
-        );
-      }
-      throw err;
+    } catch {
+      throw new ValidationError(`tipoObjeto must be one of: expediente, contacto`);
     }
   }
 

@@ -19,12 +19,12 @@
 
 ### Auth y bases transversales (`AUTH`)
 
-- [ ] **AUTH-01** — El usuario puede iniciar sesión con email/password y recibir un JWT (15 min) + refresh cookie (7 d). *(Arquitectura §9)*
-- [ ] **AUTH-02** — El refresh rotativo emite un nuevo refresh al usarlo e invalida el anterior. *(Arquitectura §9.1)*
-- [ ] **AUTH-03** — Logout invalida el refresh token en servidor. *(Arquitectura §9.1)*
-- [ ] **AUTH-04** — Toda petición autenticada inyecta automáticamente el `usuarioId` desde el JWT — ningún endpoint acepta `usuarioId` en el body. *(Arquitectura §9.2)*
+- [x] **AUTH-01** — El usuario puede iniciar sesión con email/password y recibir un JWT (15 min) + refresh cookie (7 d). *(Arquitectura §9)*
+- [x] **AUTH-02** — El refresh rotativo emite un nuevo refresh al usarlo e invalida el anterior. *(Arquitectura §9.1)*
+- [x] **AUTH-03** — Logout invalida el refresh token en servidor. *(Arquitectura §9.1)*
+- [x] **AUTH-04** — Toda petición autenticada inyecta automáticamente el `usuarioId` desde el JWT — ningún endpoint acepta `usuarioId` en el body. *(Arquitectura §9.2)*
 - [x] **AUTH-05** — Un script de seed crea el usuario por defecto y los esquemas vacíos (`expediente`, `contacto`) de forma idempotente. *(Arquitectura §16)*
-- [ ] **AUTH-06** — Toda colección de negocio aplica soft-delete vía middleware Mongoose: las queries por defecto excluyen `activo: false`. *(Datos §2.3)*
+- [x] **AUTH-06** — Toda colección de negocio aplica soft-delete vía middleware Mongoose: las queries por defecto excluyen `activo: false`. *(Datos §2.3)*
 - [x] **AUTH-07** — Toda operación `create`/`update`/`delete`/`link`/`unlink`/`generate`/`login`/`logout` queda registrada en la colección `auditoria` de forma asíncrona e inmutable. *(Arquitectura §18)*
 - [x] **AUTH-08** — Existe el módulo `esquemas` con endpoints CRUD por `tipoObjeto`. *(Cubre F-090, F-091, F-093, F-094, F-096)*
 

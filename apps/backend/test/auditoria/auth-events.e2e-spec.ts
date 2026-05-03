@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * auth-events.e2e-spec.ts
  * E2E tests: login/logout produce audit records in `auditoria` (AUTH-07)

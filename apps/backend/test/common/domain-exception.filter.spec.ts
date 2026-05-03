@@ -3,7 +3,7 @@
  * Tests that DomainError subclasses produce correct HTTP status + body shape.
  */
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Controller, Get, HttpCode } from '@nestjs/common';
+import { INestApplication, Controller, Get } from '@nestjs/common';
 import request from 'supertest';
 import {
   NotFoundError,

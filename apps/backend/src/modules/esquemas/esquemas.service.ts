@@ -61,11 +61,7 @@ export class EsquemasService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  deleteParametro(
-    _usuarioId: string | Types.ObjectId,
-    _tipoObjeto: TipoObjeto,
-    _nombre: string,
-  ): never {
+  deleteParametro(_usuarioId: string | Types.ObjectId, _tipoObjeto: TipoObjeto, _nombre: string): never {
     throw new NotImplementedError('Not Implemented (post-MVP F-095)');
   }
 }

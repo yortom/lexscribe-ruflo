@@ -73,6 +73,7 @@ export class UsuariosRepository {
           'refreshTokens.tokenHash': oldTokenHash,
         },
         {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           $pull: { refreshTokens: { tokenHash: oldTokenHash } } as any,
         },
         { returnDocument: 'after' },
@@ -116,6 +117,7 @@ export class UsuariosRepository {
     return this.model
       .findByIdAndUpdate(
         userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         { $pull: { refreshTokens: { tokenHash } } as any },
         { new: true },
       )

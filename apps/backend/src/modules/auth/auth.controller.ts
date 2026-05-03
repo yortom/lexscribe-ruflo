@@ -39,9 +39,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const plainToken: string | undefined = (req as any).cookies?.[
-      'refresh_token'
-    ];
+    const plainToken: string | undefined = req.cookies?.['refresh_token'];
     if (!plainToken) {
       throw new UnauthorizedError('Invalid refresh token');
     }
@@ -58,9 +56,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const plainToken: string | undefined = (req as any).cookies?.[
-      'refresh_token'
-    ];
+    const plainToken: string | undefined = req.cookies?.['refresh_token'];
     if (plainToken) {
       const ip = req.ip ?? null;
       const userAgent = req.headers['user-agent'] ?? null;

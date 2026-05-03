@@ -28,7 +28,8 @@ class DummyController {
   @Post('update')
   @Audited('foo', 'update', { diffBefore: (req) => req.body['__before'] as unknown })
   update(@Body() body: Record<string, unknown>) {
-    const { __before: _b, ...rest } = body;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { __before: _before, ...rest } = body;
     return { _id: 'abc123', ...rest };
   }
 

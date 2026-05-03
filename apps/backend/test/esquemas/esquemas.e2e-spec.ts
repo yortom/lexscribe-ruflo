@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -18,7 +19,6 @@ describe('AUTH-08 esquemas', () => {
   let esquemaModel: Model<any>;
   let auditoriaModel: Model<any>;
   let bearerToken: string;
-  let userId: string;
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -47,7 +47,6 @@ describe('AUTH-08 esquemas', () => {
       passwordHash,
       refreshTokens: [],
     });
-    userId = String(usuario._id);
 
     // Create esquema for expediente (simulating seed)
     await esquemaModel.create({

@@ -4,3 +4,4 @@ export interface HealthStatus {
   status: 'ok' | 'error';
   timestamp: ISODateString;
 }
+export * from './contacto';

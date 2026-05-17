@@ -40,7 +40,7 @@ services:
       NODE_ENV: production
       PORT: 3001
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017/lexscribe}
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}

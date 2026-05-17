@@ -32,24 +32,27 @@ export class ContactosService {
   }
 
   async create(usuarioId: string, dto: CreateContactoInput) {
-    let contacto;
+    // CONT-03: registrar parámetros ANTES de persistir el contacto.
+    // Si un parámetro tipo conflicta con el esquema dinámico existente,
+    // registerParametros lanza ConflictError y queremos abortar la creación
+    // sin dejar contactos huérfanos en la BD.
+    await this.registerParametros(usuarioId, dto.parametros ?? {});
     try {
-      contacto = await this.repo.create(usuarioId, dto);
+      return await this.repo.create(usuarioId, dto);
     } catch (err) {
       if ((err as { code?: number }).code === 11000) {
         throw new ConflictError('Contact documentacionFiscal already registered');
       }
       throw err;
     }
-    // CONT-03: registrar parámetros nuevos en el esquema dinámico (FL-13 Punto A)
-    await this.registerParametros(usuarioId, dto.parametros ?? {});
-    return contacto;
   }
 
   async update(usuarioId: string, id: string, dto: UpdateContactoInput) {
+    // Validar/registrar parámetros antes del update para fail-fast sin
+    // mutar el contacto si los tipos chocan con el esquema dinámico.
+    if (dto.parametros) await this.registerParametros(usuarioId, dto.parametros);
     const updated = await this.repo.update(usuarioId, id, dto);
     if (!updated) throw new NotFoundError('contacto', id);
-    if (dto.parametros) await this.registerParametros(usuarioId, dto.parametros);
     return updated;
   }
 

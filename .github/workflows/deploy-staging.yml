@@ -25,6 +25,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+      # Build shared packages first — apps consume @lexscribe/shared-* via dist/index.js (CJS).
+      # Without this, type-check fails because shared packages' .d.ts aren't generated yet.
+      - run: pnpm run build:packages
       - run: pnpm -r run lint
       - run: pnpm -r run type-check
       - run: pnpm -r run test

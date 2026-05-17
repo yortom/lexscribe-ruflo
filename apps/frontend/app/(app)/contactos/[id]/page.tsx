@@ -1,11 +1,10 @@
 'use client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { ContactoForm } from '@/components/contactos/ContactoForm';
-import { getContacto, updateContacto, deleteContacto } from '@/lib/api/contactos';
+import { deleteContacto, getContacto, updateContacto } from '@/lib/api/contactos';
 import type { CreateContactoInput } from '@lexscribe/shared-validation';
 
-// Next.js 14: params is synchronous (not a Promise)
 export default function ContactoDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const router = useRouter();
@@ -31,11 +30,11 @@ export default function ContactoDetailPage({ params }: { params: { id: string } 
 
   return (
     <div className="space-y-6">
-      <header className="flex justify-between items-center">
+      <header className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">{data.nombre}</h2>
         <button
           onClick={() => {
-            if (confirm('¿Eliminar contacto?')) deleteMut.mutate();
+            if (confirm('Eliminar contacto?')) deleteMut.mutate();
           }}
           disabled={deleteMut.isPending}
           className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
@@ -45,12 +44,12 @@ export default function ContactoDetailPage({ params }: { params: { id: string } 
       </header>
 
       {updateMut.isSuccess && (
-        <p className="text-green-600 text-sm" role="status">
+        <p className="text-sm text-green-600" role="status">
           Cambios guardados
         </p>
       )}
       {updateMut.error && (
-        <p className="text-red-600 text-sm" role="alert">
+        <p className="text-sm text-red-600" role="alert">
           Error: {(updateMut.error as Error).message}
         </p>
       )}
@@ -67,19 +66,18 @@ export default function ContactoDetailPage({ params }: { params: { id: string } 
         submitLabel="Guardar cambios"
       />
 
-      {/* CONT-05: Expedientes vinculados — stub vacío hasta Phase 4 */}
       <section className="border-t pt-4">
-        <h3 className="text-lg font-semibold mb-2">Expedientes vinculados</h3>
+        <h3 className="mb-2 text-lg font-semibold">Expedientes vinculados</h3>
         {data.expedientesVinculados.length === 0 ? (
           <p className="text-sm text-gray-500">
-            Este contacto no aparece en ningún expediente todavía.
-            (Disponible cuando se implementen expedientes en Phase 4.)
+            Este contacto no aparece en ningun expediente todavia. Disponible cuando se implementen
+            expedientes en Phase 4.
           </p>
         ) : (
           <ul className="space-y-1 text-sm">
             {data.expedientesVinculados.map((e) => (
               <li key={e._id} className="text-gray-700">
-                {e.nombre} — {e.rol}
+                {e.nombre} - {e.rol}
               </li>
             ))}
           </ul>

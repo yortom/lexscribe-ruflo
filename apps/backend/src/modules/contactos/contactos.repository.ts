@@ -7,15 +7,18 @@ import {
   UpdateContactoInput,
   QueryContactoInput,
 } from '@lexscribe/shared-validation';
+import { hashPii } from '../../common/crypto/pii-crypto';
 
 @Injectable()
 export class ContactosRepository {
-  constructor(
-    @InjectModel(Contacto.name) private readonly model: Model<ContactoDocument>,
-  ) {}
+  constructor(@InjectModel(Contacto.name) private readonly model: Model<ContactoDocument>) {}
 
   private toObjectId(id: string | Types.ObjectId): Types.ObjectId {
     return typeof id === 'string' ? new Types.ObjectId(id) : id;
+  }
+
+  private escapeRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   async findAll(
@@ -26,7 +29,12 @@ export class ContactosRepository {
       usuarioId: this.toObjectId(usuarioId),
     };
     if (opts.tipologia) filter.tipologia = opts.tipologia;
-    if (opts.search) filter.$text = { $search: opts.search };
+    if (opts.search) {
+      filter.$or = [
+        { nombre: { $regex: this.escapeRegex(opts.search), $options: 'i' } },
+        { documentacionFiscalHash: hashPii(opts.search) },
+      ];
+    }
     const [items, total] = await Promise.all([
       this.model
         .find(filter)
@@ -39,10 +47,7 @@ export class ContactosRepository {
     return { items, total };
   }
 
-  async findById(
-    usuarioId: string,
-    id: string,
-  ): Promise<ContactoDocument | null> {
+  async findById(usuarioId: string, id: string): Promise<ContactoDocument | null> {
     return this.model
       .findOne({
         _id: this.toObjectId(id),
@@ -51,10 +56,7 @@ export class ContactosRepository {
       .exec();
   }
 
-  async create(
-    usuarioId: string,
-    data: CreateContactoInput,
-  ): Promise<ContactoDocument> {
+  async create(usuarioId: string, data: CreateContactoInput): Promise<ContactoDocument> {
     return this.model.create({ ...data, usuarioId: this.toObjectId(usuarioId) });
   }
 
@@ -72,10 +74,7 @@ export class ContactosRepository {
       .exec();
   }
 
-  async softDelete(
-    usuarioId: string,
-    id: string,
-  ): Promise<ContactoDocument | null> {
+  async softDelete(usuarioId: string, id: string): Promise<ContactoDocument | null> {
     return this.model
       .findOneAndUpdate(
         { _id: this.toObjectId(id), usuarioId: this.toObjectId(usuarioId) },

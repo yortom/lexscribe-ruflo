@@ -5,9 +5,9 @@ import { ContactoForm } from '../../components/contactos/ContactoForm';
 describe('ContactoForm', () => {
   it('renders the form with required fields', () => {
     render(<ContactoForm onSubmit={vi.fn()} />);
-    expect(screen.getByText('Nombre / Razón social')).toBeTruthy();
+    expect(screen.getByText('Nombre / Razon social')).toBeTruthy();
     expect(screen.getByText('Tipo')).toBeTruthy();
-    expect(screen.getByText('Tipología')).toBeTruthy();
+    expect(screen.getByText('Tipologia')).toBeTruthy();
     expect(screen.getByText('Guardar')).toBeTruthy();
   });
 

@@ -73,7 +73,7 @@ describe('ContactoTable', () => {
 
   it('renders tipologia column header', () => {
     render(<ContactoTable {...defaultProps} />);
-    expect(screen.getByText('Tipología')).toBeTruthy();
+    expect(screen.getByText('Tipologia')).toBeTruthy();
   });
 
   it('calls onSearch with input value after debounce', async () => {

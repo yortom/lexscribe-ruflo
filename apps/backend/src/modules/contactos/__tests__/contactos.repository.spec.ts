@@ -43,10 +43,7 @@ describe('ContactosRepository', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ContactosRepository,
-        { provide: getModelToken(Contacto.name), useValue: model },
-      ],
+      providers: [ContactosRepository, { provide: getModelToken(Contacto.name), useValue: model }],
     }).compile();
 
     repository = module.get(ContactosRepository);
@@ -99,16 +96,17 @@ describe('ContactosRepository', () => {
     model.find.mockReturnValue(findQuery);
     model.countDocuments.mockReturnValue(countQuery);
 
-    await expect(
-      repository.findAll(usuarioId, { page: 2, limit: 10 }),
-    ).resolves.toEqual({ items: docs, total: 2 });
+    await expect(repository.findAll(usuarioId, { page: 2, limit: 10 })).resolves.toEqual({
+      items: docs,
+      total: 2,
+    });
 
     expect(findQuery.skip).toHaveBeenCalledWith(10);
     expect(findQuery.limit).toHaveBeenCalledWith(10);
     expect(findQuery.sort).toHaveBeenCalledWith({ fechaCreacion: -1 });
   });
 
-  it('includes tipologia and text search filters when listing contactos', async () => {
+  it('includes tipologia and search filters when listing contactos', async () => {
     model.find.mockReturnValue(createQueryMock([]));
     model.countDocuments.mockReturnValue({
       exec: jest.fn().mockResolvedValue(0),
@@ -124,13 +122,16 @@ describe('ContactosRepository', () => {
     expect(model.find).toHaveBeenCalledWith(
       expect.objectContaining({
         tipologia: 'cliente',
-        $text: { $search: 'Ana' },
+        $or: expect.arrayContaining([
+          { nombre: { $regex: 'Ana', $options: 'i' } },
+          { documentacionFiscalHash: expect.any(String) },
+        ]),
       }),
     );
     expect(model.countDocuments).toHaveBeenCalledWith(
       expect.objectContaining({
         tipologia: 'cliente',
-        $text: { $search: 'Ana' },
+        $or: expect.any(Array),
       }),
     );
   });
@@ -141,9 +142,9 @@ describe('ContactosRepository', () => {
       exec: jest.fn().mockResolvedValue(updated),
     });
 
-    await expect(
-      repository.update(usuarioId, contactoId, { nombre: 'Ana Updated' }),
-    ).resolves.toBe(updated);
+    await expect(repository.update(usuarioId, contactoId, { nombre: 'Ana Updated' })).resolves.toBe(
+      updated,
+    );
 
     expect(model.findOneAndUpdate).toHaveBeenCalledWith(
       { _id: expect.any(Types.ObjectId), usuarioId: expect.any(Types.ObjectId) },
@@ -158,9 +159,7 @@ describe('ContactosRepository', () => {
       exec: jest.fn().mockResolvedValue(deleted),
     });
 
-    await expect(repository.softDelete(usuarioId, contactoId)).resolves.toBe(
-      deleted,
-    );
+    await expect(repository.softDelete(usuarioId, contactoId)).resolves.toBe(deleted);
 
     expect(model.findOneAndUpdate).toHaveBeenCalledWith(
       { _id: expect.any(Types.ObjectId), usuarioId: expect.any(Types.ObjectId) },

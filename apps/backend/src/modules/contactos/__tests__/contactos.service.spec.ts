@@ -36,9 +36,12 @@ describe('ContactosService', () => {
     const items = [{ nombre: 'Ana' }];
     repo.findAll.mockResolvedValue({ items, total: 1 });
 
-    await expect(
-      service.list(usuarioId, { page: 1, limit: 20 }),
-    ).resolves.toEqual({ items, total: 1, page: 1, limit: 20 });
+    await expect(service.list(usuarioId, { page: 1, limit: 20 })).resolves.toEqual({
+      items,
+      total: 1,
+      page: 1,
+      limit: 20,
+    });
     expect(repo.findAll).toHaveBeenCalledWith(usuarioId, {
       page: 1,
       limit: 20,
@@ -60,9 +63,7 @@ describe('ContactosService', () => {
   it('throws NotFoundError when contacto detail does not exist', async () => {
     repo.findById.mockResolvedValue(null);
 
-    await expect(service.getById(usuarioId, contactoId)).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(service.getById(usuarioId, contactoId)).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('creates a contacto and returns the repository result', async () => {
@@ -106,16 +107,16 @@ describe('ContactosService', () => {
     });
 
     expect(esquemasService.addParametro).toHaveBeenCalledTimes(2);
-    expect(esquemasService.addParametro).toHaveBeenCalledWith(
-      usuarioId,
-      'contacto',
-      { nombre: 'profesion', tipoDato: 'texto', obligatorio: false },
-    );
-    expect(esquemasService.addParametro).toHaveBeenCalledWith(
-      usuarioId,
-      'contacto',
-      { nombre: 'aniosExp', tipoDato: 'texto', obligatorio: false },
-    );
+    expect(esquemasService.addParametro).toHaveBeenCalledWith(usuarioId, 'contacto', {
+      nombre: 'profesion',
+      tipoDato: 'texto',
+      obligatorio: false,
+    });
+    expect(esquemasService.addParametro).toHaveBeenCalledWith(usuarioId, 'contacto', {
+      nombre: 'aniosExp',
+      tipoDato: 'numero',
+      obligatorio: false,
+    });
   });
 
   it('updates a contacto and registers provided parametros', async () => {
@@ -129,11 +130,11 @@ describe('ContactosService', () => {
       }),
     ).resolves.toBe(updated);
 
-    expect(esquemasService.addParametro).toHaveBeenCalledWith(
-      usuarioId,
-      'contacto',
-      { nombre: 'profesion', tipoDato: 'texto', obligatorio: false },
-    );
+    expect(esquemasService.addParametro).toHaveBeenCalledWith(usuarioId, 'contacto', {
+      nombre: 'profesion',
+      tipoDato: 'texto',
+      obligatorio: false,
+    });
   });
 
   it('throws NotFoundError when updating a missing contacto', async () => {
@@ -155,8 +156,6 @@ describe('ContactosService', () => {
   it('throws NotFoundError when removing a missing contacto', async () => {
     repo.softDelete.mockResolvedValue(null);
 
-    await expect(service.remove(usuarioId, contactoId)).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(service.remove(usuarioId, contactoId)).rejects.toBeInstanceOf(NotFoundError);
   });
 });

@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { MongoIdPipe } from '../../common/pipes/mongo-id.pipe';
 import { AuditInterceptor } from '../auditoria/interceptors/audit.interceptor';
 import { Audited } from '../auditoria/decorators/audited.decorator';
 import { ContactosService } from './contactos.service';
@@ -31,7 +32,7 @@ export class ContactosController {
   }
 
   @Get(':id')
-  getById(@CurrentUser('id') uid: string, @Param('id') id: string) {
+  getById(@CurrentUser('id') uid: string, @Param('id', MongoIdPipe) id: string) {
     return this.service.getById(uid, id);
   }
 
@@ -45,7 +46,7 @@ export class ContactosController {
   @Audited('contacto', 'update')
   update(
     @CurrentUser('id') uid: string,
-    @Param('id') id: string,
+    @Param('id', MongoIdPipe) id: string,
     @Body() dto: UpdateContactoDto,
   ) {
     return this.service.update(uid, id, dto);
@@ -53,7 +54,7 @@ export class ContactosController {
 
   @Delete(':id')
   @Audited('contacto', 'delete')
-  remove(@CurrentUser('id') uid: string, @Param('id') id: string) {
+  remove(@CurrentUser('id') uid: string, @Param('id', MongoIdPipe) id: string) {
     return this.service.remove(uid, id);
   }
 }

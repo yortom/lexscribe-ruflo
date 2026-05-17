@@ -6,6 +6,7 @@ import {
   CreateContactoInput,
   UpdateContactoInput,
   QueryContactoInput,
+  type AddParametroInput,
 } from '@lexscribe/shared-validation';
 
 @Injectable()
@@ -58,16 +59,22 @@ export class ContactosService {
     return deleted;
   }
 
-  private async registerParametros(
-    usuarioId: string,
-    parametros: Record<string, unknown>,
-  ) {
+  private async registerParametros(usuarioId: string, parametros: Record<string, unknown>) {
     for (const nombre of Object.keys(parametros)) {
       await this.esquemasService.addParametro(usuarioId, 'contacto', {
         nombre,
-        tipoDato: 'texto',
+        tipoDato: this.inferTipoDato(parametros[nombre]),
         obligatorio: false,
       });
     }
+  }
+
+  private inferTipoDato(value: unknown): AddParametroInput['tipoDato'] {
+    if (typeof value === 'number') return 'numero';
+    if (typeof value === 'boolean') return 'booleano';
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return 'fecha';
+    }
+    return 'texto';
   }
 }

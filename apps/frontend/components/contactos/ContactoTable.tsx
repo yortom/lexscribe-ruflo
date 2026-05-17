@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Contacto } from '@lexscribe/shared-types';
 
@@ -49,8 +49,7 @@ export function ContactoTable({
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="text"
           placeholder="Buscar por nombre o NIF..."
@@ -70,35 +69,23 @@ export function ContactoTable({
         </select>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-md border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Nombre</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Tipo</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Tipologia</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Nombre
+                Documentacion fiscal
               </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Tipo
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Tipología
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Documentación fiscal
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Email
-              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Email</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
             {items.length === 0 ? (
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-6 text-center text-gray-400"
-                >
+                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
                   No hay contactos
                 </td>
               </tr>
@@ -109,19 +96,13 @@ export function ContactoTable({
                   onClick={() => router.push(`/contactos/${c._id}`)}
                   className="cursor-pointer hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
-                    {c.nombre}
-                  </td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{c.nombre}</td>
                   <td className="px-4 py-3 text-gray-600">
-                    {c.tipo === 'fisica' ? 'Persona física' : 'Persona jurídica'}
+                    {c.tipo === 'fisica' ? 'Persona fisica' : 'Persona juridica'}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{c.tipologia}</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {c.documentacionFiscal ?? '—'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {c.email ?? '—'}
-                  </td>
+                  <td className="px-4 py-3 text-gray-600">{c.documentacionFiscal ?? '-'}</td>
+                  <td className="px-4 py-3 text-gray-600">{c.email ?? '-'}</td>
                 </tr>
               ))
             )}
@@ -129,24 +110,23 @@ export function ContactoTable({
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">
-            Página {page} de {totalPages}
+            Pagina {page} de {totalPages}
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="rounded border border-gray-300 px-3 py-1 disabled:opacity-50 hover:bg-gray-50"
+              className="rounded border border-gray-300 px-3 py-1 hover:bg-gray-50 disabled:opacity-50"
             >
               Anterior
             </button>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
-              className="rounded border border-gray-300 px-3 py-1 disabled:opacity-50 hover:bg-gray-50"
+              className="rounded border border-gray-300 px-3 py-1 hover:bg-gray-50 disabled:opacity-50"
             >
               Siguiente
             </button>

@@ -13,6 +13,7 @@ import { Usuario } from '../../src/modules/usuarios/schemas/usuario.schema';
 import { Contacto } from '../../src/modules/contactos/schemas/contacto.schema';
 import { Esquema } from '../../src/modules/esquemas/schemas/esquema.schema';
 import { Auditoria } from '../../src/modules/auditoria/schemas/auditoria.schema';
+import { isEncryptedPii } from '../../src/common/crypto/pii-crypto';
 
 describe('CONT-01..05 contactos', () => {
   let app: INestApplication;
@@ -28,6 +29,7 @@ describe('CONT-01..05 contactos', () => {
     tipologia: 'cliente',
     nombre: 'Ana López',
     documentacionFiscal: '12345678A',
+    documentoIdentidad: '12345678Z',
     email: 'ana@test.es',
     telefono: '+34600000000',
   };
@@ -70,12 +72,10 @@ describe('CONT-01..05 contactos', () => {
     });
 
     // Login to get bearer token
-    const loginRes = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send({
-        email: 'contactos-test@lexscribe.local',
-        password: 'TestPass123!',
-      });
+    const loginRes = await request(app.getHttpServer()).post('/api/v1/auth/login').send({
+      email: 'contactos-test@lexscribe.local',
+      password: 'TestPass123!',
+    });
 
     bearerToken = loginRes.body.accessToken as string;
   });
@@ -133,7 +133,14 @@ describe('CONT-01..05 contactos', () => {
     expect(res.body.tipo).toBe('fisica');
     expect(res.body.tipologia).toBe('cliente');
     expect(res.body.nombre).toBe('Ana López');
+    expect(res.body.documentacionFiscal).toBe(BASE_CONTACTO.documentacionFiscal);
+    expect(res.body.documentoIdentidad).toBe(BASE_CONTACTO.documentoIdentidad);
     expect(res.body.activo).toBe(true);
+
+    const stored = await contactoModel.findById(res.body._id);
+    expect(isEncryptedPii(stored!.documentacionFiscal)).toBe(true);
+    expect(isEncryptedPii(stored!.documentoIdentidad)).toBe(true);
+    expect(stored!.documentacionFiscalHash).toEqual(expect.any(String));
   });
 
   it('CONT-01: creates persona jurídica', async () => {
@@ -173,7 +180,13 @@ describe('CONT-01..05 contactos', () => {
         tipo: 'fisica',
         tipologia: 'interesado',
         nombre: 'Param Test',
-        parametros: { profesion: 'Abogado', estadoCivil: 'Casado' },
+        parametros: {
+          profesion: 'Abogado',
+          estadoCivil: 'Casado',
+          aniosExp: 5,
+          fechaAlta: '2026-05-17',
+          activoCaso: true,
+        },
       });
 
     expect([200, 201]).toContain(res.status);
@@ -189,6 +202,12 @@ describe('CONT-01..05 contactos', () => {
     expect(nombres).toContain('estadoCivil');
     const profesion = esquema!.parametros.find((p: any) => p.nombre === 'profesion');
     expect(profesion!.tipoDato).toBe('texto');
+    const aniosExp = esquema!.parametros.find((p: any) => p.nombre === 'aniosExp');
+    expect(aniosExp!.tipoDato).toBe('numero');
+    const fechaAlta = esquema!.parametros.find((p: any) => p.nombre === 'fechaAlta');
+    expect(fechaAlta!.tipoDato).toBe('fecha');
+    const activoCaso = esquema!.parametros.find((p: any) => p.nombre === 'activoCaso');
+    expect(activoCaso!.tipoDato).toBe('booleano');
   });
 
   it('CONT-03: idempotent — repeating same parametro key does not duplicate', async () => {
@@ -219,9 +238,7 @@ describe('CONT-01..05 contactos', () => {
       usuarioId: new Types.ObjectId(usuarioId),
     });
 
-    const profesionEntries = esquema!.parametros.filter(
-      (p: any) => p.nombre === 'profesion',
-    );
+    const profesionEntries = esquema!.parametros.filter((p: any) => p.nombre === 'profesion');
     expect(profesionEntries).toHaveLength(1);
   });
 
@@ -289,7 +306,7 @@ describe('CONT-01..05 contactos', () => {
     }
   });
 
-  it('CONT-04: searches by nombre via $text index', async () => {
+  it('CONT-04: searches by nombre', async () => {
     await Promise.all([
       request(app.getHttpServer())
         .post('/api/v1/contactos')
@@ -308,6 +325,26 @@ describe('CONT-01..05 contactos', () => {
     expect(res.status).toBe(200);
     expect(res.body.items).toHaveLength(1);
     expect(res.body.items[0].nombre).toBe('Ana López');
+  });
+
+  it('CONT-04: searches by exact documentacionFiscal hash', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/contactos')
+      .set('Authorization', `Bearer ${bearerToken}`)
+      .send({
+        tipo: 'fisica',
+        tipologia: 'cliente',
+        nombre: 'Fiscal Search',
+        documentacionFiscal: '87654321B',
+      });
+
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/contactos?search=87654321B')
+      .set('Authorization', `Bearer ${bearerToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items[0].documentacionFiscal).toBe('87654321B');
   });
 
   // ---------------------------------------------------------------------------
@@ -337,6 +374,14 @@ describe('CONT-01..05 contactos', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.code).toBe('NOT_FOUND');
+  });
+
+  it('CONT-05: returns 400 for invalid ObjectId params', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/contactos/not-a-valid-object-id')
+      .set('Authorization', `Bearer ${bearerToken}`);
+
+    expect(res.status).toBe(400);
   });
 
   // ---------------------------------------------------------------------------
@@ -377,9 +422,7 @@ describe('CONT-01..05 contactos', () => {
       .delete(`/api/v1/contactos/${id}`)
       .set('Authorization', `Bearer ${bearerToken}`);
 
-    const doc = await contactoModel
-      .findOne({ _id: id }, null, { withInactive: true })
-      .exec();
+    const doc = await contactoModel.findOne({ _id: id }, null, { withInactive: true }).exec();
 
     expect(doc).toBeTruthy();
     expect(doc!.activo).toBe(false);

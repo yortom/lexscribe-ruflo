@@ -1,19 +1,10 @@
 'use client';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  CreateContactoSchema,
-  type CreateContactoInput,
-} from '@lexscribe/shared-validation';
+import { CreateContactoSchema, type CreateContactoInput } from '@lexscribe/shared-validation';
 import { ParametrosEditor } from './ParametrosEditor';
 
-/**
- * RHF helper: coerce empty string to undefined for optional string fields.
- * This ensures Zod's .string().email().optional() accepts empty <input> as "not provided".
- * i18n note: Zod validation messages are in English for MVP — translation to Spanish is deferred (i18n pending).
- */
-const emptyToUndefined = (v: unknown) =>
-  v === '' ? undefined : (v as string);
+const emptyToUndefined = (v: unknown) => (v === '' ? undefined : (v as string));
 
 interface ContactoFormProps {
   initial?: Partial<CreateContactoInput>;
@@ -21,9 +12,7 @@ interface ContactoFormProps {
   submitLabel?: string;
 }
 
-function getDefaultValues(
-  initial?: Partial<CreateContactoInput>,
-): CreateContactoInput {
+function getDefaultValues(initial?: Partial<CreateContactoInput>): CreateContactoInput {
   return {
     tipo: initial?.tipo ?? 'fisica',
     tipologia: initial?.tipologia ?? 'cliente',
@@ -37,11 +26,7 @@ function getDefaultValues(
   };
 }
 
-export function ContactoForm({
-  initial,
-  onSubmit,
-  submitLabel = 'Guardar',
-}: ContactoFormProps) {
+export function ContactoForm({ initial, onSubmit, submitLabel = 'Guardar' }: ContactoFormProps) {
   const {
     register,
     handleSubmit,
@@ -56,27 +41,21 @@ export function ContactoForm({
   const parametros = (watch('parametros') as Record<string, unknown>) ?? {};
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-2xl">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Tipo
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Tipo</label>
           <select
             {...register('tipo')}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option value="fisica">Persona física</option>
-            <option value="juridica">Persona jurídica</option>
+            <option value="fisica">Persona fisica</option>
+            <option value="juridica">Persona juridica</option>
           </select>
-          {errors.tipo && (
-            <span className="text-red-600 text-sm">{errors.tipo.message}</span>
-          )}
+          {errors.tipo && <span className="text-sm text-red-600">{errors.tipo.message}</span>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Tipología
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Tipologia</label>
           <select
             {...register('tipologia')}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -87,107 +66,77 @@ export function ContactoForm({
             <option value="otros">Otros</option>
           </select>
           {errors.tipologia && (
-            <span className="text-red-600 text-sm">
-              {errors.tipologia.message}
-            </span>
+            <span className="text-sm text-red-600">{errors.tipologia.message}</span>
           )}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Nombre / Razón social
-        </label>
+        <label className="block text-sm font-medium text-gray-700">Nombre / Razon social</label>
         <input
           {...register('nombre')}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
-        {errors.nombre && (
-          <span className="text-red-600 text-sm">{errors.nombre.message}</span>
-        )}
+        {errors.nombre && <span className="text-sm text-red-600">{errors.nombre.message}</span>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            NIF/CIF
-          </label>
+          <label className="block text-sm font-medium text-gray-700">NIF/CIF</label>
           <input
             {...register('documentacionFiscal', { setValueAs: emptyToUndefined })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           {errors.documentacionFiscal && (
-            <span className="text-red-600 text-sm">
-              {errors.documentacionFiscal.message}
-            </span>
+            <span className="text-sm text-red-600">{errors.documentacionFiscal.message}</span>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            DNI/NIE
-          </label>
+          <label className="block text-sm font-medium text-gray-700">DNI/NIE</label>
           <input
             {...register('documentoIdentidad', { setValueAs: emptyToUndefined })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           {errors.documentoIdentidad && (
-            <span className="text-red-600 text-sm">
-              {errors.documentoIdentidad.message}
-            </span>
+            <span className="text-sm text-red-600">{errors.documentoIdentidad.message}</span>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Email</label>
           <input
             type="email"
             {...register('email', { setValueAs: emptyToUndefined })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          {errors.email && (
-            <span className="text-red-600 text-sm">{errors.email.message}</span>
-          )}
+          {errors.email && <span className="text-sm text-red-600">{errors.email.message}</span>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Teléfono
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Telefono</label>
           <input
             {...register('telefono', { setValueAs: emptyToUndefined })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           {errors.telefono && (
-            <span className="text-red-600 text-sm">
-              {errors.telefono.message}
-            </span>
+            <span className="text-sm text-red-600">{errors.telefono.message}</span>
           )}
         </div>
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Dirección
-          </label>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700">Direccion</label>
           <input
             {...register('direccion', { setValueAs: emptyToUndefined })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           {errors.direccion && (
-            <span className="text-red-600 text-sm">
-              {errors.direccion.message}
-            </span>
+            <span className="text-sm text-red-600">{errors.direccion.message}</span>
           )}
         </div>
       </div>
 
       <section>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">
-          Parámetros personalizados
-        </h3>
+        <h3 className="mb-2 text-sm font-medium text-gray-700">Parametros personalizados</h3>
         <ParametrosEditor
           value={parametros}
-          onChange={(next) =>
-            setValue('parametros', next, { shouldValidate: false })
-          }
+          onChange={(next) => setValue('parametros', next, { shouldValidate: false })}
         />
       </section>
 

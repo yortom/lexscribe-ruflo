@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
+const isWindows = process.platform === 'win32';
+
 const nextConfig = {
-  output: 'standalone',
+  output: isWindows ? undefined : 'standalone',
   reactStrictMode: true,
   webpack: (config) => {
     // pnpm crea symlinks workspace → packages/*. Sin esto webpack los resuelve
@@ -12,9 +14,7 @@ const nextConfig = {
   },
   async rewrites() {
     const backend = process.env.BACKEND_URL ?? 'http://localhost:3001';
-    return [
-      { source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` },
-    ];
+    return [{ source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` }];
   },
 };
 export default nextConfig;

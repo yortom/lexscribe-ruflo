@@ -9,10 +9,11 @@
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "dev": "pnpm -r --parallel --filter \"./apps/*\" --filter \"./packages/*\" run dev",
-    "build": "pnpm -r --filter \"./apps/*\" run build",
-    "test": "pnpm -r run test",
+    "build:packages": "pnpm -r --filter \"./packages/*\" run build",
+    "build": "pnpm run build:packages && pnpm -r --filter \"./apps/*\" run build",
+    "test": "pnpm run build:packages && pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "type-check": "pnpm -r run type-check",
+    "type-check": "pnpm run build:packages && pnpm -r run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "seed": "pnpm --filter backend seed"
   },

@@ -32,6 +32,16 @@ function serializeValor(valor: string, tipoDato: TipoDato): unknown {
   return valor;
 }
 
+function getRowError(row: ParamRow): string | undefined {
+  if (row.nombre && !NOMBRE_RE.test(row.nombre)) {
+    return 'Debe empezar por letra y usar solo letras, numeros o guion bajo';
+  }
+  if (row.tipoDato === 'numero' && row.valor.trim() !== '' && !Number.isFinite(Number(row.valor))) {
+    return 'Debe ser un numero valido';
+  }
+  return undefined;
+}
+
 export function ParametrosEditor({ value, onChange }: ParametrosEditorProps) {
   const [rows, setRows] = useState<ParamRow[]>(() =>
     Object.entries(value).map(([nombre, v]) => ({
@@ -44,8 +54,9 @@ export function ParametrosEditor({ value, onChange }: ParametrosEditorProps) {
   useEffect(() => {
     const next: Record<string, unknown> = {};
     for (const row of rows) {
-      if (row.nombre && NOMBRE_RE.test(row.nombre)) {
-        next[row.nombre] = serializeValor(row.valor, row.tipoDato);
+      if (row.nombre && NOMBRE_RE.test(row.nombre) && !getRowError(row)) {
+        const serialized = serializeValor(row.valor, row.tipoDato);
+        if (serialized !== undefined) next[row.nombre] = serialized;
       }
     }
     onChange(next);
@@ -65,10 +76,7 @@ export function ParametrosEditor({ value, onChange }: ParametrosEditorProps) {
       prev.map((row, i) => {
         if (i !== index) return row;
         const next = { ...row, ...patch };
-        const error =
-          next.nombre && !NOMBRE_RE.test(next.nombre)
-            ? 'Debe empezar por letra y usar solo letras, numeros o guion bajo'
-            : undefined;
+        const error = getRowError(next);
         return { ...next, error };
       }),
     );
@@ -109,10 +117,14 @@ export function ParametrosEditor({ value, onChange }: ParametrosEditorProps) {
             </select>
           ) : (
             <input
-              type={row.tipoDato === 'fecha' ? 'date' : 'text'}
+              type={
+                row.tipoDato === 'fecha' ? 'date' : row.tipoDato === 'numero' ? 'number' : 'text'
+              }
+              step={row.tipoDato === 'numero' ? 'any' : undefined}
               placeholder="valor"
               value={row.valor}
               onChange={(e) => updateRow(i, { valor: e.target.value })}
+              aria-invalid={row.error ? 'true' : 'false'}
               className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           )}

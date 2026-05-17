@@ -4,13 +4,11 @@ const PREFIX = 'enc:v1:';
 
 function getKey(): Buffer {
   const secret = process.env.APP_ENCRYPTION_KEY;
-  if (!secret && process.env.NODE_ENV === 'production') {
-    throw new Error('APP_ENCRYPTION_KEY is required in production');
+  if (!secret) {
+    throw new Error('APP_ENCRYPTION_KEY is required');
   }
 
-  return createHash('sha256')
-    .update(secret ?? 'lexscribe-dev-only-pii-key')
-    .digest();
+  return createHash('sha256').update(secret).digest();
 }
 
 export function normalizePii(value: string): string {

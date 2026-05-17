@@ -28,6 +28,7 @@ const config: Config = {
     },
   },
   testEnvironment: 'node',
+  setupFiles: ['<rootDir>/test/setup-unit.ts'],
   moduleNameMapper: {
     '^@lexscribe/(.*)$': '<rootDir>/../../packages/$1/src',
   },

@@ -78,7 +78,7 @@ ContactoSchema.pre('findOneAndUpdate', function () {
 
 ContactoSchema.plugin(softDeletePlugin);
 
-ContactoSchema.index({ nombre: 'text' });
+ContactoSchema.index({ usuarioId: 1, nombre: 1 });
 ContactoSchema.index(
   { usuarioId: 1, documentacionFiscalHash: 1 },
   {

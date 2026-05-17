@@ -129,7 +129,7 @@
 
 **Indices:**
 
-- `{ nombre: "text" }` - busqueda por nombre (F-055).
+- `{ usuarioId: 1, nombre: 1 }` - busqueda parcial por nombre dentro del usuario (F-055).
 - `{ usuarioId: 1, documentacionFiscalHash: 1 }` - unico parcial (cuando exista valor) para evitar duplicados sin exponer PII.
 
 **Notas:**
@@ -492,3 +492,4 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 | 2026-04-26 | Creación inicial del documento. Inventario de 8 colecciones (`expedientes`, `contactos`, `plantillas`, `clausulas`, `documentos`, `eventos`, `facturas`, `esquemas`) con esquema, índices, relaciones y trazabilidad a features de FUNCIONAL.md. Layout de Storage definido.                                                                                                                                                     |
 | 2026-04-26 | Resueltas decisiones de modelo: roles texto libre, **soft delete universal** (`activo` + `fechaInactivacion`), versionado de plantillas por nuevo documento (`plantillaRaizId` + `version`), nueva colección **`usuarios`** y campo `usuarioId` en todas las colecciones de negocio para preparar multi-usuario. Validación a nivel aplicación. Actualizadas convenciones, todas las colecciones, índices, relaciones y storage. |
 | 2026-05-17 | `contactos`: `documentacionFiscal` y `documentoIdentidad` quedan cifrados a nivel de aplicacion; duplicados y busqueda exacta por NIF/CIF usan `documentacionFiscalHash`.                                                                                                                                                                                                                                                        |
+| 2026-05-17 | `contactos`: indice de nombre alineado con busqueda parcial por usuario (`{ usuarioId: 1, nombre: 1 }`).                                                                                                                                                                                                                                                                                                                         |

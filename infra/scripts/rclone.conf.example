@@ -1,0 +1,20 @@
+# Plantilla rclone — copiar a /etc/rclone/rclone.conf en el NAS y completar con `rclone config`
+# NO incluir secretos reales aquí. Este archivo se versiona en Git.
+
+[gdrive]
+type = drive
+scope = drive
+# Tras 'rclone config' se rellenan automáticamente:
+# client_id =
+# client_secret =
+# token = {"access_token":"...","refresh_token":"..."}
+# team_drive =
+
+[minio]
+type = s3
+provider = Minio
+env_auth = false
+access_key_id = ${MINIO_ACCESS_KEY}
+secret_access_key = ${MINIO_SECRET_KEY}
+endpoint = http://minio:9000
+acl = private

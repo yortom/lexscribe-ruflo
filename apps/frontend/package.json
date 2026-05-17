@@ -1,42 +1,41 @@
 {
   "name": "@lexscribe/frontend",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3000",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "next": "^14.2.13",
+    "@hookform/resolvers": "^5.2.2",
+    "@lexscribe/shared-types": "workspace:*",
+    "@lexscribe/shared-validation": "workspace:*",
+    "@tanstack/react-query": "^5.100.9",
+    "@tanstack/react-query-devtools": "^5.100.9",
+    "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@tanstack/react-query": "^5.56.0",
-    "react-hook-form": "^7.53.0",
-    "@hookform/resolvers": "^3.9.0",
-    "zod": "^3.23.8",
-    "@uiw/react-codemirror": "^4.23.3",
-    "@codemirror/state": "^6.4.1",
-    "@codemirror/view": "^6.34.0",
-    "@codemirror/language": "^6.10.2",
-    "tailwindcss": "^3.4.13",
-    "@lexscribe/shared-types": "workspace:*",
-    "@lexscribe/shared-validation": "workspace:*"
+    "react-hook-form": "^7.75.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.0",
-    "@types/react": "^18.3.10",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.0",
-    "vitest": "^2.1.1",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/jest-dom": "^6.5.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.13"
+    "eslint-config-next": "^14.2.5",
+    "jsdom": "^24.0.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
   }
 }

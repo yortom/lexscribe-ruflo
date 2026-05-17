@@ -15,26 +15,26 @@
 - [ ] **INF-03** — Pull requests ejecutan automáticamente lint, type-check, tests unitarios y build. *(Arquitectura §11)*
 - [ ] **INF-04** — Merge a `main` despliega a entorno staging vía GitHub Actions + webhook al NAS. *(Arquitectura §11)*
 - [ ] **INF-05** — Tag `v*` despliega a producción en el NAS. *(Arquitectura §11)*
-- [ ] **INF-06** — Backup diario de MinIO y de Mongo a Google Drive vía `rclone`. *(Arquitectura §8.2)*
+- [x] **INF-06** — Backup diario de MinIO y de Mongo a Google Drive vía `rclone`. *(Arquitectura §8.2)*
 
 ### Auth y bases transversales (`AUTH`)
 
-- [ ] **AUTH-01** — El usuario puede iniciar sesión con email/password y recibir un JWT (15 min) + refresh cookie (7 d). *(Arquitectura §9)*
-- [ ] **AUTH-02** — El refresh rotativo emite un nuevo refresh al usarlo e invalida el anterior. *(Arquitectura §9.1)*
-- [ ] **AUTH-03** — Logout invalida el refresh token en servidor. *(Arquitectura §9.1)*
-- [ ] **AUTH-04** — Toda petición autenticada inyecta automáticamente el `usuarioId` desde el JWT — ningún endpoint acepta `usuarioId` en el body. *(Arquitectura §9.2)*
-- [ ] **AUTH-05** — Un script de seed crea el usuario por defecto y los esquemas vacíos (`expediente`, `contacto`) de forma idempotente. *(Arquitectura §16)*
-- [ ] **AUTH-06** — Toda colección de negocio aplica soft-delete vía middleware Mongoose: las queries por defecto excluyen `activo: false`. *(Datos §2.3)*
-- [ ] **AUTH-07** — Toda operación `create`/`update`/`delete`/`link`/`unlink`/`generate`/`login`/`logout` queda registrada en la colección `auditoria` de forma asíncrona e inmutable. *(Arquitectura §18)*
-- [ ] **AUTH-08** — Existe el módulo `esquemas` con endpoints CRUD por `tipoObjeto`. *(Cubre F-090, F-091, F-093, F-094, F-096)*
+- [x] **AUTH-01** — El usuario puede iniciar sesión con email/password y recibir un JWT (15 min) + refresh cookie (7 d). *(Arquitectura §9)*
+- [x] **AUTH-02** — El refresh rotativo emite un nuevo refresh al usarlo e invalida el anterior. *(Arquitectura §9.1)*
+- [x] **AUTH-03** — Logout invalida el refresh token en servidor. *(Arquitectura §9.1)*
+- [x] **AUTH-04** — Toda petición autenticada inyecta automáticamente el `usuarioId` desde el JWT — ningún endpoint acepta `usuarioId` en el body. *(Arquitectura §9.2)*
+- [x] **AUTH-05** — Un script de seed crea el usuario por defecto y los esquemas vacíos (`expediente`, `contacto`) de forma idempotente. *(Arquitectura §16)*
+- [x] **AUTH-06** — Toda colección de negocio aplica soft-delete vía middleware Mongoose: las queries por defecto excluyen `activo: false`. *(Datos §2.3)*
+- [x] **AUTH-07** — Toda operación `create`/`update`/`delete`/`link`/`unlink`/`generate`/`login`/`logout` queda registrada en la colección `auditoria` de forma asíncrona e inmutable. *(Arquitectura §18)*
+- [x] **AUTH-08** — Existe el módulo `esquemas` con endpoints CRUD por `tipoObjeto`. *(Cubre F-090, F-091, F-093, F-094, F-096)*
 
 ### Contactos (`CONT`)
 
-- [ ] **CONT-01** — El usuario puede crear contactos como persona física o jurídica con los atributos base (nombre/razón social, NIF/CIF, DNI, dirección, email, teléfono). *(F-050, F-051)*
-- [ ] **CONT-02** — Cada contacto tiene una tipología (`cliente`, `parte_contraria`, `interesado`, `otros`). *(F-052)*
-- [ ] **CONT-03** — El usuario puede añadir parámetros personalizados a un contacto, que se registran en el esquema dinámico del tipo `contacto`. *(F-051b, F-091)*
-- [ ] **CONT-04** — El usuario puede listar, filtrar y buscar contactos por nombre o documentación fiscal. *(F-055)*
-- [ ] **CONT-05** — Desde un contacto, el usuario puede ver en qué expedientes está vinculado. *(F-054)*
+- [x] **CONT-01** — El usuario puede crear contactos como persona física o jurídica con los atributos base (nombre/razón social, NIF/CIF, DNI, dirección, email, teléfono). *(F-050, F-051)*
+- [x] **CONT-02** — Cada contacto tiene una tipología (`cliente`, `parte_contraria`, `interesado`, `otros`). *(F-052)*
+- [x] **CONT-03** — El usuario puede añadir parámetros personalizados a un contacto, que se registran en el esquema dinámico del tipo `contacto`. *(F-051b, F-091)*
+- [x] **CONT-04** — El usuario puede listar, filtrar y buscar contactos por nombre o documentación fiscal. *(F-055)*
+- [x] **CONT-05** — Desde un contacto, el usuario puede ver en qué expedientes está vinculado. *(F-054)*
 
 ### Cláusulas (`CLAU`)
 

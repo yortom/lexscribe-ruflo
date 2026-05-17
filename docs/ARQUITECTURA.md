@@ -103,6 +103,39 @@ ruflo-Lexscribe/
 └── README.md
 ```
 
+### 3.1 Compilación de packages compartidos
+
+Los packages `shared-types` y `shared-validation` se **compilan a `dist/`
+(CommonJS)** antes de ser consumidos por las apps. No se importan como TS source
+directo. Esto garantiza compatibilidad estable con:
+
+- **Backend NestJS** — `nest start --watch` ejecuta `apps/backend/dist/`
+  (CommonJS) y resuelve `@lexscribe/shared-validation` a `dist/index.js`.
+- **Frontend Next.js 14 (webpack)** — consume el package como dependencia
+  externa normal (sin `transpilePackages`). Webpack bundlea el CJS sin inyectar
+  HMR ESM.
+
+**Configuración de cada package compartido (`packages/shared-*/package.json`):**
+
+```json
+{
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput"
+  }
+}
+```
+
+El `pnpm dev` raíz invoca en paralelo el `dev` de cada workspace, así que
+`tsc --watch` recompila los packages cuando cambian sus `src/*.ts` y los
+consumidores reciben los cambios sin reiniciar.
+
+**Ciclo en local:** `pnpm install` → `pnpm --filter "./packages/*" build` (una
+vez) → `pnpm dev` (mantiene watch).
+
 ---
 
 ## 4. Frontend (Next.js)
@@ -474,9 +507,9 @@ GitHub Actions con tres pipelines:
 
 | Componente | Versión mínima | Notas |
 |------------|---------------|-------|
-| Node.js | 22 LTS | Pinned en `engines` y en imagen Docker base. |
+| Node.js | 22 LTS | Pinned en `engines` (`>=22.0.0`) y `.nvmrc` (`22`). **No usar Node 24** — su `--experimental-strip-types` por defecto rompe la resolución CJS de los packages compartidos. |
 | MongoDB | 8.x | Imagen oficial. |
-| pnpm | 9.x | Gestor monorepo. |
+| pnpm | 9.12.0 | Gestor monorepo. Fijado en `package.json` (`packageManager: "pnpm@9.12.0"`). Activado vía `corepack enable && corepack prepare pnpm@9.12.0 --activate`. |
 | Docker | 24.x | Engine en el NAS. |
 | Docker Compose | v2 | Plugin moderno. |
 
@@ -608,3 +641,4 @@ Política: revisar bumps de versión cada 6 meses como parte del ciclo de manten
 |-------|--------|
 | 2026-04-26 | Creación inicial. Stack TypeScript end-to-end con Next.js (frontend), NestJS (backend), MongoDB + Mongoose, MinIO en NAS con backup a Google Drive, JWT + refresh, docxtemplater para generación. Despliegue con Docker Compose en NAS, CI/CD con GitHub Actions. Observabilidad básica (Pino + Sentry). 13 secciones + decisiones abiertas + diagrama de capas. |
 | 2026-04-26 | Cerradas decisiones abiertas. Editor de plantillas: **CodeMirror 6** (sección 4.3). Idioma de API: inglés. Versiones runtime: Node 22 LTS, MongoDB 8.x (sección 15). Nuevas secciones: **16 Seed inicial** (usuario por defecto + esquemas vacíos), **17 Cifrado** (3 capas: volumen NAS / TLS / AES por campo de PII), **18 Log de acciones** (colección `auditoria` inmutable, capturada por interceptor + eventos). Notificaciones por email descartadas para MVP. |
+| 2026-05-10 | **Sección 3.1 nueva** — `packages/shared-*` se compilan a `dist/` (CJS) en lugar de consumirse como TS source directo. Cambios: `main: "./dist/index.js"`, `tsconfig` con `module: commonjs`, scripts `build`/`dev` con `tsc --watch`. Frontend Next.js NO usa `transpilePackages` (causa HMR injection inválido en archivos CJS). Sección 15 actualizada: prohibir Node 24 (rompe la resolución), pnpm 9.12.0 vía corepack. |

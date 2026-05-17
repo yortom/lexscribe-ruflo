@@ -4,20 +4,104 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+  IMAGE_PREFIX: lexscribe
+
 jobs:
-  build-and-push:
+  ci:
+    name: Lint + TypeCheck + Test + Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.12.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+      - run: pnpm test
+      - run: pnpm build
+
+  build-and-push:
+    name: Build & Push images to GHCR
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
+    outputs:
+      sha_tag: ${{ steps.meta.outputs.sha_tag }}
     steps:
       - uses: actions/checkout@v4
 
-      # TODO:
-      # 1. Run lint/typecheck/test (reuse pr.yml steps).
-      # 2. Build Docker images for backend and frontend.
-      # 3. Push to GitHub Container Registry (ghcr.io).
-      # 4. Trigger webhook on staging NAS to pull and re-up docker-compose.
+      - name: Compute short SHA
+        id: meta
+        run: echo "sha_tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Placeholder
-        run: echo "deploy-staging.yml — TODO see ARQUITECTURA §11.2"
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-backend:staging
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-backend:${{ steps.meta.outputs.sha_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-frontend:staging
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-frontend:${{ steps.meta.outputs.sha_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: infra/nginx
+          file: infra/nginx/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-nginx:staging
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/lexscribe-nginx:${{ steps.meta.outputs.sha_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  notify-nas:
+    name: Notify NAS staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger NAS staging webhook
+        run: |
+          curl --fail --show-error --silent \
+            -X POST "${{ secrets.NAS_STAGING_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.NAS_STAGING_WEBHOOK_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"environment":"staging","sha":"${{ needs.build-and-push.outputs.sha_tag }}"}'

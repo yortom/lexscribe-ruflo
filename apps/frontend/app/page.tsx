@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
-    <main>
-      <h1>Lexscribe</h1>
+    <main className="flex min-h-screen items-center justify-center p-8">
+      <h1 className="text-3xl font-bold">Lexscribe</h1>
     </main>
   );
 }

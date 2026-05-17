@@ -66,7 +66,17 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 
 ## Validated Requirements
 
-*(Vacío — ningún requisito implementado aún.)*
+### Phase 2 — Auth y Bases Transversales (2026-05-02)
+
+- **INF-06** — Backup diario rclone → Google Drive operativo (`infra/scripts/backup-daily.sh`; real-Drive upload requiere paso manual del operador en NAS)
+- **AUTH-01** — Login email/password → JWT 15 min + refresh cookie 7 d con argon2id
+- **AUTH-02** — Refresh rotativo: nuevo token, viejo invalidado, reuse detection (clearAllRefreshTokens)
+- **AUTH-03** — Logout invalida el refresh token en servidor
+- **AUTH-04** — `@CurrentUser()` inyecta `usuarioId` desde JWT; DTOs con `.strict()` rechazan `usuarioId` en body
+- **AUTH-05** — `pnpm seed` idempotente: 1 usuario + 2 esquemas vacíos; no sobrescribe password
+- **AUTH-06** — `softDeletePlugin` aplicado a `usuario.schema.ts`; plugin unit-tested (6 aserciones); Phase 3 aplica a `contactos`
+- **AUTH-07** — `auditoria` asíncrona (setImmediate) con `AuditInterceptor` + `@Audited` + listeners EventEmitter para create/update/delete/link/unlink/generate/login/logout
+- **AUTH-08** — Módulo `esquemas` con GET/POST/DELETE por `tipoObjeto`; `$addToSet` atómico; auditoría integrada
 
 ## Out of Scope
 
@@ -112,4 +122,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-04-27 — milestone v1.0 MVP iniciada (bootstrap desde `docs/`).*
+*Last updated: 2026-05-03 — Phase 2 complete (auth + bases transversales, 9/9 requirements satisfied).*

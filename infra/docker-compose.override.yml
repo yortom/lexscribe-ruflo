@@ -1,0 +1,12 @@
+# Override para desarrollo local - expone puertos de infra al host
+# Docker Compose aplica este archivo automaticamente si se llama override.yml
+# NO usar en produccion
+services:
+  mongodb:
+    ports:
+      - "27017:27017"
+
+  minio:
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Consola web (http://localhost:9001)

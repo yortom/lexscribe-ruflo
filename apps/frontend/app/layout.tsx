@@ -1,8 +1,9 @@
-import type { Metadata, ReactNode } from 'next';
+import './globals.css';
+import type { ReactNode } from 'react';
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Lexscribe',
-  description: 'Automatización de contratos legales',
+  description: 'Lexscribe — gestión de despacho legal',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

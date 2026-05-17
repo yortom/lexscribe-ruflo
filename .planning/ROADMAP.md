@@ -10,8 +10,8 @@
 - Integer phases (1, 2, 3…): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde
-- [ ] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup
+- [x] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde — Completed 2026-04-27
+- [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
 - [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
 - [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
 - [ ] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
@@ -34,10 +34,11 @@
 **Plans**: TBD
 
 Plans:
-- [ ] 01-01: Inicializar monorepo pnpm workspaces con apps/frontend, apps/backend, packages/shared-types, packages/shared-validation
-- [ ] 01-02: Configurar Docker Compose con servicios frontend, backend, mongodb, minio, nginx
-- [ ] 01-03: Implementar healthcheck endpoints en NestJS (Terminus) y healthcheck de contenedores
-- [ ] 01-04: Configurar GitHub Actions: PR pipeline (lint, type-check, tests, build), deploy-staging y deploy-prod
+- [x] 01-01: Monorepo init — pnpm workspaces + shared packages + tooling base
+- [x] 01-02: Frontend skeleton — Next.js 14 App Router + Tailwind + Vitest
+- [x] 01-03: Backend skeleton — NestJS + Pino + Terminus health endpoints + Jest
+- [x] 01-04: Docker Compose + Nginx + Dockerfiles para frontend y backend
+- [x] 01-05: GitHub Actions — pr.yml + deploy-staging.yml + deploy-prod.yml
 
 ### Phase 2: Auth y bases transversales
 **Goal**: Login funcional, registro de auditoría operativo, soft-delete activo, esquema dinámico disponible y backup automatizado.
@@ -50,13 +51,13 @@ Plans:
   4. Crear/editar/borrar cualquier recurso genera registro en `auditoria` con accion, recursoId, cambios, timestamp
   5. Backup diario de MinIO + Mongo a Google Drive verificable inspeccionando Drive
   6. Endpoints `/api/v1/esquemas/:tipoObjeto` CRUD operativos para `expediente` y `contacto`
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: Módulo auth NestJS: usuarios collection, JWT+refresh con rotación, guards, decorador @CurrentUser, frontend login/logout
-- [ ] 02-02: Bases transversales: soft-delete middleware Mongoose, ZodValidationPipe, ExceptionFilter con errores de dominio tipados
-- [ ] 02-03: Auditoría: interceptor + event listeners para create/update/delete/link/unlink/generate/login/logout
-- [ ] 02-04: Seed idempotente (usuario + esquemas vacíos) + módulo esquemas con CRUD + rclone backup en NAS
+- [x] 02-01-auth-jwt-refresh-PLAN.md — Módulo auth NestJS (Wave 0 setup, usuarios+refresh tokens, JWT+rotación, @CurrentUser, login UI Next.js) — Completed 2026-05-02
+- [x] 02-02-bases-transversales-PLAN.md — Soft-delete plugin Mongoose, ZodValidationPipe global, DomainExceptionFilter con errores tipados — Completed 2026-05-02
+- [x] 02-03-auditoria-PLAN.md — Auditoría híbrida: AuditInterceptor + EventEmitter listeners + auth.login/logout events — Completed 2026-05-02
+- [x] 02-04-seed-esquemas-backup-PLAN.md — Módulo esquemas (CRUD) + pnpm seed idempotente + rclone backup-daily.sh — Completed 2026-05-02
 
 ### Phase 3: Contactos
 **Goal**: El usuario puede gestionar la base de contactos completa con sus parámetros personalizados.
@@ -71,7 +72,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
+- [x] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
 - [ ] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
 - [ ] 03-03: Tests unitarios e integración del módulo contactos
 
@@ -177,9 +178,9 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Bootstrap de infraestructura | 0/4 | Not started | - |
-| 2. Auth y bases transversales | 0/4 | Not started | - |
-| 3. Contactos | 0/3 | Not started | - |
+| 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
+| 2. Auth y bases transversales | 3/4 | In Progress|  |
+| 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
 | 5. Plantillas y Editor | 0/4 | Not started | - |
 | 6. Generación y Documentos | 0/4 | Not started | - |

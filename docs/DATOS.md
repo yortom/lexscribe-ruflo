@@ -35,18 +35,18 @@
 
 ## 3. Inventario de colecciones
 
-| Colección | Función | Features principales |
-|-----------|---------|----------------------|
-| `expedientes` | Caso jurídico — agrupa documentos, contactos, fechas, facturación | F-001 a F-008 |
-| `contactos` | Persona física o jurídica vinculable a expedientes | F-050 a F-055 |
-| `plantillas` | Documento base con variables `{{objeto.campo}}` | F-020 a F-029 |
-| `clausulas` | Cláusulas tipo reutilizables | F-040 a F-046 |
-| `documentos` | Documento concreto dentro de un expediente (generado o subido) | F-010 a F-018 |
-| `eventos` | Entradas del calendario (auto desde documentos o manuales) | F-060 a F-066 |
-| `facturas` | Entradas de facturación por expediente | F-070 a F-075 |
-| `esquemas` | Esquema dinámico de variables por tipo de objeto | F-090 a F-096 |
-| `usuarios` | Usuarios del sistema. En el MVP contiene un único registro; preparado para multi-usuario | — (preparación arquitectónica) |
-| `auditoria` | Log inmutable de acciones del sistema (create / update / delete / link / generate / login). Detalle en [`ARQUITECTURA.md` §18](ARQUITECTURA.md). | Auditoría legal |
+| Colección     | Función                                                                                                                                          | Features principales           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| `expedientes` | Caso jurídico — agrupa documentos, contactos, fechas, facturación                                                                                | F-001 a F-008                  |
+| `contactos`   | Persona física o jurídica vinculable a expedientes                                                                                               | F-050 a F-055                  |
+| `plantillas`  | Documento base con variables `{{objeto.campo}}`                                                                                                  | F-020 a F-029                  |
+| `clausulas`   | Cláusulas tipo reutilizables                                                                                                                     | F-040 a F-046                  |
+| `documentos`  | Documento concreto dentro de un expediente (generado o subido)                                                                                   | F-010 a F-018                  |
+| `eventos`     | Entradas del calendario (auto desde documentos o manuales)                                                                                       | F-060 a F-066                  |
+| `facturas`    | Entradas de facturación por expediente                                                                                                           | F-070 a F-075                  |
+| `esquemas`    | Esquema dinámico de variables por tipo de objeto                                                                                                 | F-090 a F-096                  |
+| `usuarios`    | Usuarios del sistema. En el MVP contiene un único registro; preparado para multi-usuario                                                         | — (preparación arquitectónica) |
+| `auditoria`   | Log inmutable de acciones del sistema (create / update / delete / link / generate / login). Detalle en [`ARQUITECTURA.md` §18](ARQUITECTURA.md). | Auditoría legal                |
 
 ---
 
@@ -54,7 +54,7 @@
 
 ### 4.1 `expedientes`
 
-> Un expediente agrupa toda la información de un caso. *(F-001)*
+> Un expediente agrupa toda la información de un caso. _(F-001)_
 
 ```js
 {
@@ -83,11 +83,13 @@
 ```
 
 **Índices:**
+
 - `{ nombre: "text" }` — búsqueda por nombre (F-007).
 - `{ "contactos.contactoId": 1, activo: 1 }` — para resolver "expedientes de un contacto" (F-054).
 - `{ usuarioId: 1, activo: 1, fechaCreacion: -1 }` — listado por defecto (filtra por propietario y activos).
 
 **Notas:**
+
 - `parametros` es un sub-documento libre cuya estructura la dicta la colección `esquemas` (entrada `tipoObjeto: "expediente"`). Ver sección 5.
 - La pareja `contactoId + rol` debe ser única dentro de un expediente — se valida en aplicación, no en MongoDB.
 - `rol` es texto libre. La aplicación puede sugerir valores recientes/comunes en la UI, pero no impone una lista cerrada.
@@ -96,7 +98,7 @@
 
 ### 4.2 `contactos`
 
-> Persona física o jurídica vinculable a uno o varios expedientes. *(F-050)*
+> Persona física o jurídica vinculable a uno o varios expedientes. _(F-050)_
 
 ```js
 {
@@ -107,8 +109,9 @@
            | "interesado" | "otros",           // F-052
   // Atributos base (F-051)
   nombre: String,                              // nombre y apellidos o razón social
-  documentacionFiscal: String,                 // NIF/CIF
-  documentoIdentidad: String,                  // DNI/NIE/Pasaporte
+  documentacionFiscal: String,                 // NIF/CIF cifrado AES-256-GCM
+  documentoIdentidad: String,                  // DNI/NIE/Pasaporte cifrado AES-256-GCM
+  documentacionFiscalHash: String | null,      // hash determinista para duplicados/busqueda exacta
   direccion: String,
   email: String,
   telefono: String,
@@ -124,18 +127,20 @@
 }
 ```
 
-**Índices:**
-- `{ nombre: "text", documentacionFiscal: "text" }` — búsqueda (F-055).
-- `{ documentacionFiscal: 1 }` — único parcial (cuando exista valor) para evitar duplicados.
+**Indices:**
+
+- `{ usuarioId: 1, nombre: 1 }` - busqueda parcial por nombre dentro del usuario (F-055).
+- `{ usuarioId: 1, documentacionFiscalHash: 1 }` - unico parcial (cuando exista valor) para evitar duplicados sin exponer PII.
 
 **Notas:**
+
 - El listado de expedientes en los que está presente un contacto **no se almacena aquí**: se obtiene consultando `expedientes` por `contactos.contactoId` (F-054).
 
 ---
 
 ### 4.3 `plantillas`
 
-> Documento base con variables `{{objeto.campo}}`. *(F-020 a F-029)*
+> Documento base con variables `{{objeto.campo}}`. _(F-020 a F-029)_
 >
 > **Versionado por nuevo documento:** cada edición que se guarda crea **un nuevo registro** en la colección. La versión anterior pasa a `activo: false` y deja de mostrarse en el frontal. Esto preserva la trazabilidad de qué plantilla generó cada documento histórico.
 
@@ -171,11 +176,13 @@
 ```
 
 **Índices:**
+
 - `{ plantillaRaizId: 1, version: -1 }` — recuperar la versión vigente o el historial.
 - `{ usuarioId: 1, activo: 1 }` — listado del frontal (solo activas).
 - `{ "variablesDetectadas.tipoObjeto": 1, "variablesDetectadas.campo": 1 }` — localizar plantillas afectadas si se renombra una variable del esquema (F-095, post-MVP).
 
 **Notas:**
+
 - `contenido` se guarda como **texto plano** con los marcadores. Cuando el origen es `.docx`, el sistema extrae el texto y lo conserva; el `.docx` original se preserva en Storage para casos donde haga falta el formato exacto.
 - `variablesDetectadas` se recalcula al editar el contenido — es una vista materializada para acelerar validaciones y formularios de generación.
 - **Edición = nueva versión:** al guardar cambios, el sistema (a) inserta un nuevo documento con `version + 1` y `activo: true`, y (b) marca la versión anterior con `activo: false` y `fechaInactivacion: now`.
@@ -186,7 +193,7 @@
 
 ### 4.4 `clausulas`
 
-> Fragmentos reutilizables de texto con o sin variables. *(F-040 a F-046)*
+> Fragmentos reutilizables de texto con o sin variables. _(F-040 a F-046)_
 
 ```js
 {
@@ -203,6 +210,7 @@
 ```
 
 **Índices:**
+
 - `{ usuarioId: 1, activo: 1, labels: 1 }` — filtrado por etiqueta dentro del catálogo activo (F-046).
 - `{ nombre: "text", texto: "text" }` — búsqueda full-text.
 
@@ -210,7 +218,7 @@
 
 ### 4.5 `documentos`
 
-> Documento concreto dentro de un expediente. Puede ser **generado** desde plantilla o **subido** preexistente. *(F-010 a F-018)*
+> Documento concreto dentro de un expediente. Puede ser **generado** desde plantilla o **subido** preexistente. _(F-010 a F-018)_
 
 ```js
 {
@@ -234,10 +242,12 @@
 ```
 
 **Índices:**
+
 - `{ expedienteId: 1, fechaCreacion: -1 }` — listado dentro de un expediente.
 - `{ plantillaId: 1 }` — si se quiere saber cuántos documentos usan una plantilla.
 
 **Notas:**
+
 - `datosCongelados` materializa el JSON resuelto — incluye nombre, NIF, importes, etc. de los contactos y expediente en el momento de la generación. **Garantiza inmutabilidad** ante cambios posteriores en `contactos`/`expedientes` (F-015).
 - Las **fechas/eventos** del documento **no** se guardan aquí: viven en `eventos` con `documentoId`.
 
@@ -245,7 +255,7 @@
 
 ### 4.6 `eventos`
 
-> Entradas del calendario, asociadas o no a un documento. *(F-060 a F-066)*
+> Entradas del calendario, asociadas o no a un documento. _(F-060 a F-066)_
 
 ```js
 {
@@ -271,6 +281,7 @@
 ```
 
 **Índices:**
+
 - `{ fechaInicio: 1 }` — vista de calendario por rango.
 - `{ expedienteId: 1, fechaInicio: 1 }` — fechas del expediente (F-006).
 - `{ documentoId: 1 }` — para FL-9 (borrado de documento con eventos).
@@ -279,7 +290,7 @@
 
 ### 4.7 `facturas`
 
-> Entradas de facturación por expediente. *(F-070 a F-075)*
+> Entradas de facturación por expediente. _(F-070 a F-075)_
 
 ```js
 {
@@ -300,17 +311,19 @@
 ```
 
 **Índices:**
+
 - `{ expedienteId: 1, fecha: -1 }` — listado dentro de la pestaña facturación del expediente.
 - `{ estado: 1 }` — para vistas filtradas (post-MVP F-075).
 
 **Notas:**
+
 - El **coste total acumulado** del expediente (F-071) se calcula sobre la marcha (`$sum` agregado por `expedienteId`). No se denormaliza en `expedientes` para evitar inconsistencias.
 
 ---
 
 ### 4.8 `esquemas`
 
-> Define qué parámetros admite cada tipo de objeto en el esquema dinámico. *(F-090 a F-096)*
+> Define qué parámetros admite cada tipo de objeto en el esquema dinámico. _(F-090 a F-096)_
 
 ```js
 {
@@ -331,9 +344,11 @@
 **Convención:** una entrada por `tipoObjeto` y por `usuarioId`. Es decir, cada usuario tiene su propio esquema dinámico.
 
 **Índices:**
+
 - `{ usuarioId: 1, tipoObjeto: 1 }` único compuesto.
 
 **Notas:**
+
 - Cuando se crea un parámetro nuevo (FL-13), se hace `$addToSet` al array `parametros` correspondiente.
 - Borrar/renombrar (F-095) es post-MVP — requeriría migración del campo en todas las instancias y validación en plantillas.
 - Esta colección **no** lleva `activo`/`fechaInactivacion`: el ciclo de vida lo gestionan los elementos del array `parametros` (un parámetro retirado se marca a nivel de elemento, no de documento entero).
@@ -359,9 +374,11 @@
 ```
 
 **Índices:**
+
 - `{ email: 1 }` único.
 
 **Notas:**
+
 - En el MVP se crea un usuario por defecto al inicializar la base de datos (`seed`). Todas las operaciones del sistema escriben su `_id` en el campo `usuarioId` de los registros que crean.
 - Cuando llegue el multi-usuario, las consultas ya filtrarán correctamente por `usuarioId` sin migración del esquema.
 
@@ -388,19 +405,20 @@ esquemas    ──○ expedientes      (gobierna .parametros)
             ──○ contactos        (gobierna .parametros)
 ```
 
-| Tipo | Patrón | Razón |
-|------|--------|-------|
-| Expediente ↔ Contactos | M:N **embebido** en `expedientes.contactos[]` | Pocas decenas como mucho; necesitamos rol contextual del contacto en ese expediente. |
-| Expediente → Documentos/Eventos/Facturas | 1:N **referenciado** | Cardinalidad alta; lectura segmentada. |
-| Documento → Plantilla | N:1 **referenciado** | Plantilla cambia, documento ya generado **no** se ve afectado (snapshot). |
-| Documento ↔ Cláusulas | N:M **referenciado** | Lista de IDs en `clausulasUsadas`. |
-| Esquema ↔ Instancias | implícito | El esquema sólo se valida/usa en aplicación. |
+| Tipo                                     | Patrón                                        | Razón                                                                                |
+| ---------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Expediente ↔ Contactos                   | M:N **embebido** en `expedientes.contactos[]` | Pocas decenas como mucho; necesitamos rol contextual del contacto en ese expediente. |
+| Expediente → Documentos/Eventos/Facturas | 1:N **referenciado**                          | Cardinalidad alta; lectura segmentada.                                               |
+| Documento → Plantilla                    | N:1 **referenciado**                          | Plantilla cambia, documento ya generado **no** se ve afectado (snapshot).            |
+| Documento ↔ Cláusulas                    | N:M **referenciado**                          | Lista de IDs en `clausulasUsadas`.                                                   |
+| Esquema ↔ Instancias                     | implícito                                     | El esquema sólo se valida/usa en aplicación.                                         |
 
 ---
 
 ## 6. Storage de archivos
 
 **Layout propuesto:**
+
 ```
 /plantillas/{plantillaId}/{nombreOriginal}.docx
 /documentos/generados/{documentoId}/{nombreSlug}.docx
@@ -408,6 +426,7 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 ```
 
 **Reglas:**
+
 - Las rutas se guardan en `storagePath` de cada colección. Nunca se reconstruyen desde nombres.
 - **Soft delete + Storage:** cuando un registro pasa a `activo: false`, el archivo en Storage **se mantiene**. El archivo solo se elimina si se purgan los inactivos (operación administrativa, fuera del flujo normal).
 - **Plantillas inactivadas por nueva versión:** el archivo original de la versión antigua **se mantiene** asociado a su registro inactivo (necesario porque los documentos generados con esa versión pueden seguir referenciándola).
@@ -420,12 +439,17 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 > El esquema dinámico (módulo funcional 4.7) se materializa con la colección `esquemas` y los sub-documentos `parametros` en `expedientes` y `contactos`.
 
 **Flujo de creación (FL-13):**
+
 1. Usuario añade parámetro `honorariosBase` a un expediente.
 2. App actualiza la entrada `esquemas` con `tipoObjeto: "expediente"`:
    ```js
    db.esquemas.updateOne(
-     { tipoObjeto: "expediente" },
-     { $addToSet: { parametros: { nombre: "honorariosBase", tipoDato: "numero", obligatorio: false } } }
+     { tipoObjeto: 'expediente' },
+     {
+       $addToSet: {
+         parametros: { nombre: 'honorariosBase', tipoDato: 'numero', obligatorio: false },
+       },
+     },
    );
    ```
 3. App escribe el valor en el expediente concreto:
@@ -438,6 +462,7 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 4. La variable queda disponible para `{{expediente.honorariosBase}}` en plantillas.
 
 **Validación al generar documento (FL-6):**
+
 - Para cada `{{tipoObjeto.campo}}` en la plantilla, se busca:
   - En el esquema (existencia del campo).
   - En la instancia concreta (presencia del valor).
@@ -447,7 +472,7 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 
 ## 8. Decisiones abiertas
 
-- ¿Tamaño máximo de archivo en Storage? Documentos legales escaneados pueden ser pesados. *(Pendiente.)*
+- ¿Tamaño máximo de archivo en Storage? Documentos legales escaneados pueden ser pesados. _(Pendiente.)_
 
 ### Resueltas
 
@@ -462,7 +487,9 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 
 ## 9. Changelog
 
-| Fecha | Cambio |
-|-------|--------|
-| 2026-04-26 | Creación inicial del documento. Inventario de 8 colecciones (`expedientes`, `contactos`, `plantillas`, `clausulas`, `documentos`, `eventos`, `facturas`, `esquemas`) con esquema, índices, relaciones y trazabilidad a features de FUNCIONAL.md. Layout de Storage definido. |
+| Fecha      | Cambio                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-26 | Creación inicial del documento. Inventario de 8 colecciones (`expedientes`, `contactos`, `plantillas`, `clausulas`, `documentos`, `eventos`, `facturas`, `esquemas`) con esquema, índices, relaciones y trazabilidad a features de FUNCIONAL.md. Layout de Storage definido.                                                                                                                                                     |
 | 2026-04-26 | Resueltas decisiones de modelo: roles texto libre, **soft delete universal** (`activo` + `fechaInactivacion`), versionado de plantillas por nuevo documento (`plantillaRaizId` + `version`), nueva colección **`usuarios`** y campo `usuarioId` en todas las colecciones de negocio para preparar multi-usuario. Validación a nivel aplicación. Actualizadas convenciones, todas las colecciones, índices, relaciones y storage. |
+| 2026-05-17 | `contactos`: `documentacionFiscal` y `documentoIdentidad` quedan cifrados a nivel de aplicacion; duplicados y busqueda exacta por NIF/CIF usan `documentacionFiscalHash`.                                                                                                                                                                                                                                                        |
+| 2026-05-17 | `contactos`: indice de nombre alineado con busqueda parcial por usuario (`{ usuarioId: 1, nombre: 1 }`).                                                                                                                                                                                                                                                                                                                         |

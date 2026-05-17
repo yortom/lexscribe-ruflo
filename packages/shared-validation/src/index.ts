@@ -1,11 +1,12 @@
-/**
- * Shared Zod schemas between frontend and backend.
- *
- * Use these to validate the same way on both sides:
- *   - Frontend: form validation (with @hookform/resolvers/zod)
- *   - Backend: DTO validation (with nestjs-zod)
- *
- * One file per domain, mirroring shared-types.
- */
+import { z } from 'zod';
 
-export {};
+export const HealthStatusSchema = z.object({
+  status: z.enum(['ok', 'error']),
+  timestamp: z.string(),
+});
+
+export type HealthStatusInput = z.infer<typeof HealthStatusSchema>;
+
+export * from './auth';
+export * from './esquemas';
+export * from './contactos';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ContactosRepository } from './contactos.repository';
 import { EsquemasService } from '../esquemas/esquemas.service';
-import { NotFoundError } from '../../common/errors';
+import { ConflictError, NotFoundError } from '../../common/errors';
 import {
   CreateContactoInput,
   UpdateContactoInput,
@@ -31,7 +31,15 @@ export class ContactosService {
   }
 
   async create(usuarioId: string, dto: CreateContactoInput) {
-    const contacto = await this.repo.create(usuarioId, dto);
+    let contacto;
+    try {
+      contacto = await this.repo.create(usuarioId, dto);
+    } catch (err) {
+      if ((err as { code?: number }).code === 11000) {
+        throw new ConflictError('Contact documentacionFiscal already registered');
+      }
+      throw err;
+    }
     // CONT-03: registrar parámetros nuevos en el esquema dinámico (FL-13 Punto A)
     await this.registerParametros(usuarioId, dto.parametros ?? {});
     return contacto;

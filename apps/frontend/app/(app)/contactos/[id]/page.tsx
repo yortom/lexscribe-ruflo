@@ -58,7 +58,11 @@ export default function ContactoDetailPage({ params }: { params: { id: string } 
       <ContactoForm
         initial={data}
         onSubmit={async (input) => {
-          await updateMut.mutateAsync(input);
+          try {
+            await updateMut.mutateAsync(input);
+          } catch {
+            // TanStack Query stores the error in updateMut.error for inline UI.
+          }
         }}
         submitLabel="Guardar cambios"
       />

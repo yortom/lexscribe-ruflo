@@ -22,7 +22,11 @@ export default function NuevoContactoPage() {
       )}
       <ContactoForm
         onSubmit={async (data) => {
-          await mutation.mutateAsync(data);
+          try {
+            await mutation.mutateAsync(data);
+          } catch {
+            // TanStack Query stores the error in mutation.error for inline UI.
+          }
         }}
         submitLabel="Crear contacto"
       />

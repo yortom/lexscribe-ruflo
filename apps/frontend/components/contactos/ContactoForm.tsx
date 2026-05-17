@@ -21,6 +21,22 @@ interface ContactoFormProps {
   submitLabel?: string;
 }
 
+function getDefaultValues(
+  initial?: Partial<CreateContactoInput>,
+): CreateContactoInput {
+  return {
+    tipo: initial?.tipo ?? 'fisica',
+    tipologia: initial?.tipologia ?? 'cliente',
+    nombre: initial?.nombre ?? '',
+    documentacionFiscal: initial?.documentacionFiscal,
+    documentoIdentidad: initial?.documentoIdentidad,
+    direccion: initial?.direccion,
+    email: initial?.email,
+    telefono: initial?.telefono,
+    parametros: initial?.parametros ?? {},
+  };
+}
+
 export function ContactoForm({
   initial,
   onSubmit,
@@ -34,13 +50,7 @@ export function ContactoForm({
     formState: { errors, isSubmitting },
   } = useForm<CreateContactoInput>({
     resolver: zodResolver(CreateContactoSchema) as Resolver<CreateContactoInput>,
-    defaultValues: {
-      tipo: 'fisica',
-      tipologia: 'cliente',
-      nombre: '',
-      parametros: {},
-      ...initial,
-    },
+    defaultValues: getDefaultValues(initial),
   });
 
   const parametros = (watch('parametros') as Record<string, unknown>) ?? {};

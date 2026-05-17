@@ -7,7 +7,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -24,7 +24,7 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ['CMD', 'mc', 'ready', 'local']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -40,9 +40,8 @@ services:
       NODE_ENV: production
       PORT: 3001
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017/lexscribe}
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY}
+      JWT_ACCESS_SECRET: '${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}'
+      APP_ENCRYPTION_KEY: '${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY is required}'
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}
       MINIO_PORT: ${MINIO_PORT:-9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
@@ -50,9 +49,10 @@ services:
       MINIO_BUCKET: ${MINIO_BUCKET:-lexscribe}
     depends_on:
       mongodb: { condition: service_healthy }
-      minio:   { condition: service_healthy }
+      minio: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/v1/health"]
+      test:
+        ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3001/api/v1/health']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -70,7 +70,7 @@ services:
     depends_on:
       backend: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3000/']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -82,11 +82,13 @@ services:
       context: ./nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ${NGINX_CERT_DIR:-./nginx/certs}:/etc/nginx/certs:ro
     depends_on:
       frontend: { condition: service_healthy }
-      backend:  { condition: service_healthy }
+      backend: { condition: service_healthy }
     networks: [lexscribe_net]
 
 volumes:

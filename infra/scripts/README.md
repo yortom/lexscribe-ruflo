@@ -7,10 +7,22 @@
 ## Local stack
 
 From repo root:
-1. cp .env.example .env  (then fill secrets)
+
+1. cp .env.example .env (then fill secrets)
 2. ./infra/scripts/generate-self-signed-cert.sh
 3. docker compose -f infra/docker-compose.yml --env-file .env up --build
 4. open https://localhost (accept self-signed warning)
+
+## Nginx TLS certificates
+
+`infra/docker-compose.yml` mounts `${NGINX_CERT_DIR:-./nginx/certs}` into `/etc/nginx/certs`.
+The directory must contain:
+
+- `lexscribe.crt`
+- `lexscribe.key`
+
+For local development, run `./infra/scripts/generate-self-signed-cert.sh` once before `docker compose up`.
+For staging/production, point `NGINX_CERT_DIR` to the NAS directory that contains the managed certificate and private key.
 
 ---
 
@@ -97,14 +109,14 @@ Añadir la siguiente línea (backup diario a las 3:00 UTC):
 
 El script usa estas variables con valores por defecto razonables:
 
-| Variable | Default | Descripción |
-|----------|---------|-------------|
-| `BACKUP_DIR` | `/var/backups/lexscribe` | Directorio local de backups |
-| `RCLONE_CONFIG` | `/etc/rclone/rclone.conf` | Ruta al config rclone |
-| `REMOTE_DRIVE` | `gdrive:lexscribe-backup` | Remote + carpeta en Drive |
-| `REMOTE_MINIO` | `minio:lexscribe` | Remote rclone para MinIO |
-| `LOCAL_RETENTION_DAYS` | `7` | Días de retención local |
-| `REMOTE_RETENTION_DAYS` | `30` | Días de retención en Drive |
+| Variable                | Default                   | Descripción                 |
+| ----------------------- | ------------------------- | --------------------------- |
+| `BACKUP_DIR`            | `/var/backups/lexscribe`  | Directorio local de backups |
+| `RCLONE_CONFIG`         | `/etc/rclone/rclone.conf` | Ruta al config rclone       |
+| `REMOTE_DRIVE`          | `gdrive:lexscribe-backup` | Remote + carpeta en Drive   |
+| `REMOTE_MINIO`          | `minio:lexscribe`         | Remote rclone para MinIO    |
+| `LOCAL_RETENTION_DAYS`  | `7`                       | Días de retención local     |
+| `REMOTE_RETENTION_DAYS` | `30`                      | Días de retención en Drive  |
 
 ## Procedimiento de verificación mensual
 

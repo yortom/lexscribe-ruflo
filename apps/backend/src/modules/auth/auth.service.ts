@@ -179,9 +179,9 @@ export class AuthService {
   setRefreshCookie(res: Response, plain: string): void {
     res.cookie('refresh_token', plain, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'test',
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/v1/auth',
+      path: '/',
       maxAge: 604800000, // 7 days in ms
     });
   }
@@ -189,9 +189,9 @@ export class AuthService {
   clearRefreshCookie(res: Response): void {
     res.clearCookie('refresh_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'test',
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/v1/auth',
+      path: '/',
     });
   }
 

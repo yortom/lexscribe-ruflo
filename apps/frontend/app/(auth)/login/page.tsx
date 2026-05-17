@@ -40,7 +40,7 @@ export default function LoginPage() {
     try {
       const res = await login(email, password);
       session.set(res.accessToken);
-      router.push('/');
+      router.push('/contactos');
     } catch (err) {
       const message = err instanceof Error ? err.message : '';
       if (message === 'Invalid credentials') {

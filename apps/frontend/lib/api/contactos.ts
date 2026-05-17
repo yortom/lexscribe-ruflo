@@ -9,6 +9,7 @@ import type {
   QueryContactoInput,
 } from '@lexscribe/shared-validation';
 import { session } from '../auth/session';
+import { refresh } from './auth';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? '/api/v1';
 
@@ -23,9 +24,8 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = session.get();
-  const res = await fetch(`${API}${path}`, {
+async function rawFetch(path: string, init: RequestInit | undefined, token: string | null) {
+  return fetch(`${API}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
@@ -34,6 +34,23 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     },
     credentials: 'include',
   });
+}
+
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  let token = session.get();
+  let res = await rawFetch(path, init, token);
+
+  // Si no hay token en memoria o el server devuelve 401, intenta refrescar
+  // usando la cookie refresh_token y reintenta UNA vez.
+  if (res.status === 401) {
+    const refreshed = await refresh();
+    if (refreshed?.accessToken) {
+      session.set(refreshed.accessToken);
+      token = refreshed.accessToken;
+      res = await rawFetch(path, init, token);
+    }
+  }
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new ApiError(body.code ?? 'UNKNOWN', body.message ?? 'API error', res.status);

@@ -20,6 +20,8 @@ COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/frontend/node_modules ./apps/frontend/node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Build shared packages first — frontend resuelve @lexscribe/shared-* a dist/index.js
+RUN pnpm --filter "./packages/*" run build
 RUN pnpm --filter @lexscribe/frontend build
 
 # === Stage 3: runtime ===

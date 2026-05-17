@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 ARG NODE_VERSION=22-alpine
 
-# === Stage 1: deps ===
+# === Stage 1: deps — instala paquetes externos (sin fuentes workspace) ===
 FROM node:${NODE_VERSION} AS deps
 RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 WORKDIR /repo
@@ -10,15 +10,22 @@ COPY tsconfig.base.json ./
 COPY apps/backend/package.json apps/backend/
 COPY packages/shared-types/package.json packages/shared-types/
 COPY packages/shared-validation/package.json packages/shared-validation/
-RUN pnpm install --frozen-lockfile
+# node-linker=hoisted: sin symlinks al .pnpm store, seguro para copiar entre stages
+RUN pnpm install --frozen-lockfile --node-linker=hoisted
 
-# === Stage 2: build ===
+# === Stage 2: build — fuentes + re-link de workspace packages ===
 FROM node:${NODE_VERSION} AS build
 RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 WORKDIR /repo
+# Copia deps externos pre-instalados (layer cacheado)
 COPY --from=deps /repo/node_modules ./node_modules
-COPY --from=deps /repo/apps/backend/node_modules ./apps/backend/node_modules
+# Copia TODO el monorepo (incluye packages/shared-*/src/)
 COPY . .
+# Re-corre install para crear los symlinks workspace ahora que el fuente existe
+# Las deps externas ya están en node_modules, pnpm solo añade los links workspace
+RUN pnpm install --frozen-lockfile --node-linker=hoisted
+# Build shared packages first — backend resuelve @lexscribe/shared-* a dist/index.js
+RUN pnpm --filter "./packages/*" run build
 RUN pnpm --filter @lexscribe/backend build
 
 # === Stage 3: runtime ===

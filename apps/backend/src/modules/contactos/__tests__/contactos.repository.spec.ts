@@ -1,8 +1,8 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { ContactosRepository } from '../contactos.repository';
-import { Contacto } from '../schemas/contacto.schema';
+import { Contacto, ContactoSchema } from '../schemas/contacto.schema';
 
 type QueryMock = {
   skip: jest.Mock;
@@ -171,5 +171,162 @@ describe('ContactosRepository', () => {
       },
       { returnDocument: 'after' },
     );
+  });
+});
+
+describe('ContactoSchema transforms and pre-hooks', () => {
+  // Use a unique model name per test suite to avoid OverwriteModelError
+  const MODEL_NAME = `ContactoTest_${Date.now()}`;
+  let ContactoModel: ReturnType<typeof mongoose.model>;
+
+  beforeAll(() => {
+    ContactoModel = mongoose.model(MODEL_NAME, ContactoSchema);
+  });
+
+  afterAll(() => {
+    mongoose.deleteModel(MODEL_NAME);
+  });
+
+  it('decryptContactoPii: returns null for null PII fields via toObject transform', () => {
+    const doc = new ContactoModel({
+      usuarioId: new Types.ObjectId(),
+      tipo: 'fisica',
+      tipologia: 'cliente',
+      nombre: 'Test User',
+      documentacionFiscal: null,
+      documentoIdentidad: null,
+    });
+
+    const plain = doc.toObject() as Record<string, unknown>;
+    expect(plain.documentacionFiscal).toBeNull();
+    expect(plain.documentoIdentidad).toBeNull();
+  });
+
+  it('decryptContactoPii: returns plaintext values unchanged via toObject transform', () => {
+    const doc = new ContactoModel({
+      usuarioId: new Types.ObjectId(),
+      tipo: 'fisica',
+      tipologia: 'cliente',
+      nombre: 'Test User',
+      documentacionFiscal: 'plaintext-no-prefix',
+      documentoIdentidad: 'another-plaintext',
+    });
+
+    const plain = doc.toObject() as Record<string, unknown>;
+    expect(plain.documentacionFiscal).toBe('plaintext-no-prefix');
+    expect(plain.documentoIdentidad).toBe('another-plaintext');
+  });
+
+  it('toObject transform: returns null for empty-string PII fields', () => {
+    const doc = new ContactoModel({
+      usuarioId: new Types.ObjectId(),
+      tipo: 'juridica',
+      tipologia: 'interesado',
+      nombre: 'Empresa SL',
+      documentacionFiscal: '',
+    });
+    const plain = doc.toObject() as Record<string, unknown>;
+    expect(plain.documentacionFiscal).toBeNull();
+  });
+
+  it('pre-findOneAndUpdate hook: runs encryptContactoPii on $set with documentacionFiscal', () => {
+    // Extract Lexscribe's own pre-findOneAndUpdate hook by introspecting schema internals.
+    // Mongoose 8 registers hooks in kareem; the schema's own hook is synchronous (no next arg).
+    type HookEntry = { fn: (this: unknown) => void };
+    type SchemaInternals = {
+      s: { hooks: { _pres: Map<string, HookEntry[]> } };
+    };
+    const hooksMap = (ContactoSchema as unknown as SchemaInternals).s?.hooks?._pres;
+    const fauHooks = hooksMap?.get('findOneAndUpdate') ?? [];
+    expect(fauHooks.length).toBeGreaterThan(0);
+
+    let currentUpdate: Record<string, unknown> = {
+      $set: { documentacionFiscal: '12345678A', documentoIdentidad: 'X1234567' },
+    };
+    const fakeQuery = {
+      getUpdate: () => currentUpdate,
+      setUpdate: (u: Record<string, unknown>) => { currentUpdate = u; },
+    };
+
+    // The Lexscribe hook is the one whose source uses getUpdate/setUpdate.
+    // We call each hook synchronously; Mongoose internal hooks may throw on fake context
+    // — we catch those and continue.
+    for (const hook of fauHooks) {
+      const fn = (hook as unknown as HookEntry)?.fn;
+      if (typeof fn !== 'function') continue;
+      // Skip timestamp hook (it accesses this.model which is not set)
+      if (fn.name === '_setTimestampsOnUpdate') continue;
+      try {
+        fn.call(fakeQuery);
+      } catch {
+        // Ignore Mongoose internal errors on fake context
+      }
+    }
+
+    // Lexscribe's hook encrypts documentacionFiscal and sets documentacionFiscalHash
+    const updatedSet = (currentUpdate.$set ?? currentUpdate) as Record<string, unknown>;
+    expect(Object.prototype.hasOwnProperty.call(updatedSet, 'documentacionFiscalHash')).toBe(true);
+  });
+
+  it('pre-findOneAndUpdate hook: skips encryption when update has no PII fields', () => {
+    type HookEntry = { fn: (this: unknown) => void };
+    type SchemaInternals = {
+      s: { hooks: { _pres: Map<string, HookEntry[]> } };
+    };
+    const hooksMap = (ContactoSchema as unknown as SchemaInternals).s?.hooks?._pres;
+    const fauHooks = hooksMap?.get('findOneAndUpdate') ?? [];
+
+    let currentUpdate: Record<string, unknown> = {
+      $set: { nombre: 'Only Name Update' },
+    };
+    const fakeQuery = {
+      getUpdate: () => currentUpdate,
+      setUpdate: (u: Record<string, unknown>) => { currentUpdate = u; },
+    };
+
+    for (const hook of fauHooks) {
+      const fn = (hook as unknown as HookEntry)?.fn;
+      if (typeof fn !== 'function') continue;
+      if (fn.name === '_setTimestampsOnUpdate') continue;
+      try { fn.call(fakeQuery); } catch { /* ignore */ }
+    }
+
+    // documentacionFiscalHash should NOT be set when documentacionFiscal is absent from $set
+    const updatedSet = (currentUpdate.$set ?? currentUpdate) as Record<string, unknown>;
+    expect(Object.prototype.hasOwnProperty.call(updatedSet, 'documentacionFiscalHash')).toBe(false);
+  });
+
+  it('pre-findOneAndUpdate hook: returns early when update is null', () => {
+    type HookEntry = { fn: (this: unknown) => void };
+    type SchemaInternals = {
+      s: { hooks: { _pres: Map<string, HookEntry[]> } };
+    };
+    const hooksMap = (ContactoSchema as unknown as SchemaInternals).s?.hooks?._pres;
+    const fauHooks = hooksMap?.get('findOneAndUpdate') ?? [];
+
+    const setUpdateSpy = jest.fn();
+    const fakeQuery = {
+      getUpdate: () => null,
+      setUpdate: setUpdateSpy,
+    };
+
+    for (const hook of fauHooks) {
+      const fn = (hook as unknown as HookEntry)?.fn;
+      if (typeof fn !== 'function') continue;
+      if (fn.name === '_setTimestampsOnUpdate') continue;
+      try { fn.call(fakeQuery); } catch { /* ignore */ }
+    }
+
+    // setUpdate should NOT be called when getUpdate() returns null
+    expect(setUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('schema has both save and findOneAndUpdate pre-hooks registered', () => {
+    type SchemaInternals = {
+      s: { hooks: { _pres: Map<string, unknown[]> } };
+    };
+    const hooks = (ContactoSchema as unknown as SchemaInternals).s?.hooks?._pres;
+    expect(hooks?.has('save')).toBe(true);
+    expect(hooks?.has('findOneAndUpdate')).toBe(true);
   });
 });

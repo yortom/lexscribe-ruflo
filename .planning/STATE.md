@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-03T19:33:00.096Z"
-last_activity: 2026-05-03
+last_updated: "2026-05-18T13:10:00.000Z"
+last_activity: 2026-05-18
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Lexscribe — State
@@ -17,17 +17,18 @@ progress:
 ## Current Position
 
 Phase: 03 (Contactos) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 - **Milestone:** v1.0 MVP
 - **Phase:** 3
 - **Phase:** 2 — Complete (2026-05-02)
 - **Plan:** 03-01 — Complete (2026-05-03)
+- **Plan:** 03-02 — Complete (2026-05-18) — UAT approved
 - **Plan:** 02-02 — Complete (2026-05-02)
 - **Plan:** 02-03 — Complete (2026-05-02)
 - **Plan:** 02-04 — Complete (2026-05-02)
-- **Status:** Executing Phase 03
-- **Last activity:** 2026-05-03
+- **Status:** Executing Phase 03 — Plan 03-02 complete, next: 03-03
+- **Last activity:** 2026-05-18
 
 ## Accumulated Context
 
@@ -78,6 +79,9 @@ Plan: 2 of 3
 - **ZodValidationPipe throws BadRequestException (not DomainError)** — Zod strict() errors return 400 without `code:VALIDATION` in body; DomainExceptionFilter only catches DomainError subclasses
 - **returnDocument:'after' instead of {new:true}** — Mongoose v9 deprecates `{new:true}` in findOneAndUpdate; all contactos repository calls use `returnDocument:'after'`
 - **FilterQuery removed in Mongoose v9** — use `Record<string,unknown>` or `QueryFilter<T>` for filter types in repositories
+- **@hookform/resolvers pinned to v3.x** — v5 imports `zod/v4/core`, incompatible with project's zod v3 schemas; v3.10.0 is the correct bridge version
+- **@tanstack/query-core pinned as explicit frontend dep** — pnpm isolated node_modules does not auto-hoist it from react-query internals into frontend webpack resolution scope; must be listed explicitly
+- **Next.js 14 sync params** — `params: { id: string }` is synchronous in Next.js 14; `use(params)` async pattern is Next.js 15+ only
 
 ## Pending Todos / Blockers
 
@@ -100,7 +104,17 @@ Plan: 2 of 3
 | 02 | 03 | ~45min | 2 | 15 |
 | 02 | 04 | ~45min | 3 | 18 |
 | 03 | 01 | ~30min | 3 | 13 |
+| 03 | 02 | ~45min | 3 | 15 |
+
+## Phase 3 Progress
+
+**Plans executed:**
+
+- `03-01` — NestJS ContactosModule: schema+softDeletePlugin, repository, service, controller, e2e tests (CONT-01..05), EsquemasService integration for dynamic params
+- `03-02` — Next.js frontend: QueryClientProvider layout, lib/api/contactos.ts, ContactoForm+ContactoTable+ParametrosEditor components, 3 CRUD pages, 14 Vitest tests, UAT 5 scenarios approved
+
+**Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
 
 ## Next Up
 
-Phase 03 — Contactos (CRUD, soft-delete, AES encryption for PII, e2e tests).
+Phase 03 — Plan 03-03 (if exists) or Phase 04 (Expedientes).

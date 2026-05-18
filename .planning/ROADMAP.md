@@ -74,7 +74,7 @@ Plans:
 Plans:
 - [x] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
 - [ ] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
-- [ ] 03-03: Tests unitarios e integración del módulo contactos
+- [x] 03-03: Tests unitarios e integración del módulo contactos
 
 ### Phase 4: Cláusulas y Expedientes
 **Goal**: Biblioteca de cláusulas reutilizables operativa + gestión de expedientes con asociación de contactos. Sin generación todavía.
@@ -180,7 +180,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
 | 2. Auth y bases transversales | 3/4 | In Progress|  |
-| 3. Contactos | 1/3 | In Progress|  |
+| 3. Contactos | 2/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
 | 5. Plantillas y Editor | 0/4 | Not started | - |
 | 6. Generación y Documentos | 0/4 | Not started | - |

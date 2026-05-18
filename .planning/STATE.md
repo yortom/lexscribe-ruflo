@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-18T13:10:00.000Z"
+last_updated: "2026-05-18T14:15:00.000Z"
 last_activity: 2026-05-18
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 03 (Contactos) — EXECUTING
+Phase: 03 (Contactos) — COMPLETE
 Plan: 3 of 3
 
 - **Milestone:** v1.0 MVP
@@ -24,10 +24,8 @@ Plan: 3 of 3
 - **Phase:** 2 — Complete (2026-05-02)
 - **Plan:** 03-01 — Complete (2026-05-03)
 - **Plan:** 03-02 — Complete (2026-05-18) — UAT approved
-- **Plan:** 02-02 — Complete (2026-05-02)
-- **Plan:** 02-03 — Complete (2026-05-02)
-- **Plan:** 02-04 — Complete (2026-05-02)
-- **Status:** Executing Phase 03 — Plan 03-02 complete, next: 03-03
+- **Plan:** 03-03 — Complete (2026-05-18)
+- **Status:** Phase 03 Complete — Next: Phase 04
 - **Last activity:** 2026-05-18
 
 ## Accumulated Context
@@ -59,6 +57,16 @@ Plan: 3 of 3
 
 **Requirements addressed:** AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, AUTH-07, AUTH-08, INF-06
 
+## Phase 3 Progress
+
+**Plans executed:**
+
+- `03-01` — NestJS ContactosModule: schema+softDeletePlugin, repository, service, controller, e2e tests (CONT-01..05), EsquemasService integration for dynamic params
+- `03-02` — Next.js frontend: QueryClientProvider layout, lib/api/contactos.ts, ContactoForm+ContactoTable+ParametrosEditor components, 3 CRUD pages, 14 Vitest tests, UAT 5 scenarios approved
+- `03-03` — Unit tests backend: 30 tests (14 repo, 10 service, 6 controller), 87.31% line coverage, 96.15% function coverage, coverageThreshold configured in jest.config.ts
+
+**Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
+
 ## Key Decisions
 
 - **Refresh token format `<userId>:<hex>`** — userId prefix enables reuse detection after rotation without DB scan or JWT
@@ -82,6 +90,7 @@ Plan: 3 of 3
 - **@hookform/resolvers pinned to v3.x** — v5 imports `zod/v4/core`, incompatible with project's zod v3 schemas; v3.10.0 is the correct bridge version
 - **@tanstack/query-core pinned as explicit frontend dep** — pnpm isolated node_modules does not auto-hoist it from react-query internals into frontend webpack resolution scope; must be listed explicitly
 - **Next.js 14 sync params** — `params: { id: string }` is synchronous in Next.js 14; `use(params)` async pattern is Next.js 15+ only
+- **Schema pre-hook coverage via kareem internals** — extract hooks from `schema.s.hooks._pres`, skip `_setTimestampsOnUpdate` by name, call synchronously with fake query; no DB required for unit tests (03-03)
 
 ## Pending Todos / Blockers
 
@@ -105,16 +114,8 @@ Plan: 3 of 3
 | 02 | 04 | ~45min | 3 | 18 |
 | 03 | 01 | ~30min | 3 | 13 |
 | 03 | 02 | ~45min | 3 | 15 |
-
-## Phase 3 Progress
-
-**Plans executed:**
-
-- `03-01` — NestJS ContactosModule: schema+softDeletePlugin, repository, service, controller, e2e tests (CONT-01..05), EsquemasService integration for dynamic params
-- `03-02` — Next.js frontend: QueryClientProvider layout, lib/api/contactos.ts, ContactoForm+ContactoTable+ParametrosEditor components, 3 CRUD pages, 14 Vitest tests, UAT 5 scenarios approved
-
-**Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
+| 03 | 03 | ~15min | 4 | 1 |
 
 ## Next Up
 
-Phase 03 — Plan 03-03 (if exists) or Phase 04 (Expedientes).
+Phase 04 — Cláusulas y Expedientes (biblioteca de cláusulas + expedientes con contactos asociados).

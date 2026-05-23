@@ -199,7 +199,7 @@ Backend endpoints (todos requieren `Authorization: Bearer <jwt>`):
   <behavior>
     - `lib/api/expedientes.ts`: list/get/create/update/delete + `linkContacto(expedienteId, {contactoId, rol})` + `unlinkContacto(expedienteId, contactoId, rol)` (rol URL-encoded en la ruta). Hooks react-query asociados con invalidation correcta (al link/unlink: invalidar `['expediente', id]` y `['contactos', contactoId]`).
     - `ExpedienteForm.tsx`: react-hook-form + zodResolver(CreateExpedienteSchema). Campos: nombre + `ParametrosEditor` (reutilizado de Phase 3) o equivalente con tipoObjeto='expediente'.
-    - `ExpedienteTabs.tsx`: tabs (shadcn/ui o headless): Contactos, Parámetros, Documentos, Fechas, Facturación. Documentos/Fechas/Facturación renderizan placeholder "Disponible en una fase futura" (Phases 6/7).
+    - `ExpedienteTabs.tsx`: tabs (shadcn/ui o headless): Contactos, Parámetros, Documentos, Fechas, Facturación. Documentos/Fechas/Facturación renderizan placeholder con string EXACTO `"Disponible en Phase 6"` (Documentos), `"Disponible en Phase 7"` (Fechas), `"Disponible en Phase 7"` (Facturación). Usar exactamente esa cadena para que el grep de aceptación sea determinista.
     - `ContactosVinculadosTab.tsx`: lista de contactos vinculados (resuelve nombre via fetch /contactos/:id por cada uno, o aceptar que backend lo populate en futuro — por ahora mostrar `contactoId` + rol y un botón Detalle que enlaza a `/contactos/:id`). Botón "Asociar contacto" abre modal. Botón "Desasociar" por cada vínculo dispara mutation unlink.
     - `AsociarContactoModal.tsx`: selector de contactos (combobox que llama a `GET /api/v1/contactos?search=...`), input rol (text), botón Guardar. Si backend devuelve 409, muestra error inline "Este contacto ya está vinculado con el rol X".
     - `ExpedientesVinculadosSection.tsx`: componente que recibe `expedientesVinculados: Array<{_id,nombre,rol}>`, renderiza una lista con enlaces a `/expedientes/:id` y badge con el rol. Si vacío, muestra "Sin expedientes vinculados".
@@ -258,7 +258,7 @@ Backend endpoints (todos requieren `Authorization: Bearer <jwt>`):
     - `grep -n "encodeURIComponent(rol)" apps/frontend/lib/api/expedientes.ts` retorna match (manejo de rol con espacios)
     - `grep -n "ExpedientesVinculadosSection" apps/frontend/app/\\(app\\)/contactos/\\[id\\]/page.tsx` retorna match
     - `grep -n "expedientesVinculados" apps/frontend/components/contactos/ExpedientesVinculadosSection.tsx` retorna match
-    - `grep -n "Disponible en una fase futura\\|Próximamente\\|Phase " apps/frontend/components/expedientes/ExpedienteTabs.tsx` retorna match (placeholders documentos/fechas/facturación)
+    - `grep -c "Disponible en Phase" apps/frontend/components/expedientes/ExpedienteTabs.tsx` retorna ≥3 (placeholders Documentos/Fechas/Facturación con string exacto "Disponible en Phase 6" / "Disponible en Phase 7")
     - `grep -n "409\\|ya vinculado\\|ya está" apps/frontend/components/expedientes/AsociarContactoModal.tsx` retorna match (manejo error duplicado)
     - `grep -c "it\\|test(" apps/frontend/__tests__/expedientes/ContactosVinculadosTab.test.tsx` ≥4
     - `pnpm --filter @lexscribe/frontend test` finaliza 0 failed

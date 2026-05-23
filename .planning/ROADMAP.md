@@ -74,7 +74,7 @@ Plans:
 Plans:
 - [x] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
 - [ ] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
-- [x] 03-03: Tests unitarios e integración del módulo contactos
+- [ ] 03-03: Tests unitarios e integración del módulo contactos
 
 ### Phase 4: Cláusulas y Expedientes
 **Goal**: Biblioteca de cláusulas reutilizables operativa + gestión de expedientes con asociación de contactos. Sin generación todavía.
@@ -86,13 +86,13 @@ Plans:
   3. Asociar/desasociar contactos con rol libre; pareja contacto+rol única (error legible si duplicado)
   4. Detalle expediente: contactos, parámetros, lista documentos vacía, fechas vacía, facturación vacía (placeholders)
   5. Desde un contacto se ven sus expedientes vinculados
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: Módulo NestJS clausulas + schema + CRUD + índices + búsqueda full-text
-- [ ] 04-02: Módulo NestJS expedientes + schema + CRUD + endpoints asociar/desasociar contactos con rol
-- [ ] 04-03: Frontend: página cláusulas (biblioteca + filtros) y página expedientes (listado + detalle)
-- [ ] 04-04: Tests unitarios e integración módulos clausulas y expedientes
+- [ ] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03)
+- [ ] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07)
+- [ ] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
+- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
 
 ### Phase 5: Plantillas y Editor
 **Goal**: El usuario puede crear plantillas a partir de archivo o pegado, ver las variables detectadas y declarar campos nuevos. Cláusulas insertables con renumeración.
@@ -180,7 +180,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
 | 2. Auth y bases transversales | 3/4 | In Progress|  |
-| 3. Contactos | 2/3 | In Progress|  |
+| 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
 | 5. Plantillas y Editor | 0/4 | Not started | - |
 | 6. Generación y Documentos | 0/4 | Not started | - |

@@ -12,7 +12,7 @@
 |---------|-------|
 | Fases completadas | 3 / 8 |
 | Planes completados | 12 / 12 (fase 03 completa) |
-| Fase activa | **04 — Cláusulas y Expedientes** (siguiente) |
+| Fase activa | **04 — Cláusulas y Expedientes** (planificada, lista para ejecutar) |
 | Plan activo | — |
 
 ---
@@ -98,9 +98,19 @@
 
 ## Próximos pasos
 
-1. **Ahora:** `/gsd:discuss-phase 04` o `/gsd:plan-phase 04` — Cláusulas y Expedientes
-2. **Fase 04 planes previstos:**
-   - `04-01` — Backend clausulas (schema, CRUD, búsqueda full-text)
-   - `04-02` — Backend expedientes (schema, CRUD, endpoints asociar/desasociar contactos con rol)
-   - `04-03` — Frontend: páginas cláusulas y expedientes
-   - `04-04` — Tests unitarios e integración módulos clausulas y expedientes
+1. **Ahora:** `/gsd:execute-phase 4` — ejecutar Wave 1 (04-01 backend cláusulas + 04-02 backend expedientes en paralelo)
+2. **Fase 04 — planes listos:**
+   - `04-01` (Wave 1, autonomous) — Backend cláusulas: schema + softDelete + `$text` index + repo + service + controller + Zod DTOs + e2e
+   - `04-02` (Wave 1, autonomous) — Backend expedientes: embedded `contactos[{contactoId,rol}]` + link/unlink + eventos `expedientes.linked/unlinked` + **cierre CONT-05 via forwardRef**
+   - `04-03` (Wave 2, **UAT checkpoint**) — Frontend: páginas cláusulas + expedientes con tabs (Contactos, Parámetros, Documentos/Fechas/Facturación placeholder)
+   - `04-04` (Wave 3, autonomous) — Unit tests ≥80% cobertura para ambos módulos
+
+### Decisiones técnicas de Phase 4 (de 04-RESEARCH.md)
+
+- **Modelo M:N contacto↔expediente**: embedded array `contactosVinculados[{contactoId, rol}]` en expediente (no collection separada)
+- **Unicidad `(contactoId, rol)`**: validada en aplicación (MongoDB no soporta unique en sub-array), lanza `ConflictError` → 409
+- **Dependencia circular** ContactosModule ↔ ExpedientesModule resuelta con `forwardRef`
+- **Eventos auditoría**: `expedientes.linked` / `expedientes.unlinked` (capturados por wildcard `*.linked`/`*.unlinked`)
+- **Búsqueda full-text cláusulas**: índice `$text` Mongoose sobre `nombre`+`texto`
+- **Labels cláusulas**: normalizados a lowercase via Zod `.transform`
+- **Placeholders detalle expediente**: `documentos:[]` / `fechas:[]` / `facturacion:[]` con texto exacto `"Disponible en Phase 6/7"` para Phases 6 y 7

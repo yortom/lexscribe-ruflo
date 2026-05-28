@@ -6,3 +6,4 @@ export interface HealthStatus {
 }
 export * from './contacto';
 export * from './clausula';
+export * from './expediente';

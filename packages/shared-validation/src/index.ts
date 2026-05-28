@@ -11,3 +11,4 @@ export * from './auth';
 export * from './esquemas';
 export * from './contactos';
 export * from './clausulas';
+export * from './expedientes';

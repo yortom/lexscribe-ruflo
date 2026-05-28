@@ -17,6 +17,8 @@ export type ExpedienteDocument = HydratedDocument<Expediente>;
 @Schema({
   collection: 'expedientes',
   timestamps: { createdAt: 'fechaCreacion', updatedAt: 'fechaActualizacion' },
+  // minimize:false → persiste y serializa parametros:{} vacío (EXPE detail contract)
+  minimize: false,
 })
 export class Expediente {
   @Prop({ type: Types.ObjectId, ref: 'Usuario', required: true, index: true })

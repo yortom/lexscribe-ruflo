@@ -11,6 +11,7 @@ import { AppModule } from '../../src/app.module';
 import { DomainExceptionFilter } from '../../src/common/filters/domain-exception.filter';
 import { Usuario } from '../../src/modules/usuarios/schemas/usuario.schema';
 import { Contacto } from '../../src/modules/contactos/schemas/contacto.schema';
+import { Expediente } from '../../src/modules/expedientes/schemas/expediente.schema';
 import { Esquema } from '../../src/modules/esquemas/schemas/esquema.schema';
 import { Auditoria } from '../../src/modules/auditoria/schemas/auditoria.schema';
 import { isEncryptedPii } from '../../src/common/crypto/pii-crypto';
@@ -19,6 +20,7 @@ describe('CONT-01..05 contactos', () => {
   let app: INestApplication;
   let usuarioModel: Model<any>;
   let contactoModel: Model<any>;
+  let expedienteModel: Model<any>;
   let esquemaModel: Model<any>;
   let auditoriaModel: Model<any>;
   let bearerToken: string;
@@ -48,6 +50,7 @@ describe('CONT-01..05 contactos', () => {
 
     usuarioModel = moduleRef.get<Model<any>>(getModelToken(Usuario.name));
     contactoModel = moduleRef.get<Model<any>>(getModelToken(Contacto.name));
+    expedienteModel = moduleRef.get<Model<any>>(getModelToken(Expediente.name));
     esquemaModel = moduleRef.get<Model<any>>(getModelToken(Esquema.name));
     auditoriaModel = moduleRef.get<Model<any>>(getModelToken(Auditoria.name));
 
@@ -70,6 +73,12 @@ describe('CONT-01..05 contactos', () => {
       tipoObjeto: 'contacto',
       parametros: [],
     });
+    // Seed: empty esquema for expediente (CONT-05 test creates expedientes)
+    await esquemaModel.create({
+      usuarioId: new Types.ObjectId(usuarioId),
+      tipoObjeto: 'expediente',
+      parametros: [],
+    });
 
     // Login to get bearer token
     const loginRes = await request(app.getHttpServer()).post('/api/v1/auth/login').send({
@@ -83,6 +92,7 @@ describe('CONT-01..05 contactos', () => {
   afterAll(async () => {
     await usuarioModel.deleteMany({});
     await contactoModel.deleteMany({});
+    await expedienteModel.deleteMany({});
     await esquemaModel.deleteMany({});
     await auditoriaModel.deleteMany({});
     await app.close();
@@ -90,6 +100,7 @@ describe('CONT-01..05 contactos', () => {
 
   afterEach(async () => {
     await contactoModel.deleteMany({});
+    await expedienteModel.deleteMany({});
     await auditoriaModel.deleteMany({});
   });
 
@@ -365,6 +376,38 @@ describe('CONT-01..05 contactos', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.expedientesVinculados).toEqual([]);
+  });
+
+  it('CONT-05: returns expedientesVinculados con datos reales cuando el contacto está vinculado', async () => {
+    const createContactoRes = await request(app.getHttpServer())
+      .post('/api/v1/contactos')
+      .set('Authorization', `Bearer ${bearerToken}`)
+      .send(BASE_CONTACTO);
+    const contactoId = createContactoRes.body._id as string;
+
+    const expRes = await request(app.getHttpServer())
+      .post('/api/v1/expedientes')
+      .set('Authorization', `Bearer ${bearerToken}`)
+      .send({ nombre: 'Caso Demo' })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/expedientes/${expRes.body._id}/contactos`)
+      .set('Authorization', `Bearer ${bearerToken}`)
+      .send({ contactoId, rol: 'cliente' })
+      .expect(201);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/contactos/${contactoId}`)
+      .set('Authorization', `Bearer ${bearerToken}`)
+      .expect(200);
+
+    expect(res.body.expedientesVinculados).toHaveLength(1);
+    expect(res.body.expedientesVinculados[0]).toMatchObject({
+      _id: expRes.body._id,
+      nombre: 'Caso Demo',
+      rol: 'cliente',
+    });
   });
 
   it('CONT-05: returns 404 for non-existent id', async () => {

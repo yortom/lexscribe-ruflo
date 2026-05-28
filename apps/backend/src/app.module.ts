@@ -10,6 +10,7 @@ import { AuditoriaModule } from './modules/auditoria/auditoria.module';
 import { ContactosModule } from './modules/contactos/contactos.module';
 import { ClausulasModule } from './modules/clausulas/clausulas.module';
 import { EsquemasModule } from './modules/esquemas/esquemas.module';
+import { ExpedientesModule } from './modules/expedientes/expedientes.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EsquemasModule } from './modules/esquemas/esquemas.module';
     ContactosModule,
     ClausulasModule,
     EsquemasModule,
+    ExpedientesModule,
     UsuariosModule,
     AuditoriaModule,
   ],

@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { ContactoForm } from '@/components/contactos/ContactoForm';
+import { ExpedientesVinculadosSection } from '@/components/contactos/ExpedientesVinculadosSection';
 import { deleteContacto, getContacto, updateContacto } from '@/lib/api/contactos';
 import type { CreateContactoInput } from '@lexscribe/shared-validation';
 
@@ -66,23 +67,7 @@ export default function ContactoDetailPage({ params }: { params: { id: string } 
         submitLabel="Guardar cambios"
       />
 
-      <section className="border-t pt-4">
-        <h3 className="mb-2 text-lg font-semibold">Expedientes vinculados</h3>
-        {data.expedientesVinculados.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            Este contacto no aparece en ningun expediente todavia. Disponible cuando se implementen
-            expedientes en Phase 4.
-          </p>
-        ) : (
-          <ul className="space-y-1 text-sm">
-            {data.expedientesVinculados.map((e) => (
-              <li key={e._id} className="text-gray-700">
-                {e.nombre} - {e.rol}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <ExpedientesVinculadosSection expedientes={data?.expedientesVinculados ?? []} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { AuditoriaModule } from './modules/auditoria/auditoria.module';
 import { ContactosModule } from './modules/contactos/contactos.module';
+import { ClausulasModule } from './modules/clausulas/clausulas.module';
 import { EsquemasModule } from './modules/esquemas/esquemas.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { EsquemasModule } from './modules/esquemas/esquemas.module';
     HealthModule,
     AuthModule,
     ContactosModule,
+    ClausulasModule,
     EsquemasModule,
     UsuariosModule,
     AuditoriaModule,

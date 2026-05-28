@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-18T14:15:00.000Z"
-last_activity: 2026-05-18
+last_updated: "2026-05-28T19:28:03.326Z"
+last_activity: 2026-05-28
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 12
+  total_plans: 16
   completed_plans: 12
 ---
 
@@ -16,17 +16,16 @@ progress:
 
 ## Current Position
 
-Phase: 03 (Contactos) — COMPLETE
-Plan: 3 of 3
+Phase: 04 (clausulas-y-expedientes) — EXECUTING
+Plan: 2 of 4 (Wave 1 complete)
 
 - **Milestone:** v1.0 MVP
-- **Phase:** 3
-- **Phase:** 2 — Complete (2026-05-02)
-- **Plan:** 03-01 — Complete (2026-05-03)
-- **Plan:** 03-02 — Complete (2026-05-18) — UAT approved
-- **Plan:** 03-03 — Complete (2026-05-18)
-- **Status:** Phase 03 Complete — Next: Phase 04
-- **Last activity:** 2026-05-18
+- **Phase:** 4 — Executing (Wave 1 done)
+- **Phase:** 3 — Complete (2026-05-18)
+- **Plan:** 04-01 — Complete (2026-05-28) — backend clausulas, 24 e2e tests
+- **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
+- **Status:** Executing Phase 04 — Wave 1 (backend) complete, next: Wave 2 (frontend, UAT checkpoint)
+- **Last activity:** 2026-05-28
 
 ## Accumulated Context
 
@@ -67,6 +66,17 @@ Plan: 3 of 3
 
 **Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
 
+## Phase 4 Progress (Wave 1 complete)
+
+**Plans executed:**
+
+- `04-01` — NestJS ClausulasModule: schema + softDeletePlugin + `$text` index (nombre/texto weights 5/1) + compound {usuarioId,activo,labels} index, repository, service, controller (JwtAuthGuard + @Audited), Zod DTOs, 24 e2e tests (CLAU-01..03 + búsqueda + filtro labels + soft-delete + audit)
+- `04-02` — NestJS ExpedientesModule: schema with embedded `contactos[{contactoId,rol}]` + 3 indexes + softDelete, repository (findByContactoId/pushContacto/pullContacto), service (link/unlink with (contactoId,rol) uniqueness → 409, eventos, dynamic params), controller (CRUD + POST/DELETE :id/contactos). **CONT-05 closed** via bidirectional forwardRef (ContactosService.getById populates real expedientesVinculados). 24 e2e tests (EXPE-01..07 + audit + CONT-05 real-link)
+
+**Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07 (backend), CONT-05 (closed)
+
+**Integration verified:** 48/48 e2e tests pass (clausulas + expedientes together), backend build + shared packages build green.
+
 ## Key Decisions
 
 - **Refresh token format `<userId>:<hex>`** — userId prefix enables reuse detection after rotation without DB scan or JWT
@@ -91,6 +101,12 @@ Plan: 3 of 3
 - **@tanstack/query-core pinned as explicit frontend dep** — pnpm isolated node_modules does not auto-hoist it from react-query internals into frontend webpack resolution scope; must be listed explicitly
 - **Next.js 14 sync params** — `params: { id: string }` is synchronous in Next.js 14; `use(params)` async pattern is Next.js 15+ only
 - **Schema pre-hook coverage via kareem internals** — extract hooks from `schema.s.hooks._pres`, skip `_setTimestampsOnUpdate` by name, call synchronously with fake query; no DB required for unit tests (03-03)
+- **Bidirectional forwardRef ContactosModule ↔ ExpedientesModule** — CONT-05 closure injects ExpedientesRepository into ContactosService.getById; both modules use `forwardRef` to break circular DI (04-02)
+- **Unicidad (contactoId, rol) validada en aplicación** — MongoDB no soporta unique en sub-array del mismo doc; ExpedientesService.linkContacto lanza ConflictError → 409 (04-02)
+- **`minimize: false` en expediente schema** — sin él, `parametros: {}` vacío serializa como undefined y rompe el contrato del detalle (04-02)
+- **$text index Mongoose con weights** — clausula schema usa `index({nombre:'text', texto:'text'}, {weights:{nombre:5, texto:1}})` para full-text search priorizando nombre (04-01)
+- **Eventos `expedientes.linked` / `expedientes.unlinked`** — terminan en `.linked`/`.unlinked`, capturados por wildcards existentes del AuditListener (04-02)
+- **`rol` con encode/decodeURIComponent** — rol viaja como path param en DELETE :id/contactos/:contactoId/:rol; soporta espacios/acentos (04-02)
 
 ## Pending Todos / Blockers
 

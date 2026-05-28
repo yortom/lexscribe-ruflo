@@ -89,8 +89,8 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03)
-- [ ] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07)
+- [x] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03) — Completed 2026-05-28
+- [x] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07) — Completed 2026-05-28
 - [ ] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
 - [ ] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
 

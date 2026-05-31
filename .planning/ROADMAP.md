@@ -105,13 +105,13 @@ Plans:
   4. Insertar cláusula desde biblioteca respeta orden y renumera automáticamente
   5. Editar y guardar plantilla → nueva versión activa; anterior → inactiva pero conservada
   6. Tests parser variables + versiones ≥ 80% cobertura
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Módulo NestJS plantillas: schema versionado, upload .txt/.docx, conversión txt→docx, storage MinIO
-- [ ] 05-02: Parser de variables: regex {{objeto.campo}}, detección automática, validación contra esquemas, F-030b
-- [ ] 05-03: Frontend editor: CodeMirror 6 con highlight, panel lateral, modal inserción cláusula con renumeración
-- [ ] 05-04: Tests parser variables, versionado de plantillas, integración MinIO
+- [ ] 05-01-parser-shared-PLAN.md — Parser de variables ({{objeto.campo}}/{{objeto.rol.campo}}), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, unit-tested) — PLAN-02/03, CLAU-04
+- [ ] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
+- [ ] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
+- [ ] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
 
 ### Phase 6: Generación y Documentos
 **Goal**: El corazón del producto: combinar plantilla + expediente → .docx generado con datos congelados. Y subida de documentos preexistentes.

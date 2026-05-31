@@ -12,7 +12,7 @@
  * Variables of tipoObjeto clausula/fecha are shown as "no declarable" and their row is disabled.
  */
 import { useState } from 'react';
-import type { VariableDetectada } from '@lexscribe/shared-types';
+import type { VariableDetectada } from '@lexscribe/shared-validation';
 import { declararVariable } from '@/lib/api/plantillas';
 
 type TipoDato = 'texto' | 'numero' | 'fecha' | 'booleano';

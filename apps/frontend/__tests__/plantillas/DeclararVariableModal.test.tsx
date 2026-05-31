@@ -6,7 +6,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { DeclararVariableModal } from '../../components/plantillas/DeclararVariableModal';
 import { declararVariable } from '../../lib/api/plantillas';
-import type { VariableDetectada } from '@lexscribe/shared-types';
+import type { VariableDetectada } from '@lexscribe/shared-validation';
 
 vi.mock('../../lib/api/plantillas', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../lib/api/plantillas')>();

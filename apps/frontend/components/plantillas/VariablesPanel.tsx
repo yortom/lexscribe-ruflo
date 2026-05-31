@@ -5,8 +5,8 @@
  * and unknown types with a red "tipo desconocido" badge (F-030b, PLAN-05).
  */
 import { useMemo } from 'react';
-import type { VariableDetectada } from '@lexscribe/shared-types';
 import { parseVariables, groupByTipoObjeto } from '@lexscribe/shared-validation';
+import type { VariableDetectada } from '@lexscribe/shared-validation';
 
 interface VariablesPanelProps {
   contenido: string;

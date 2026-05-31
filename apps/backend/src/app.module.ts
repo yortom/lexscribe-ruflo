@@ -11,6 +11,7 @@ import { ContactosModule } from './modules/contactos/contactos.module';
 import { ClausulasModule } from './modules/clausulas/clausulas.module';
 import { EsquemasModule } from './modules/esquemas/esquemas.module';
 import { ExpedientesModule } from './modules/expedientes/expedientes.module';
+import { PlantillasModule } from './modules/plantillas/plantillas.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ExpedientesModule } from './modules/expedientes/expedientes.module';
     ClausulasModule,
     EsquemasModule,
     ExpedientesModule,
+    PlantillasModule,
     UsuariosModule,
     AuditoriaModule,
   ],

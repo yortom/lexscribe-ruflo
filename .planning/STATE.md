@@ -3,29 +3,30 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-28T19:28:03.326Z"
-last_activity: 2026-05-28
+last_updated: "2026-05-31T16:59:07.300Z"
+last_activity: 2026-05-31
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 16
-  completed_plans: 12
+  total_plans: 20
+  completed_plans: 15
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 04 (clausulas-y-expedientes) — EXECUTING
-Plan: 2 of 4 (Wave 1 complete)
+Phase: 05 (plantillas-y-editor) — EXECUTING
+Plan: 2 of 4
 
 - **Milestone:** v1.0 MVP
-- **Phase:** 4 — Executing (Wave 1 done)
+- **Phase:** 4 — Complete (Wave 1: clausulas + expedientes)
 - **Phase:** 3 — Complete (2026-05-18)
 - **Plan:** 04-01 — Complete (2026-05-28) — backend clausulas, 24 e2e tests
 - **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
-- **Status:** Executing Phase 04 — Wave 1 (backend) complete, next: Wave 2 (frontend, UAT checkpoint)
-- **Last activity:** 2026-05-28
+- **Plan:** 05-01 — Complete (2026-05-31) — parser shared: variable-parser, clausula-renumber, plantilla Zod schemas + shared-types, 52 vitest tests (TDD)
+- **Status:** Executing Phase 05, Plan 2
+- **Last activity:** 2026-05-31
 
 ## Accumulated Context
 
@@ -107,6 +108,9 @@ Plan: 2 of 4 (Wave 1 complete)
 - **$text index Mongoose con weights** — clausula schema usa `index({nombre:'text', texto:'text'}, {weights:{nombre:5, texto:1}})` para full-text search priorizando nombre (04-01)
 - **Eventos `expedientes.linked` / `expedientes.unlinked`** — terminan en `.linked`/`.unlinked`, capturados por wildcards existentes del AuditListener (04-02)
 - **`rol` con encode/decodeURIComponent** — rol viaja como path param en DELETE :id/contactos/:contactoId/:rol; soporta espacios/acentos (04-02)
+- **KNOWN_TIPO_OBJETO standalone 4-value const** — parser recognizes expediente/contacto/clausula/fecha; distinct from esquemas.TIPO_OBJETO (expediente/contacto only for addParametro) (05-01)
+- **DeclararVariableSchema restricts tipoObjeto to expediente|contacto** — clausula/fecha not persistable to dynamic schema; Pitfall 4 enforced at Zod boundary (05-01)
+- **esArray always false in MVP** — F-025 iteration syntax {{#each}} is P1/post-MVP and explicitly not parsed (05-01)
 
 ## Pending Todos / Blockers
 
@@ -131,6 +135,7 @@ Plan: 2 of 4 (Wave 1 complete)
 | 03 | 01 | ~30min | 3 | 13 |
 | 03 | 02 | ~45min | 3 | 15 |
 | 03 | 03 | ~15min | 4 | 1 |
+| Phase 05 P01 | 6min | 3 tasks | 11 files |
 
 ## Next Up
 

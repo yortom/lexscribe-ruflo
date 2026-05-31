@@ -55,12 +55,12 @@
 
 ### Plantillas (`PLAN`)
 
-- [ ] **PLAN-01** — El usuario puede crear plantillas subiendo un archivo `.txt`, un `.docx` o pegando texto plano. *(F-020, F-021, F-022)*
+- [x] **PLAN-01** — El usuario puede crear plantillas subiendo un archivo `.txt`, un `.docx` o pegando texto plano. *(F-020, F-021, F-022)*
 - [x] **PLAN-02** — El sistema detecta automáticamente todas las variables `{{objeto.campo}}` en el texto importado y las expone agrupadas por tipo de objeto. *(F-023, F-024)*
 - [x] **PLAN-03** — El sistema valida los tipos de objeto en variables (`expediente`, `contacto`, `clausula`, `fecha`); tipos desconocidos producen un error controlado señalando línea y variable, impidiendo finalizar la plantilla. *(F-030b)*
-- [ ] **PLAN-04** — El usuario puede declarar variables nuevas desde el editor de plantilla con un tipo conocido pero campo inexistente (p.ej. `{{expediente.honorariosBase}}`); el campo se añade al esquema dinámico. *(F-092)*
+- [x] **PLAN-04** — El usuario puede declarar variables nuevas desde el editor de plantilla con un tipo conocido pero campo inexistente (p.ej. `{{expediente.honorariosBase}}`); el campo se añade al esquema dinámico. *(F-092)*
 - [ ] **PLAN-05** — El editor (CodeMirror 6) resalta visualmente las variables `{{...}}` y muestra un panel lateral con la lista de variables detectadas en tiempo real. *(Arquitectura §4.3)*
-- [ ] **PLAN-06** — Cada edición de una plantilla guardada genera una nueva versión: la anterior queda inactiva, la nueva activa, y los documentos históricos siguen apuntando a su versión exacta. *(Datos §4.3)*
+- [x] **PLAN-06** — Cada edición de una plantilla guardada genera una nueva versión: la anterior queda inactiva, la nueva activa, y los documentos históricos siguen apuntando a su versión exacta. *(Datos §4.3)*
 
 ### Documentos: generación y subida (`DOC`)
 

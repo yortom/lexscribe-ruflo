@@ -109,7 +109,7 @@ Plans:
 
 Plans:
 - [x] 05-01-parser-shared-PLAN.md — Parser de variables ({{objeto.campo}}/{{objeto.rol.campo}}), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, unit-tested) — PLAN-02/03, CLAU-04
-- [ ] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
+- [x] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
 - [ ] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
 - [ ] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
 
@@ -182,7 +182,7 @@ Plans:
 | 2. Auth y bases transversales | 3/4 | In Progress|  |
 | 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
-| 5. Plantillas y Editor | 1/4 | In Progress|  |
+| 5. Plantillas y Editor | 2/4 | In Progress|  |
 | 6. Generación y Documentos | 0/4 | Not started | - |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |

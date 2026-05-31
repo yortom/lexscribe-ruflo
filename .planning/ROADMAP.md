@@ -110,7 +110,7 @@ Plans:
 Plans:
 - [x] 05-01-parser-shared-PLAN.md — Parser de variables ({{objeto.campo}}/{{objeto.rol.campo}}), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, unit-tested) — PLAN-02/03, CLAU-04
 - [x] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
-- [ ] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
+- [x] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
 - [ ] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
 
 ### Phase 6: Generación y Documentos

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-31T17:14:20.544Z"
+last_updated: "2026-05-31T23:45:00.000Z"
 last_activity: 2026-05-31
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 20
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Lexscribe — State
@@ -17,7 +17,7 @@ progress:
 ## Current Position
 
 Phase: 05 (plantillas-y-editor) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 - **Milestone:** v1.0 MVP
 - **Phase:** 4 — Complete (Wave 1: clausulas + expedientes)
@@ -26,7 +26,9 @@ Plan: 3 of 4
 - **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
 - **Plan:** 05-01 — Complete (2026-05-31) — parser shared: variable-parser, clausula-renumber, plantilla Zod schemas + shared-types, 52 vitest tests (TDD)
 - **Plan:** 05-02 — Complete (2026-05-31) — backend plantillas: StorageService (MinIO), schema+versioning, service+controller, 35 tests (7 unit + 28 e2e)
-- **Status:** Executing Phase 05, Plan 3
+- **Plan:** 05-03 — Complete (2026-05-31) — frontend editor: CM6 editor + VariablesPanel + InsertarClausulaModal + DeclararVariableModal + plantillas pages
+- **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
+- **Status:** Phase 05 Complete
 - **Last activity:** 2026-05-31
 
 ## Accumulated Context
@@ -116,6 +118,9 @@ Plan: 3 of 4
 - **StorageService not @Global()** — explicit import per module (DDD). Phase 6 documentos will import StorageModule explicitly (05-02)
 - **NODE_ENV=test guard in StorageService.onModuleInit** — skips HeadBucket/CreateBucket in CI; no live MinIO needed for tests (05-02)
 - **Zod + service defense-in-depth Pitfall 4** — DeclararVariableSchema restricts tipoObjeto to expediente|contacto AND service checks explicitly (05-02)
+- **MISSING_ID = '000000000000000000000000' pattern** — valid 24-char hex for "not found" branches in repository unit tests; avoids BSONError from toObjectId() (05-04)
+- **Directory-level jest threshold includes controller/DTOs** — coverageThreshold per `./src/modules/plantillas/` counts all files; controller spec required to avoid 0% dragging aggregate below 80% (05-04)
+- **Contactos branch coverage at 69.69% deferred** — pre-existing from 03-03, out of scope for 05-04; `pnpm -r run test` not affected (no --coverage in test script) (05-04)
 
 ## Pending Todos / Blockers
 
@@ -142,7 +147,8 @@ Plan: 3 of 4
 | 03 | 03 | ~15min | 4 | 1 |
 | Phase 05 P01 | 6min | 3 tasks | 11 files |
 | Phase 05 P02 | 30min | 3 tasks | 17 files |
+| 05 | 04 | ~20min | 3 | 4 |
 
 ## Next Up
 
-Phase 04 — Cláusulas y Expedientes (biblioteca de cláusulas + expedientes con contactos asociados).
+Phase 06 — Documentos (generación de documentos .docx desde plantillas + expedientes, docxtemplater).

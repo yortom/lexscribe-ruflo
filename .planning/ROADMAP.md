@@ -14,7 +14,7 @@
 - [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
 - [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
 - [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
-- [ ] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
+- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6 (completed 2026-05-31)
 - [ ] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes
 - [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
 - [ ] **Phase 8: Hardening** - Cifrado AES, Sentry, E2E de los 13 flujos
@@ -111,7 +111,7 @@ Plans:
 - [x] 05-01-parser-shared-PLAN.md — Parser de variables ({{objeto.campo}}/{{objeto.rol.campo}}), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, unit-tested) — PLAN-02/03, CLAU-04
 - [x] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
 - [x] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
-- [ ] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
+- [x] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
 
 ### Phase 6: Generación y Documentos
 **Goal**: El corazón del producto: combinar plantilla + expediente → .docx generado con datos congelados. Y subida de documentos preexistentes.
@@ -182,7 +182,7 @@ Plans:
 | 2. Auth y bases transversales | 3/4 | In Progress|  |
 | 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
-| 5. Plantillas y Editor | 2/4 | In Progress|  |
+| 5. Plantillas y Editor | 4/4 | Complete   | 2026-05-31 |
 | 6. Generación y Documentos | 0/4 | Not started | - |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |

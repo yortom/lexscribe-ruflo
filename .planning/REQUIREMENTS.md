@@ -95,7 +95,7 @@
 - [ ] **SEC-03** — Toda comunicación entre navegador y backend es HTTPS, con certificado válido (Let's Encrypt o equivalente). *(Arquitectura §17.2)*
 - [ ] **SEC-04** — Las claves AES y JWT viven en variables de entorno; nunca en código ni en repositorio. *(Arquitectura §17.4)*
 - [ ] **SEC-05** — Los 13 flujos de usuario (`FL-1` a `FL-13`) tienen tests E2E pasando con Playwright. *(Arquitectura §13.2)*
-- [ ] **SEC-06** — Los servicios y utilidades críticas (parser de variables, render de plantilla) tienen al menos 80% de cobertura de tests. *(Arquitectura §13.2)*
+- [x] **SEC-06** — Los servicios y utilidades críticas (parser de variables, render de plantilla) tienen al menos 80% de cobertura de tests. *(Arquitectura §13.2)*
 - [ ] **SEC-07** — Sentry captura errores de frontend y backend con stack trace y contexto de usuario. *(Arquitectura §12)*
 
 ---

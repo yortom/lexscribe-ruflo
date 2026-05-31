@@ -16,6 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <h1 className="text-lg font-semibold">Lexscribe</h1>
           <nav className="flex gap-4 text-sm">
             <a href="/contactos">Contactos</a>
+            <a href="/clausulas">Cláusulas</a>
+            <a href="/expedientes">Expedientes</a>
           </nav>
         </header>
         <main className="flex-1 px-6 py-6">{children}</main>

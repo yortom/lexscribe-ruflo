@@ -1,4 +1,5 @@
 import { ConflictError, NotFoundError } from '../../../common/errors';
+import { ExpedientesRepository } from '../../expedientes/expedientes.repository';
 import { EsquemasService } from '../../esquemas/esquemas.service';
 import { ContactosRepository } from '../contactos.repository';
 import { ContactosService } from '../contactos.service';
@@ -13,6 +14,7 @@ describe('ContactosService', () => {
     softDelete: jest.Mock;
   };
   let esquemasService: { addParametro: jest.Mock };
+  let expedientesRepo: { findByContactoId: jest.Mock };
 
   const usuarioId = 'usuario-1';
   const contactoId = 'contacto-1';
@@ -26,9 +28,11 @@ describe('ContactosService', () => {
       softDelete: jest.fn(),
     };
     esquemasService = { addParametro: jest.fn() };
+    expedientesRepo = { findByContactoId: jest.fn().mockResolvedValue([]) };
     service = new ContactosService(
       repo as unknown as ContactosRepository,
       esquemasService as unknown as EsquemasService,
+      expedientesRepo as unknown as ExpedientesRepository,
     );
   });
 
@@ -58,6 +62,7 @@ describe('ContactosService', () => {
       nombre: 'Ana',
       expedientesVinculados: [],
     });
+    expect(expedientesRepo.findByContactoId).toHaveBeenCalledWith(usuarioId, contactoId);
   });
 
   it('throws NotFoundError when contacto detail does not exist', async () => {

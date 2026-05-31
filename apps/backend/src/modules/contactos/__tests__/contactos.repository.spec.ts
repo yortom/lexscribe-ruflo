@@ -1,6 +1,6 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import mongoose, { Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { ContactosRepository } from '../contactos.repository';
 import { Contacto, ContactoSchema } from '../schemas/contacto.schema';
 
@@ -177,7 +177,7 @@ describe('ContactosRepository', () => {
 describe('ContactoSchema transforms and pre-hooks', () => {
   // Use a unique model name per test suite to avoid OverwriteModelError
   const MODEL_NAME = `ContactoTest_${Date.now()}`;
-  let ContactoModel: ReturnType<typeof mongoose.model>;
+  let ContactoModel: Model<any>;
 
   beforeAll(() => {
     ContactoModel = mongoose.model(MODEL_NAME, ContactoSchema);

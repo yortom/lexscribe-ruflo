@@ -152,8 +152,10 @@ export class PlantillasService {
     id: string,
     dto: DeclararVariableInput,
   ) {
-    // Verify plantilla exists (404 if not)
-    const plantilla = await this.repo.findActiveById(usuarioId, id);
+    // Verify plantilla exists (404 if not). Include inactive versions: declaring a
+    // schema field is esquema-scoped, so a superseded (post-save) version id must
+    // still validate instead of 404'ing (PLAN-04 / PLAN-06 interaction).
+    const plantilla = await this.repo.findByIdIncludingInactive(usuarioId, id);
     if (!plantilla) throw new NotFoundError('plantilla', id);
 
     // Defense-in-depth: Pitfall 4 guard (Zod already blocks, but service enforces too)

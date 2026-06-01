@@ -268,6 +268,34 @@ describe('findActiveById', () => {
   });
 });
 
+// ─── findByIdIncludingInactive ────────────────────────────────────────────
+
+describe('findByIdIncludingInactive', () => {
+  it('returns the document and bypasses the active filter (withInactive)', async () => {
+    const model = makeModel();
+    const repo = buildRepo(model);
+
+    const doc = makeMockDoc();
+    const query = makeQueryStub(doc);
+    model.findOne.mockReturnValue(query as any);
+
+    const result = await repo.findByIdIncludingInactive(USER_ID, DOC_ID);
+    expect(result).toBe(doc);
+    expect(query.setOptions).toHaveBeenCalledWith({ withInactive: true });
+  });
+
+  it('returns null when document not found', async () => {
+    const model = makeModel();
+    const repo = buildRepo(model);
+
+    const query = makeQueryStub(null);
+    model.findOne.mockReturnValue(query as any);
+
+    const result = await repo.findByIdIncludingInactive(USER_ID, MISSING_ID);
+    expect(result).toBeNull();
+  });
+});
+
 // ─── findActiveByRaiz ────────────────────────────────────────────────────
 
 describe('findActiveByRaiz', () => {

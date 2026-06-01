@@ -37,6 +37,7 @@ function makeRepo(): jest.Mocked<PlantillasRepository> {
     createFirstVersion: jest.fn(),
     createNewVersion: jest.fn(),
     findActiveById: jest.fn(),
+    findByIdIncludingInactive: jest.fn(),
     findActiveByRaiz: jest.fn(),
     listActive: jest.fn(),
     findVersions: jest.fn(),
@@ -287,7 +288,7 @@ describe('PlantillasService', () => {
   describe('declararVariable', () => {
     it('calls esquemas.addParametro with {nombre, tipoDato, obligatorio:false} for expediente', async () => {
       const plantilla = makePlantilla();
-      repo.findActiveById.mockResolvedValue(plantilla as any);
+      repo.findByIdIncludingInactive.mockResolvedValue(plantilla as any);
       const schemaResult = { parametros: [] };
       esquemas.addParametro.mockResolvedValue(schemaResult as any);
 
@@ -309,7 +310,7 @@ describe('PlantillasService', () => {
 
     it('calls esquemas.addParametro for contacto tipoObjeto', async () => {
       const plantilla = makePlantilla();
-      repo.findActiveById.mockResolvedValue(plantilla as any);
+      repo.findByIdIncludingInactive.mockResolvedValue(plantilla as any);
       esquemas.addParametro.mockResolvedValue({} as any);
 
       const dto = {
@@ -325,7 +326,7 @@ describe('PlantillasService', () => {
 
     it('throws ValidationError for tipoObjeto=clausula (Pitfall 4 guard)', async () => {
       const plantilla = makePlantilla();
-      repo.findActiveById.mockResolvedValue(plantilla as any);
+      repo.findByIdIncludingInactive.mockResolvedValue(plantilla as any);
 
       const dto = {
         nombre: 'titulo',
@@ -339,7 +340,7 @@ describe('PlantillasService', () => {
 
     it('throws ValidationError for tipoObjeto=fecha (Pitfall 4 guard)', async () => {
       const plantilla = makePlantilla();
-      repo.findActiveById.mockResolvedValue(plantilla as any);
+      repo.findByIdIncludingInactive.mockResolvedValue(plantilla as any);
 
       const dto = {
         nombre: 'inicio',
@@ -352,7 +353,7 @@ describe('PlantillasService', () => {
     });
 
     it('throws NotFoundError when plantilla not found', async () => {
-      repo.findActiveById.mockResolvedValue(null);
+      repo.findByIdIncludingInactive.mockResolvedValue(null);
 
       const dto = {
         nombre: 'campo',

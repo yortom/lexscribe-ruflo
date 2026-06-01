@@ -117,6 +117,24 @@ export class PlantillasRepository {
       .exec();
   }
 
+  /**
+   * Find a plantilla by _id INCLUDING inactive versions (existence checks).
+   * Used by declararVariable: declaring a schema field is esquema-scoped, so it
+   * must succeed even if the caller passed a now-superseded (inactive) version id.
+   */
+  async findByIdIncludingInactive(
+    usuarioId: string,
+    id: string,
+  ): Promise<PlantillaDocument | null> {
+    return this.model
+      .findOne({
+        _id: this.toObjectId(id),
+        usuarioId: this.toObjectId(usuarioId),
+      })
+      .setOptions({ withInactive: true })
+      .exec();
+  }
+
   async findActiveByRaiz(
     usuarioId: string,
     raizId: string,

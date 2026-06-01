@@ -69,9 +69,18 @@ export default function PlantillaDetailPage({ params }: { params: { id: string }
   const updateMut = useMutation({
     mutationFn: (input: { contenido: string }) =>
       updatePlantilla(id, { contenido: input.contenido }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['plantilla', id] });
+    onSuccess: (nuevaVersion) => {
       setApiError(null);
+      // PLAN-06: saving creates a NEW version with a new _id and deactivates the
+      // prior one. Navigate to the new active version so the page — and follow-up
+      // actions (Declarar/Insertar, which key off the URL id) — reference the
+      // active version instead of the now-inactive prior id.
+      if (nuevaVersion?._id && nuevaVersion._id !== id) {
+        qc.setQueryData(['plantilla', nuevaVersion._id], nuevaVersion);
+        router.replace(`/plantillas/${nuevaVersion._id}`);
+      } else {
+        qc.invalidateQueries({ queryKey: ['plantilla', id] });
+      }
     },
     onError: (err) => {
       if (err instanceof ApiError) setApiError(err.message);

@@ -17,6 +17,7 @@ import { VariablesPanel } from '@/components/plantillas/VariablesPanel';
 import { InsertarClausulaModal } from '@/components/plantillas/InsertarClausulaModal';
 import { DeclararVariableModal } from '@/components/plantillas/DeclararVariableModal';
 import { getPlantilla, updatePlantilla, ApiError } from '@/lib/api/plantillas';
+import { getEsquema, type Esquema } from '@/lib/api/esquemas';
 import type { Plantilla } from '@lexscribe/shared-types';
 import { parseVariables, detectClausulaHeaders } from '@lexscribe/shared-validation';
 import type { VariableDetectada } from '@lexscribe/shared-validation';
@@ -38,6 +39,17 @@ export default function PlantillaDetailPage({ params }: { params: { id: string }
     queryFn: () => getPlantilla(id),
   });
 
+  // Already-declared dynamic fields per tipoObjeto (PLAN-04): used to hide variables
+  // that are already in the esquema from the "Declarar variables" modal.
+  const { data: esqExpediente } = useQuery<Esquema>({
+    queryKey: ['esquema', 'expediente'],
+    queryFn: () => getEsquema('expediente'),
+  });
+  const { data: esqContacto } = useQuery<Esquema>({
+    queryKey: ['esquema', 'contacto'],
+    queryFn: () => getEsquema('contacto'),
+  });
+
   // Initialize local contenido from fetched data on first load
   useEffect(() => {
     if (data && !initialized) {
@@ -53,11 +65,29 @@ export default function PlantillaDetailPage({ params }: { params: { id: string }
   const invalidas = allVars.filter((v) => !v.valido);
   const hasInvalid = invalidas.length > 0;
 
-  // For DeclararVariableModal: pass all valid expediente/contacto variables
-  // Backend addParametro is idempotent so passing all is safe for MVP
-  const declarableVars: VariableDetectada[] = allVars.filter(
-    (v) => v.valido && (v.tipoObjeto === 'expediente' || v.tipoObjeto === 'contacto'),
-  );
+  // Variables offered in the "Declarar variables" modal (PLAN-04):
+  // - valid variables only
+  // - declarable types (expediente/contacto) ALREADY in the esquema are hidden
+  //   (so a field disappears once declared — esquema refetched on declare)
+  // - non-declarable types (clausula/fecha) are still shown, rendered as
+  //   "no declarable" by the modal (Pitfall 4 / D-03)
+  // - de-duplicated by tipoObjeto|campo (same field can occur many times in content)
+  const declaredCampos = new Set<string>([
+    ...(esqExpediente?.parametros ?? []).map((p) => `expediente|${p.nombre}`),
+    ...(esqContacto?.parametros ?? []).map((p) => `contacto|${p.nombre}`),
+  ]);
+
+  const declarableVars: VariableDetectada[] = [];
+  const seenCampos = new Set<string>();
+  for (const v of allVars) {
+    if (!v.valido) continue;
+    const key = `${v.tipoObjeto}|${v.campo}`;
+    if (seenCampos.has(key)) continue;
+    const esDeclarable = v.tipoObjeto === 'expediente' || v.tipoObjeto === 'contacto';
+    if (esDeclarable && declaredCampos.has(key)) continue; // already declared → hide
+    seenCampos.add(key);
+    declarableVars.push(v);
+  }
 
   // Compute afterNumero for InsertarClausulaModal: last detected clause header (most common MVP case).
   function getAfterNumero(): number {
@@ -188,6 +218,8 @@ export default function PlantillaDetailPage({ params }: { params: { id: string }
           onClose={() => setShowDeclararModal(false)}
           onDeclared={() => {
             setShowDeclararModal(false);
+            // Refetch esquemas so the just-declared field disappears from the list.
+            qc.invalidateQueries({ queryKey: ['esquema'] });
             qc.invalidateQueries({ queryKey: ['plantilla', id] });
           }}
         />

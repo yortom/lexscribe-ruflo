@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-31T23:45:00.000Z"
-last_activity: 2026-05-31
+status: planning
+last_updated: "2026-06-02T17:49:40.362Z"
+last_activity: 2026-06-02
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 20
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Lexscribe — State
@@ -20,16 +20,16 @@ Phase: 05 (plantillas-y-editor) — EXECUTING
 Plan: 4 of 4
 
 - **Milestone:** v1.0 MVP
-- **Phase:** 4 — Complete (Wave 1: clausulas + expedientes)
+- **Phase:** 6
 - **Phase:** 3 — Complete (2026-05-18)
-- **Plan:** 04-01 — Complete (2026-05-28) — backend clausulas, 24 e2e tests
+- **Plan:** Not started
 - **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
 - **Plan:** 05-01 — Complete (2026-05-31) — parser shared: variable-parser, clausula-renumber, plantilla Zod schemas + shared-types, 52 vitest tests (TDD)
 - **Plan:** 05-02 — Complete (2026-05-31) — backend plantillas: StorageService (MinIO), schema+versioning, service+controller, 35 tests (7 unit + 28 e2e)
 - **Plan:** 05-03 — Complete (2026-05-31) — frontend editor: CM6 editor + VariablesPanel + InsertarClausulaModal + DeclararVariableModal + plantillas pages
 - **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
-- **Status:** Phase 05 Complete
-- **Last activity:** 2026-05-31
+- **Status:** Ready to plan
+- **Last activity:** 2026-06-02
 
 ## Accumulated Context
 

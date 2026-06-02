@@ -1,9 +1,10 @@
 ---
 phase: 05-plantillas-y-editor
 verified: 2026-05-31T18:00:00Z
-status: human_needed
-score: 8/8 automated must-haves verified
+status: passed
+score: 8/8 automated must-haves verified; 5/5 human UAT passed (05-HUMAN-UAT.md)
 re_verification: false
+human_verification_resolved: "2026-06-02 — all 5 UAT scenarios passed; 2 bugs found & fixed (commits 58e9927, 896edfc)"
 human_verification:
   - test: "FL-2 — Crear plantilla + deteccion de variables en tiempo real"
     expected: "Variables resaltadas azul en el editor CM6; panel lateral agrupa por tipoObjeto (expediente, contacto)"

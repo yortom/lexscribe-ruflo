@@ -45,11 +45,15 @@ export function decryptPii(value: unknown): string | null {
   const [ivRaw, tagRaw, encryptedRaw] = value.slice(PREFIX.length).split('.');
   if (!ivRaw || !tagRaw || !encryptedRaw) return value;
 
-  const decipher = createDecipheriv('aes-256-gcm', getKey(), Buffer.from(ivRaw, 'base64url'));
-  decipher.setAuthTag(Buffer.from(tagRaw, 'base64url'));
+  try {
+    const decipher = createDecipheriv('aes-256-gcm', getKey(), Buffer.from(ivRaw, 'base64url'));
+    decipher.setAuthTag(Buffer.from(tagRaw, 'base64url'));
 
-  return Buffer.concat([
-    decipher.update(Buffer.from(encryptedRaw, 'base64url')),
-    decipher.final(),
-  ]).toString('utf8');
+    return Buffer.concat([
+      decipher.update(Buffer.from(encryptedRaw, 'base64url')),
+      decipher.final(),
+    ]).toString('utf8');
+  } catch {
+    return null;
+  }
 }

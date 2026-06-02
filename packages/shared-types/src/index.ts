@@ -5,3 +5,6 @@ export interface HealthStatus {
   timestamp: ISODateString;
 }
 export * from './contacto';
+export * from './clausula';
+export * from './expediente';
+export * from './plantilla';

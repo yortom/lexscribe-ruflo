@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ContactosRepository } from './contactos.repository';
 import { EsquemasService } from '../esquemas/esquemas.service';
+import { ExpedientesRepository } from '../expedientes/expedientes.repository';
 import { ConflictError, NotFoundError } from '../../common/errors';
 import {
   CreateContactoInput,
@@ -14,6 +15,8 @@ export class ContactosService {
   constructor(
     private readonly repo: ContactosRepository,
     private readonly esquemasService: EsquemasService,
+    @Inject(forwardRef(() => ExpedientesRepository))
+    private readonly expedientesRepo: ExpedientesRepository,
   ) {}
 
   async list(usuarioId: string, query: QueryContactoInput) {
@@ -24,10 +27,15 @@ export class ContactosService {
   async getById(usuarioId: string, id: string) {
     const contacto = await this.repo.findById(usuarioId, id);
     if (!contacto) throw new NotFoundError('contacto', id);
-    // CONT-05: stub vacío hasta Phase 4 — expedientes module no existe aún
+    // CONT-05 / F-054: vista inversa — expedientes donde aparece este contacto.
+    const expedientes = await this.expedientesRepo.findByContactoId(usuarioId, id);
     return {
       ...contacto.toObject(),
-      expedientesVinculados: [] as Array<{ _id: string; nombre: string; rol: string }>,
+      expedientesVinculados: expedientes.flatMap((e) =>
+        e.contactos
+          .filter((c) => c.contactoId.toString() === id)
+          .map((c) => ({ _id: e._id.toString(), nombre: e.nombre, rol: c.rol })),
+      ),
     };
   }
 

@@ -14,7 +14,7 @@
 - [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
 - [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
 - [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
-- [ ] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
+- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6 (completed 2026-05-31)
 - [ ] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes
 - [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
 - [ ] **Phase 8: Hardening** - Cifrado AES, Sentry, E2E de los 13 flujos
@@ -86,13 +86,13 @@ Plans:
   3. Asociar/desasociar contactos con rol libre; pareja contacto+rol única (error legible si duplicado)
   4. Detalle expediente: contactos, parámetros, lista documentos vacía, fechas vacía, facturación vacía (placeholders)
   5. Desde un contacto se ven sus expedientes vinculados
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: Módulo NestJS clausulas + schema + CRUD + índices + búsqueda full-text
-- [ ] 04-02: Módulo NestJS expedientes + schema + CRUD + endpoints asociar/desasociar contactos con rol
-- [ ] 04-03: Frontend: página cláusulas (biblioteca + filtros) y página expedientes (listado + detalle)
-- [ ] 04-04: Tests unitarios e integración módulos clausulas y expedientes
+- [x] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03) — Completed 2026-05-28
+- [x] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07) — Completed 2026-05-28
+- [ ] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
+- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
 
 ### Phase 5: Plantillas y Editor
 **Goal**: El usuario puede crear plantillas a partir de archivo o pegado, ver las variables detectadas y declarar campos nuevos. Cláusulas insertables con renumeración.
@@ -105,13 +105,13 @@ Plans:
   4. Insertar cláusula desde biblioteca respeta orden y renumera automáticamente
   5. Editar y guardar plantilla → nueva versión activa; anterior → inactiva pero conservada
   6. Tests parser variables + versiones ≥ 80% cobertura
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Módulo NestJS plantillas: schema versionado, upload .txt/.docx, conversión txt→docx, storage MinIO
-- [ ] 05-02: Parser de variables: regex {{objeto.campo}}, detección automática, validación contra esquemas, F-030b
-- [ ] 05-03: Frontend editor: CodeMirror 6 con highlight, panel lateral, modal inserción cláusula con renumeración
-- [ ] 05-04: Tests parser variables, versionado de plantillas, integración MinIO
+- [x] 05-01-parser-shared-PLAN.md — Parser de variables ({{objeto.campo}}/{{objeto.rol.campo}}), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, unit-tested) — PLAN-02/03, CLAU-04
+- [x] 05-02-backend-plantillas-PLAN.md — StorageService (MinIO/S3 reusable) + módulo NestJS plantillas (schema versionado, save parse+validate F-030b, versionado two-step, declarar-variable, mammoth/docx) — PLAN-01/04/06
+- [x] 05-03-frontend-editor-PLAN.md — Editor CodeMirror 6 (highlight válido/inválido), panel variables, modal insertar cláusula (renumera), modal declarar variable, páginas + UAT (autonomous:false) — PLAN-05 (+01..04, CLAU-04 vía UI)
+- [x] 05-04-tests-coverage-PLAN.md — Cobertura >=80% parser+renumber+plantillas versioning, thresholds enforced, suite verde — SEC-06
 
 ### Phase 6: Generación y Documentos
 **Goal**: El corazón del producto: combinar plantilla + expediente → .docx generado con datos congelados. Y subida de documentos preexistentes.
@@ -182,7 +182,7 @@ Plans:
 | 2. Auth y bases transversales | 3/4 | In Progress|  |
 | 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
-| 5. Plantillas y Editor | 0/4 | Not started | - |
+| 5. Plantillas y Editor | 4/4 | Complete   | 2026-05-31 |
 | 6. Generación y Documentos | 0/4 | Not started | - |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Contacto, ContactoSchema } from './schemas/contacto.schema';
 import { ContactosController } from './contactos.controller';
@@ -7,6 +7,7 @@ import { ContactosRepository } from './contactos.repository';
 import { EsquemasModule } from '../esquemas/esquemas.module';
 import { AuditoriaModule } from '../auditoria/auditoria.module';
 import { AuthModule } from '../auth/auth.module';
+import { ExpedientesModule } from '../expedientes/expedientes.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from '../auth/auth.module';
     EsquemasModule, // Para inyectar EsquemasService (CONT-03)
     AuditoriaModule, // Para AuditInterceptor
     AuthModule, // Para JwtAuthGuard
+    forwardRef(() => ExpedientesModule), // ExpedientesRepository (CONT-05 vista inversa) — ciclo
   ],
   controllers: [ContactosController],
   providers: [ContactosService, ContactosRepository],

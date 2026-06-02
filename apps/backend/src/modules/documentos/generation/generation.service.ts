@@ -11,7 +11,7 @@
  *  7. Upload rendered .docx to MinIO
  *  8. Persist documento with datosCongelados snapshot (DOC-07)
  */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Types } from 'mongoose';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
@@ -22,6 +22,8 @@ import { EsquemasService } from '../../esquemas/esquemas.service';
 import { DocumentosRepository } from '../documentos.repository';
 import { DocumentoDocument } from '../schemas/documento.schema';
 import { textoToDocxBuffer } from '../../plantillas/conversion';
+import { PlantillasService } from '../../plantillas/plantillas.service';
+import { ExpedientesRepository } from '../../expedientes/expedientes.repository';
 
 /** Slug a filename to safe ASCII for storage path (removes diacritics, replaces spaces). */
 function slugify(name: string): string {
@@ -35,8 +37,9 @@ function slugify(name: string): string {
 @Injectable()
 export class GenerationService {
   constructor(
-    private readonly plantillasService: { getById(uid: string, id: string): Promise<any> },
-    private readonly expedientesRepo: { findById(uid: string, id: string): Promise<any> },
+    private readonly plantillasService: PlantillasService,
+    @Inject(forwardRef(() => ExpedientesRepository))
+    private readonly expedientesRepo: ExpedientesRepository,
     private readonly esquemas: EsquemasService,
     private readonly storage: StorageService,
     private readonly repo: DocumentosRepository,
@@ -120,8 +123,9 @@ export class GenerationService {
    * Structure: { expediente, contacto: { [rol]: {...} }, clausula, fecha }
    * (Claude's Discretion — CONTEXT.md + ARQUITECTURA.md §7.2)
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private buildContext(
-    expediente: { nombre: string; fechaCreacion: string; parametros: Record<string, unknown> },
+    expediente: any,
     dto: GenerateDocumentoInput,
   ): Record<string, unknown> {
     return {

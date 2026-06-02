@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Types } from 'mongoose';
 import { ExpedientesRepository } from './expedientes.repository';
 import { EsquemasService } from '../esquemas/esquemas.service';
 import { ContactosRepository } from '../contactos/contactos.repository';
+import { DocumentosRepository } from '../documentos/documentos.repository';
 import { ConflictError, NotFoundError } from '../../common/errors';
 import type { AuditEventPayload } from '../auditoria/listeners/audit.listener';
 import {
@@ -21,6 +22,8 @@ export class ExpedientesService {
     private readonly esquemasService: EsquemasService,
     private readonly contactosRepo: ContactosRepository,
     private readonly eventEmitter: EventEmitter2,
+    @Inject(forwardRef(() => DocumentosRepository))
+    private readonly documentosRepo: DocumentosRepository,
   ) {}
 
   async list(usuarioId: string, query: QueryExpedienteInput) {
@@ -31,11 +34,12 @@ export class ExpedientesService {
   async getById(usuarioId: string, id: string) {
     const expediente = await this.repo.findById(usuarioId, id);
     if (!expediente) throw new NotFoundError('expediente', id);
-    // EXPE-06 / EXPE-07: placeholders hasta Phase 7 (fechas) y Phase 6 (documentos)
+    // EXPE-07: poblar documentos reales del expediente (closed in Phase 6)
+    const { items } = await this.documentosRepo.listByExpediente(usuarioId, id, { page: 1, limit: 100 });
     return {
       ...expediente.toObject(),
-      documentos: [] as unknown[],
-      fechas: [] as unknown[],
+      documentos: items,
+      fechas: [] as unknown[], // EXPE-06: placeholder hasta Phase 7 (fechas/calendario)
     };
   }
 

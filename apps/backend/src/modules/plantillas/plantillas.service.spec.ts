@@ -130,7 +130,7 @@ describe('PlantillasService', () => {
       const plantilla = makePlantilla();
       repo.createFirstVersion.mockResolvedValue(plantilla as any);
 
-      await service.create('uid-1', { nombre: 'A', contenido: '{{expediente.numero}}' } as any);
+      await service.create('uid-1', { nombre: 'A', contenido: '{{expediente.numero}}', formatoOriginal: 'pegado' });
 
       expect(repo.createFirstVersion.mock.calls[0][1].formatoOriginal).toBe('pegado');
     });

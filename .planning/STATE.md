@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-06-02T17:49:40.362Z"
+status: executing
+last_updated: "2026-06-02T19:18:42.930Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 18
+  total_plans: 24
+  completed_plans: 19
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 05 (plantillas-y-editor) — EXECUTING
-Plan: 4 of 4
+Phase: 06 (generaci-n-y-documentos) — EXECUTING
+Plan: 2 of 4
 
 - **Milestone:** v1.0 MVP
 - **Phase:** 6
@@ -28,7 +28,8 @@ Plan: 4 of 4
 - **Plan:** 05-02 — Complete (2026-05-31) — backend plantillas: StorageService (MinIO), schema+versioning, service+controller, 35 tests (7 unit + 28 e2e)
 - **Plan:** 05-03 — Complete (2026-05-31) — frontend editor: CM6 editor + VariablesPanel + InsertarClausulaModal + DeclararVariableModal + plantillas pages
 - **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
-- **Status:** Ready to plan
+- **Plan:** 06-01 — Complete (2026-06-02) — docxtemplater+pizzip, StorageService.getObject, Documento schema+repo, GenerationService pipeline, 7 TDD tests (DOC-01/03/04/07)
+- **Status:** Executing Phase 06
 - **Last activity:** 2026-06-02
 
 ## Accumulated Context
@@ -121,6 +122,10 @@ Plan: 4 of 4
 - **MISSING_ID = '000000000000000000000000' pattern** — valid 24-char hex for "not found" branches in repository unit tests; avoids BSONError from toObjectId() (05-04)
 - **Directory-level jest threshold includes controller/DTOs** — coverageThreshold per `./src/modules/plantillas/` counts all files; controller spec required to avoid 0% dragging aggregate below 80% (05-04)
 - **Contactos branch coverage at 69.69% deferred** — pre-existing from 03-03, out of scope for 05-04; `pnpm -r run test` not affected (no --coverage in test script) (05-04)
+- **datosCongelados is same object passed to doc.render() and repo.create()** — DOC-07 immutability by design; no copy needed, one reference (06-01)
+- **docId pre-computed via new Types.ObjectId() before MinIO upload** — key includes docId; no second DB round-trip needed after upload (06-01)
+- **StorageService.getObject uses GetObjectCommand already imported in Phase 5** — only Readable from 'stream' added as new import (06-01)
+- **NuevoCampoSchema restricts tipoObjeto to expediente|contacto** — clausula/fecha not declarable in dynamic schema; same Pitfall 4 boundary as DeclararVariableSchema (06-01)
 
 ## Pending Todos / Blockers
 
@@ -148,6 +153,7 @@ Plan: 4 of 4
 | Phase 05 P01 | 6min | 3 tasks | 11 files |
 | Phase 05 P02 | 30min | 3 tasks | 17 files |
 | 05 | 04 | ~20min | 3 | 4 |
+| Phase 06 P01 | ~6min | 3 tasks | 12 files |
 
 ## Next Up
 

@@ -128,7 +128,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 06-01-backend-pipeline-generacion-PLAN.md — Deps docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, schema+repo, GenerationService (buildContext+render+MinIO+datosCongelados+auto-declare) — DOC-01/03/04/07
+- [x] 06-01-backend-pipeline-generacion-PLAN.md — Deps docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, schema+repo, GenerationService (buildContext+render+MinIO+datosCongelados+auto-declare) — DOC-01/03/04/07
 - [ ] 06-02-backend-modulo-documentos-PLAN.md — DocumentosService+Controller (generar/upload/download/list/delete), módulo+forwardRef, AppModule, cierre EXPE-07, e2e — DOC-02/04/05/06/07
 - [ ] 06-03-frontend-formulario-generacion-PLAN.md — Cliente HTTP, pre-relleno, GeneracionForm por secciones, RolFaltanteModal, página nuevo, pestaña Documentos (descarga/subida), UAT — DOC-01/02/03/05/06
 - [ ] 06-04-tests-cobertura-PLAN.md — Repository+controller specs, refuerzo DOC-07 inmutabilidad, coverageThreshold documentos >=80% — DOC-01..07 (SEC-06)
@@ -183,6 +183,6 @@ Plans:
 | 3. Contactos | 1/3 | In Progress|  |
 | 4. Cláusulas y Expedientes | 0/4 | Not started | - |
 | 5. Plantillas y Editor | 4/4 | Complete   | 2026-05-31 |
-| 6. Generación y Documentos | 0/4 | Not started | - |
+| 6. Generación y Documentos | 1/4 | In Progress|  |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |

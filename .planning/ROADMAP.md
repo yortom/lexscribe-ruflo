@@ -125,13 +125,13 @@ Plans:
   5. Descarga .docx vía endpoint autenticado con presigned URL (5 min TTL)
   6. Subida documento preexistente (.docx/.pdf/.txt) guardado en MinIO con tipo: "subido"
   7. Cambiar NIF de un contacto NO modifica .docx ya generado ni su datosCongelados
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: Pipeline generación backend: construir JSON contexto, resolver variables, docxtemplater, MinIO, datosCongelados
-- [ ] 06-02: Módulo NestJS documentos: schema, subida preexistentes, descarga con presigned URL, soft-delete con evaluación eventos
-- [ ] 06-03: Frontend: formulario generación con pre-relleno, asignación roles, declaración variables nuevas
-- [ ] 06-04: Tests pipeline generación, inmutabilidad datosCongelados, subida/descarga
+- [ ] 06-01-backend-pipeline-generacion-PLAN.md — Deps docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, schema+repo, GenerationService (buildContext+render+MinIO+datosCongelados+auto-declare) — DOC-01/03/04/07
+- [ ] 06-02-backend-modulo-documentos-PLAN.md — DocumentosService+Controller (generar/upload/download/list/delete), módulo+forwardRef, AppModule, cierre EXPE-07, e2e — DOC-02/04/05/06/07
+- [ ] 06-03-frontend-formulario-generacion-PLAN.md — Cliente HTTP, pre-relleno, GeneracionForm por secciones, RolFaltanteModal, página nuevo, pestaña Documentos (descarga/subida), UAT — DOC-01/02/03/05/06
+- [ ] 06-04-tests-cobertura-PLAN.md — Repository+controller specs, refuerzo DOC-07 inmutabilidad, coverageThreshold documentos >=80% — DOC-01..07 (SEC-06)
 
 ### Phase 7: Calendario y Facturación
 **Goal**: Calendario operativo con eventos auto/manuales y borrado controlado; facturación por expediente con totales y estados.

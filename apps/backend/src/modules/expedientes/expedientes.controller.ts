@@ -70,7 +70,6 @@ export class ExpedientesController {
   }
 
   // EXPE-02: unlink contacto — auditoría vía evento '*.unlinked' (no @Audited).
-  // El rol puede contener espacios; el frontend lo envía con encodeURIComponent.
   @Delete(':id/contactos/:contactoId/:rol')
   unlinkContacto(
     @CurrentUser('id') uid: string,
@@ -78,6 +77,6 @@ export class ExpedientesController {
     @Param('contactoId', MongoIdPipe) contactoId: string,
     @Param('rol') rol: string,
   ) {
-    return this.service.unlinkContacto(uid, id, contactoId, decodeURIComponent(rol));
+    return this.service.unlinkContacto(uid, id, contactoId, rol);
   }
 }

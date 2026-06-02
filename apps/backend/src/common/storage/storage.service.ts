@@ -46,11 +46,16 @@ export class StorageService implements OnModuleInit {
       await this.s3.send(new HeadBucketCommand({ Bucket: this.bucket }));
       this.logger.log(`Bucket "${this.bucket}" already exists`);
     } catch (err: unknown) {
+      // AWS SDK v3 exposes HTTP status via $metadata.httpStatusCode, not statusCode
       const statusCode =
-        err instanceof Error && 'statusCode' in err
-          ? (err as { statusCode: number }).statusCode
+        err != null &&
+        typeof err === 'object' &&
+        '$metadata' in err &&
+        typeof (err as { $metadata?: { httpStatusCode?: unknown } }).$metadata
+          ?.httpStatusCode === 'number'
+          ? (err as { $metadata: { httpStatusCode: number } }).$metadata.httpStatusCode
           : null;
-      // 404 = not found → create; other errors we log and continue
+      // 404 = bucket not found → create; other errors we log and continue
       if (statusCode === 404 || statusCode === 403) {
         try {
           await this.s3.send(new CreateBucketCommand({ Bucket: this.bucket }));

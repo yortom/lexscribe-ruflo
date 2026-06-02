@@ -31,11 +31,11 @@ export class ContactosService {
     const expedientes = await this.expedientesRepo.findByContactoId(usuarioId, id);
     return {
       ...contacto.toObject(),
-      expedientesVinculados: expedientes.map((e) => ({
-        _id: e._id.toString(),
-        nombre: e.nombre,
-        rol: e.contactos.find((c) => c.contactoId.toString() === id)?.rol ?? '',
-      })),
+      expedientesVinculados: expedientes.flatMap((e) =>
+        e.contactos
+          .filter((c) => c.contactoId.toString() === id)
+          .map((c) => ({ _id: e._id.toString(), nombre: e.nombre, rol: c.rol })),
+      ),
     };
   }
 

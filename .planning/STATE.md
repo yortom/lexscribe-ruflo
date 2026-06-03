@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-06-03T19:16:11.997Z"
+status: planning
+last_updated: "2026-06-03T19:22:45.602Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 8
@@ -20,7 +20,7 @@ Phase: 06 (generaci-n-y-documentos) — EXECUTING
 Plan: 4 of 4 (complete)
 
 - **Milestone:** v1.0 MVP
-- **Phase:** 6
+- **Phase:** 7
 - **Phase:** 3 — Complete (2026-05-18)
 - **Plan:** Not started
 - **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
@@ -32,7 +32,7 @@ Plan: 4 of 4 (complete)
 - **Plan:** 06-02 — Complete (2026-06-02) — DocumentosModule (controller/service/DTOs/module), EXPE-07 closed, GenerationService DI fixed, 27 tests (12 unit + 15 e2e), DOC-02/04/05/06/07
 - **Plan:** 06-03 — Complete (2026-06-03) — frontend formulario generación: HTTP client, preRellenarFormulario, GeneracionForm (secciones+contador+modal), DocumentosList (descarga/subida), EXPE-07 pestaña Documentos, UAT aprobado (DOC-01/02/03/05/06)
 - **Plan:** 06-04 — Complete (2026-06-03) — repository+controller unit specs (18 tests), DOC-07 reinforced, jest coverageThreshold >=80%, 138 unit tests green, DOC-01..07
-- **Status:** Phase 06 Complete — Ready for Phase 07 (Calendario y Facturación)
+- **Status:** Ready to plan
 - **Last activity:** 2026-06-03
 
 ## Accumulated Context

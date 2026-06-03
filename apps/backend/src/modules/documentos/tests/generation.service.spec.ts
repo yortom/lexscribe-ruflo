@@ -242,20 +242,40 @@ describe('GenerationService', () => {
       },
     });
 
+    // Set up a real source expediente object whose reference we will capture
+    const sourceExpediente = makeExpediente({
+      nombre: 'Caso Inmutabilidad',
+      parametros: { numero: '2026-001', honorarios: 1000 },
+    });
+    expedientesRepo = makeExpedientesRepo(sourceExpediente);
+    service = new GenerationService(
+      plantillasService as any,
+      expedientesRepo as any,
+      esquemas,
+      storage,
+      documentosRepo,
+    );
+
     const result = await service.generar(uid, expedienteId, dto as any);
 
     // Capture what was passed to doc.render
     expect(mockDocRender).toHaveBeenCalledTimes(1);
     const renderedContext = mockDocRender.mock.calls[0][0];
 
-    // datosCongelados must equal the context used in render
+    // datosCongelados must equal the context used in render (same structural content)
     expect(result.datosCongelados).toEqual(renderedContext);
 
-    // Mutating the expediente parametros object after generation must NOT affect datosCongelados
-    const expediente = makeExpediente({ parametros: { numero: '2026-001' } });
-    const frozenDC = JSON.parse(JSON.stringify(result.datosCongelados));
-    expediente.parametros['numero'] = 'CHANGED';
-    expect(result.datosCongelados).toEqual(frozenDC); // still the same
+    // DOC-07: Mutating the source expediente parametros object AFTER generation
+    // must NOT affect the datosCongelados that was persisted.
+    // buildContext spreads parametros → new object → no shared reference.
+    const frozenSnapshot = JSON.parse(JSON.stringify(result.datosCongelados));
+    sourceExpediente.parametros['numero'] = 'MUTATED';
+    sourceExpediente.parametros['honorarios'] = 9999;
+
+    // datosCongelados must still hold the original snapshotted values
+    expect(result.datosCongelados).toEqual(frozenSnapshot);
+    expect((result.datosCongelados as any)?.expediente?.numero).toBe('2026-001');
+    expect((result.datosCongelados as any)?.expediente?.honorarios).toBe(1000);
   });
 
   // ── Test 5 (DOC-03): camposNuevos → addParametro ─────────────────────────

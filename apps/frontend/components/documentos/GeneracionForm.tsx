@@ -33,7 +33,7 @@ interface CampoNuevo {
   tipoObjeto: 'expediente' | 'contacto';
   rol?: string | null;
   nombre: string;
-  tipoDato: string;
+  tipoDato: 'texto' | 'numero' | 'fecha' | 'booleano';
 }
 
 /**
@@ -156,7 +156,7 @@ export function GeneracionForm({
     for (const key of camposNuevosSet) {
       const [rolPart, ...campoParts] = key.split('|');
       const campo = campoParts.join('|');
-      const tipoDato = tiposCamposNuevos[key] ?? 'texto';
+      const tipoDato = (tiposCamposNuevos[key] ?? 'texto') as CampoNuevo['tipoDato'];
       const tipoObjetoGrupo = grupos.find((g) =>
         g.variables.some((v) => (v.rol ?? '') === rolPart && v.campo === campo),
       )?.tipoObjeto;

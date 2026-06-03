@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-03T13:27:19.596Z"
+last_updated: "2026-06-03T19:16:11.997Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 24
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Lexscribe — State
@@ -30,8 +30,9 @@ Plan: 4 of 4 (complete)
 - **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
 - **Plan:** 06-01 — Complete (2026-06-02) — docxtemplater+pizzip, StorageService.getObject, Documento schema+repo, GenerationService pipeline, 7 TDD tests (DOC-01/03/04/07)
 - **Plan:** 06-02 — Complete (2026-06-02) — DocumentosModule (controller/service/DTOs/module), EXPE-07 closed, GenerationService DI fixed, 27 tests (12 unit + 15 e2e), DOC-02/04/05/06/07
+- **Plan:** 06-03 — Complete (2026-06-03) — frontend formulario generación: HTTP client, preRellenarFormulario, GeneracionForm (secciones+contador+modal), DocumentosList (descarga/subida), EXPE-07 pestaña Documentos, UAT aprobado (DOC-01/02/03/05/06)
 - **Plan:** 06-04 — Complete (2026-06-03) — repository+controller unit specs (18 tests), DOC-07 reinforced, jest coverageThreshold >=80%, 138 unit tests green, DOC-01..07
-- **Status:** Executing Phase 06
+- **Status:** Phase 06 Complete — Ready for Phase 07 (Calendario y Facturación)
 - **Last activity:** 2026-06-03
 
 ## Accumulated Context
@@ -133,6 +134,8 @@ Plan: 4 of 4 (complete)
 - **Extension validation uses file.originalname (Pitfall 5)** — MIME_BY_EXT[ext] lookup by lowercase extension; browser-provided mimetype ignored; .exe and unknown extensions → ValidationError (06-02)
 - **coverageThreshold ./src/modules/documentos/ counts direct-child files only** — Jest directory threshold applies to files directly in the path; dto/ and generation/ subdirectories are separate entries; controller+repo+service aggregate well above 80% (06-04)
 - **DOC-07 referential independence via buildContext spread** — datosCongelados is a new plain object (parametros spread, not reference copy); mutation of source expediente after generar() does not affect persisted snapshot (06-04)
+- **preRellenarFormulario accepts pre-resolved contactoFieldsByRol from page caller** — pure function with no async side-effects; page loads and resolves contacto fields before mounting GeneracionForm (06-03)
+- **DocumentosList decoupled via expedienteId prop + useQuery** — component fetches its own data, re-fetches on invalidation; no prop-drilling of document arrays from parent tabs (06-03)
 
 ## Pending Todos / Blockers
 
@@ -163,7 +166,8 @@ Plan: 4 of 4 (complete)
 | Phase 06 P01 | ~6min | 3 tasks | 12 files |
 | Phase 06 P02 | ~35min | 3 tasks | 12 files |
 | Phase 06 P04 | ~15min | 2 tasks | 4 files |
+| Phase 06 P03 | 90min | 4 tasks | 10 files |
 
 ## Next Up
 
-Phase 06 — Documentos (generación de documentos .docx desde plantillas + expedientes, docxtemplater).
+Phase 07 — Calendario y Facturación (eventos auto/manuales, vista calendario, pestaña facturación del expediente).

@@ -269,8 +269,8 @@ describe('GenerationService', () => {
     // must NOT affect the datosCongelados that was persisted.
     // buildContext spreads parametros → new object → no shared reference.
     const frozenSnapshot = JSON.parse(JSON.stringify(result.datosCongelados));
-    sourceExpediente.parametros['numero'] = 'MUTATED';
-    sourceExpediente.parametros['honorarios'] = 9999;
+    (sourceExpediente.parametros as Record<string, unknown>)['numero'] = 'MUTATED';
+    (sourceExpediente.parametros as Record<string, unknown>)['honorarios'] = 9999;
 
     // datosCongelados must still hold the original snapshotted values
     expect(result.datosCongelados).toEqual(frozenSnapshot);

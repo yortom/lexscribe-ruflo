@@ -25,6 +25,24 @@ import { textoToDocxBuffer } from '../../plantillas/conversion';
 import { PlantillasService } from '../../plantillas/plantillas.service';
 import { ExpedientesRepository } from '../../expedientes/expedientes.repository';
 
+/**
+ * docxtemplater parser that resolves dotted paths against the render context.
+ * The built-in default parser does `scope["expediente.nombre"]` (a literal key lookup),
+ * which never matches our nested datosCongelados ({ expediente: { nombre } }). This walks
+ * the dotted tag (`expediente.nombre`, `contacto.vendedor.nombre`) into the nested object.
+ */
+function dottedTagParser(tag: string) {
+  return {
+    get(scope: Record<string, unknown> | null | undefined): unknown {
+      if (tag === '.') return scope;
+      return tag.split('.').reduce<unknown>((acc, key) => {
+        if (acc === null || acc === undefined) return undefined;
+        return (acc as Record<string, unknown>)[key];
+      }, scope);
+    },
+  };
+}
+
 /** Slug a filename to safe ASCII for storage path (removes diacritics, replaces spaces). */
 function slugify(name: string): string {
   return name
@@ -87,8 +105,15 @@ export class GenerationService {
       : await textoToDocxBuffer(plantilla.contenido);
 
     // Step 6: Render with docxtemplater (Pattern 1)
+    // Plantillas use {{objeto.campo}} delimiters (FUNCIONAL.md §5.2); docxtemplater
+    // defaults to single-brace { }, which mis-parses {{ }} as a duplicate close tag.
     const zip = new PizZip(baseBuffer);
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      delimiters: { start: '{{', end: '}}' },
+      parser: dottedTagParser,
+    });
     doc.render(datosCongelados);
     const out: Buffer = doc.getZip().generate({ type: 'nodebuffer', compression: 'DEFLATE' });
 

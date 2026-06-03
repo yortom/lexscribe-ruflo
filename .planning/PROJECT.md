@@ -78,6 +78,17 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 - **AUTH-07** — `auditoria` asíncrona (setImmediate) con `AuditInterceptor` + `@Audited` + listeners EventEmitter para create/update/delete/link/unlink/generate/login/logout
 - **AUTH-08** — Módulo `esquemas` con GET/POST/DELETE por `tipoObjeto`; `$addToSet` atómico; auditoría integrada
 
+### Phase 6 — Generación y Documentos (2026-06-03)
+
+- **DOC-01** — Formulario de generación: variables agrupadas por `tipoObjeto`, pre-relleno desde expediente/contactos (`GeneracionForm` + `preRellenarFormulario`)
+- **DOC-02** — Completitud bloqueante: backend lanza `ValidationError` si falta cualquier variable antes de render; frontend "Generar (faltan N)" + `RolFaltanteModal`
+- **DOC-03** — Variables nuevas → `esquemas.addParametro` al generar (FL-13 entrada C); badge "nuevo" + selector de tipo (D-08)
+- **DOC-04** — Render `.docx` vía `docxtemplater` (delimitadores `{{ }}` + parser dotted-path) → upload a MinIO. Bug de delimitadores encontrado en UAT y corregido (`af13eab`); regression test real en `generation.render.spec.ts`
+- **DOC-05** — Descarga vía presigned URL (`getPresignedUrl`, 300 s)
+- **DOC-06** — Subida de documentos preexistentes `.docx`/`.pdf`/`.txt` (validación por extensión)
+- **DOC-07** — `datosCongelados` inmutable: snapshot JSON resuelto, sin referencia compartida; test explícito de inmutabilidad
+- **EXPE-07** (cerrado) — `ExpedienteDetailResponse.documentos` poblado con documentos reales; pestaña Documentos con listado + descarga + subida
+
 ## Out of Scope
 
 Ver `docs/FUNCIONAL.md §7` y `REQUIREMENTS.md` sección "Out of Scope". Las exclusiones explícitas se mantienen sincronizadas con esa sección.
@@ -122,4 +133,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-03 — Phase 2 complete (auth + bases transversales, 9/9 requirements satisfied).*
+*Last updated: 2026-06-03 — Phase 6 complete (generación de documentos .docx end-to-end, DOC-01..DOC-07 + EXPE-07 validados).*

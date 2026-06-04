@@ -148,8 +148,8 @@ export class GenerationService {
    * Structure: { expediente, contacto: { [rol]: {...} }, clausula, fecha }
    * (Claude's Discretion — CONTEXT.md + ARQUITECTURA.md §7.2)
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private buildContext(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expediente: any,
     dto: GenerateDocumentoInput,
   ): Record<string, unknown> {

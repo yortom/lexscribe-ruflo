@@ -15,7 +15,6 @@ import { ValidationError } from '../../../common/errors';
 const mockDocRender = jest.fn();
 const mockDocGenerate = jest.fn().mockReturnValue(Buffer.from('rendered-docx'));
 const mockDocxInstance = { render: mockDocRender, getZip: () => ({ generate: mockDocGenerate }) };
-const MockDocxtemplater = jest.fn().mockImplementation(() => mockDocxInstance);
 
 jest.mock('docxtemplater', () => {
   return { __esModule: true, default: jest.fn().mockImplementation(() => mockDocxInstance) };
@@ -26,7 +25,6 @@ jest.mock('pizzip', () => {
 });
 
 // mock conversion (textoToDocxBuffer for storagePath=null case)
-const mockTextoToDocxBuffer = jest.fn().mockResolvedValue(Buffer.from('base-docx-from-text'));
 jest.mock('../../plantillas/conversion', () => ({
   textoToDocxBuffer: jest.fn().mockResolvedValue(Buffer.from('base-docx-from-text')),
 }));
@@ -212,7 +210,7 @@ describe('GenerationService', () => {
 
   it('Test 3 (DOC-04): uploads to MinIO with correct key pattern and persists documento', async () => {
     const dto = makeDto();
-    const result = await service.generar(uid, expedienteId, dto as any);
+    await service.generar(uid, expedienteId, dto as any);
 
     // storage.putObject called once
     expect(storage.putObject).toHaveBeenCalledTimes(1);

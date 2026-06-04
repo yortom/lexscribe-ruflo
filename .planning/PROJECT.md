@@ -78,6 +78,27 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 - **AUTH-07** — `auditoria` asíncrona (setImmediate) con `AuditInterceptor` + `@Audited` + listeners EventEmitter para create/update/delete/link/unlink/generate/login/logout
 - **AUTH-08** — Módulo `esquemas` con GET/POST/DELETE por `tipoObjeto`; `$addToSet` atómico; auditoría integrada
 
+### Phase 3 — Contactos (2026-05-18)
+
+- **CONT-01** — Crear contacto persona física/jurídica con campos base + tipología (UI + backend)
+- **CONT-02** — Listado con búsqueda por nombre/NIF y filtro por tipología, paginado
+- **CONT-03** — Parámetro personalizado del contacto registrado en esquema dinámico de `contacto` al guardar
+- **CONT-04** — Editar/soft-delete de contacto con auditoría
+- **CONT-05** — Sección "Expedientes vinculados" en el detalle del contacto (stub en Phase 3, poblado real al cerrar en Phase 4)
+
+### Phase 4 — Cláusulas y Expedientes (2026-05-31)
+
+- **CLAU-01/02/03** — Biblioteca de cláusulas: crear/editar/borrar con texto y labels; búsqueda `$text` y filtro por label
+- **EXPE-01..06** — Expedientes: crear con nombre + parámetros + fecha auto; asociar/desasociar contactos con rol (pareja contacto+rol única → 409); detalle tabbed con placeholders de documentos/fechas/facturación
+- **CONT-05** (cerrado) — Vista inversa real: `ContactosService.getById` puebla `expedientesVinculados` vía `ExpedientesRepository` (forwardRef bidireccional)
+- **Frontend + tests** — Páginas Next.js cláusulas/expedientes con detalle tabbed y modal asociar contacto; unit tests Jest ≥80% por módulo
+
+### Phase 5 — Plantillas y Editor (2026-05-31)
+
+- **PLAN-01..06** — Subida `.txt`/`.docx`/pegado → plantilla (texto plano + storagePath); detección automática de variables; declarar campos nuevos; editor CodeMirror 6 con highlight + panel en vivo; versionado por nuevo registro (anterior conservada)
+- **CLAU-04** — Insertar cláusula desde biblioteca con renumeración automática (ordinales españoles)
+- **SEC-06** (plantillas) — Cobertura ≥80% en parser de variables y versionado; thresholds enforced
+
 ### Phase 6 — Generación y Documentos (2026-06-03)
 
 - **DOC-01** — Formulario de generación: variables agrupadas por `tipoObjeto`, pre-relleno desde expediente/contactos (`GeneracionForm` + `preRellenarFormulario`)

@@ -12,8 +12,8 @@
 
 - [x] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde — Completed 2026-04-27
 - [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
-- [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
-- [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
+- [x] **Phase 3: Contactos** - CRUD contactos con esquema dinámico — Completed 2026-05-18
+- [x] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados — Completed 2026-05-31
 - [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6 (completed 2026-05-31)
 - [x] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes (completed 2026-06-03)
 - [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
@@ -73,8 +73,8 @@ Plans:
 
 Plans:
 - [x] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
-- [ ] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
-- [ ] 03-03: Tests unitarios e integración del módulo contactos
+- [x] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
+- [x] 03-03: Tests unitarios e integración del módulo contactos
 
 ### Phase 4: Cláusulas y Expedientes
 **Goal**: Biblioteca de cláusulas reutilizables operativa + gestión de expedientes con asociación de contactos. Sin generación todavía.
@@ -91,8 +91,8 @@ Plans:
 Plans:
 - [x] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03) — Completed 2026-05-28
 - [x] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07) — Completed 2026-05-28
-- [ ] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
-- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
+- [x] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
+- [x] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
 
 ### Phase 5: Plantillas y Editor
 **Goal**: El usuario puede crear plantillas a partir de archivo o pegado, ver las variables detectadas y declarar campos nuevos. Cláusulas insertables con renumeración.
@@ -179,10 +179,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
-| 2. Auth y bases transversales | 3/4 | In Progress|  |
-| 3. Contactos | 1/3 | In Progress|  |
-| 4. Cláusulas y Expedientes | 0/4 | Not started | - |
-| 5. Plantillas y Editor | 4/4 | Complete   | 2026-05-31 |
-| 6. Generación y Documentos | 4/4 | Complete   | 2026-06-03 |
+| 2. Auth y bases transversales | 4/4 | Complete | 2026-05-02 |
+| 3. Contactos | 3/3 | Complete | 2026-05-18 |
+| 4. Cláusulas y Expedientes | 4/4 | Complete | 2026-05-31 |
+| 5. Plantillas y Editor | 4/4 | Complete | 2026-05-31 |
+| 6. Generación y Documentos | 4/4 | Complete | 2026-06-03 |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |

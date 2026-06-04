@@ -9,31 +9,32 @@ progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 24
-  completed_plans: 22
+  completed_plans: 24
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 06 (generaci-n-y-documentos) — EXECUTING
-Plan: 4 of 4 (complete)
-
 - **Milestone:** v1.0 MVP
-- **Phase:** 7
-- **Phase:** 3 — Complete (2026-05-18)
-- **Plan:** Not started
-- **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
-- **Plan:** 05-01 — Complete (2026-05-31) — parser shared: variable-parser, clausula-renumber, plantilla Zod schemas + shared-types, 52 vitest tests (TDD)
-- **Plan:** 05-02 — Complete (2026-05-31) — backend plantillas: StorageService (MinIO), schema+versioning, service+controller, 35 tests (7 unit + 28 e2e)
-- **Plan:** 05-03 — Complete (2026-05-31) — frontend editor: CM6 editor + VariablesPanel + InsertarClausulaModal + DeclararVariableModal + plantillas pages
-- **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
-- **Plan:** 06-01 — Complete (2026-06-02) — docxtemplater+pizzip, StorageService.getObject, Documento schema+repo, GenerationService pipeline, 7 TDD tests (DOC-01/03/04/07)
-- **Plan:** 06-02 — Complete (2026-06-02) — DocumentosModule (controller/service/DTOs/module), EXPE-07 closed, GenerationService DI fixed, 27 tests (12 unit + 15 e2e), DOC-02/04/05/06/07
-- **Plan:** 06-03 — Complete (2026-06-03) — frontend formulario generación: HTTP client, preRellenarFormulario, GeneracionForm (secciones+contador+modal), DocumentosList (descarga/subida), EXPE-07 pestaña Documentos, UAT aprobado (DOC-01/02/03/05/06)
-- **Plan:** 06-04 — Complete (2026-06-03) — repository+controller unit specs (18 tests), DOC-07 reinforced, jest coverageThreshold >=80%, 138 unit tests green, DOC-01..07
-- **Status:** Ready to plan
-- **Last activity:** 2026-06-03
+- **Phases complete:** 6 of 8 (Phases 1–6) — 24 of 24 planned plans complete
+- **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
+- **Next phase:** Phase 7 — Calendario y Facturación — not started
+- **Status:** Ready to plan Phase 7
+- **Last activity:** 2026-06-04
+
+### Phases at a glance
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| 1 — Bootstrap | Monorepo, Docker, Nginx, CI/CD | ✓ 2026-04-27 |
+| 2 — Auth y bases transversales | JWT+refresh, auditoría, soft-delete, esquemas, backup | ✓ 2026-05-02 |
+| 3 — Contactos | CRUD contactos + esquema dinámico + tests | ✓ 2026-05-18 |
+| 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend+tests), CONT-05/EXPE-07 | ✓ 2026-05-31 |
+| 5 — Plantillas y Editor | Parser variables, CodeMirror 6, versionado plantillas | ✓ 2026-05-31 |
+| 6 — Generación y Documentos | docxtemplater `.docx`, datosCongelados, subida/descarga | ✓ 2026-06-03 |
+| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ○ pending |
+| 8 — Hardening | Cifrado AES PII, Sentry, E2E Playwright FL-1..13 | ○ pending |
 
 ## Accumulated Context
 
@@ -74,16 +75,42 @@ Plan: 4 of 4 (complete)
 
 **Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
 
-## Phase 4 Progress (Wave 1 complete)
+## Phase 4 Summary (Complete — 2026-05-31)
 
 **Plans executed:**
 
 - `04-01` — NestJS ClausulasModule: schema + softDeletePlugin + `$text` index (nombre/texto weights 5/1) + compound {usuarioId,activo,labels} index, repository, service, controller (JwtAuthGuard + @Audited), Zod DTOs, 24 e2e tests (CLAU-01..03 + búsqueda + filtro labels + soft-delete + audit)
 - `04-02` — NestJS ExpedientesModule: schema with embedded `contactos[{contactoId,rol}]` + 3 indexes + softDelete, repository (findByContactoId/pushContacto/pullContacto), service (link/unlink with (contactoId,rol) uniqueness → 409, eventos, dynamic params), controller (CRUD + POST/DELETE :id/contactos). **CONT-05 closed** via bidirectional forwardRef (ContactosService.getById populates real expedientesVinculados). 24 e2e tests (EXPE-01..07 + audit + CONT-05 real-link)
+- `04-03` — Frontend Next.js: páginas cláusulas + expedientes con detalle tabbed (ContactosVinculadosTab), modal asociar contacto (AsociarContactoModal), formularios (ClausulaForm/ExpedienteForm) + tablas; UAT humano aprobado
+- `04-04` — Unit tests Jest de clausulas/expedientes/contactos (repo+service+controller) ≥80% cobertura por módulo + `jest.config.ts` coverageThreshold per-module
 
-**Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07 (backend), CONT-05 (closed)
+**Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07, CONT-05 (closed)
 
-**Integration verified:** 48/48 e2e tests pass (clausulas + expedientes together), backend build + shared packages build green.
+**Integration verified:** clausulas + expedientes e2e pass together; backend build + shared packages build green; frontend clausulas/expedientes Vitest suites green.
+
+## Phase 5 Summary (Complete — 2026-05-31)
+
+**Plans executed:**
+
+- `05-01` — Parser de variables compartido (`{{objeto.campo}}` / `{{objeto.rol.campo}}`), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, 52 vitest tests TDD)
+- `05-02` — Backend PlantillasModule: StorageService (MinIO/S3), schema versionado, save parse+validate, versionado two-step, declarar-variable, conversión mammoth/docx (7 unit + 28 e2e)
+- `05-03` — Frontend editor CodeMirror 6 (highlight variables válidas/inválidas), VariablesPanel, InsertarClausulaModal (renumera), DeclararVariableModal, páginas plantillas (UAT)
+- `05-04` — Gate de cobertura SEC-06: 67 unit tests, módulo plantillas 99.13% líneas / 79.03% ramas, pipeline verde
+
+**Requirements addressed:** PLAN-01..06, CLAU-04, SEC-06 (plantillas)
+
+## Phase 6 Summary (Complete & verified — 2026-06-03)
+
+**Plans executed:**
+
+- `06-01` — Pipeline núcleo: docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, Documento schema+repo, GenerationService (buildContext → render → MinIO → datosCongelados + auto-declare campos nuevos), 7 TDD tests (DOC-01/03/04/07)
+- `06-02` — DocumentosModule: service+controller (generar/upload/download/list/delete), módulo+forwardRef, AppModule, **EXPE-07 cerrado** (documentos reales en el expediente), 27 tests (12 unit + 15 e2e) (DOC-02/04/05/06/07)
+- `06-03` — Frontend generación: HTTP client, preRellenarFormulario, GeneracionForm (secciones por tipoObjeto + contador "faltan N" + RolFaltanteModal + badge "nuevo"), página `/expedientes/[id]/documentos/nuevo`, DocumentosList (descarga/subida), UAT aprobado (DOC-01/02/03/05/06)
+- `06-04` — Repository+controller unit specs (18 tests), DOC-07 inmutabilidad reforzada, coverageThreshold documentos ≥80%, suite backend verde (DOC-01..07)
+
+**Requirements addressed:** DOC-01..07, EXPE-07 (closed)
+
+**Post-UAT fix:** docxtemplater configurado con delimitadores `{{ }}` + parser de rutas con punto (commit del fix); regression test real de render añadido. Verificación: 225 unit + tsc limpio.
 
 ## Key Decisions
 

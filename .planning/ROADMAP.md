@@ -91,8 +91,8 @@ Plans:
 Plans:
 - [x] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03) — Completed 2026-05-28
 - [x] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07) — Completed 2026-05-28
-- [x] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
-- [x] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
+- [x] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto (entregado; sin SUMMARY formal — no se ejecutó como plan GSD)
+- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — **Diferido**: unit tests backend de cláusulas/expedientes NO implementados (cobertura actual: e2e). Candidato a Phase 8 / SEC-06
 
 ### Phase 5: Plantillas y Editor
 **Goal**: El usuario puede crear plantillas a partir de archivo o pegado, ver las variables detectadas y declarar campos nuevos. Cláusulas insertables con renumeración.
@@ -181,8 +181,10 @@ Plans:
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
 | 2. Auth y bases transversales | 4/4 | Complete | 2026-05-02 |
 | 3. Contactos | 3/3 | Complete | 2026-05-18 |
-| 4. Cláusulas y Expedientes | 4/4 | Complete | 2026-05-31 |
+| 4. Cláusulas y Expedientes | 3/4 | Complete* | 2026-05-31 |
 | 5. Plantillas y Editor | 4/4 | Complete | 2026-05-31 |
 | 6. Generación y Documentos | 4/4 | Complete | 2026-06-03 |
 | 7. Calendario y Facturación | 0/4 | Not started | - |
 | 8. Hardening | 0/4 | Not started | - |
+
+> \* **Phase 4 — Complete (features) con deuda técnica:** backend (04-01/02) + frontend (04-03, entregado sin SUMMARY) están operativos y verificados por e2e + tests de frontend. El plan **04-04 (unit tests backend de cláusulas/expedientes) está diferido** — no existen unit specs para esos módulos (sí para contactos). Pendiente de cerrar en Phase 8 / SEC-06.

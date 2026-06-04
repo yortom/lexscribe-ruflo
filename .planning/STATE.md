@@ -9,7 +9,7 @@ progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 24
-  completed_plans: 24
+  completed_plans: 22
 ---
 
 # Lexscribe — State
@@ -17,9 +17,10 @@ progress:
 ## Current Position
 
 - **Milestone:** v1.0 MVP
-- **Phases complete:** 6 of 8 (Phases 1–6) — 24 of 24 planned plans complete
+- **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
 - **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
 - **Next phase:** Phase 7 — Calendario y Facturación — not started
+- **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
 - **Status:** Ready to plan Phase 7
 - **Last activity:** 2026-06-04
 
@@ -30,7 +31,7 @@ progress:
 | 1 — Bootstrap | Monorepo, Docker, Nginx, CI/CD | ✓ 2026-04-27 |
 | 2 — Auth y bases transversales | JWT+refresh, auditoría, soft-delete, esquemas, backup | ✓ 2026-05-02 |
 | 3 — Contactos | CRUD contactos + esquema dinámico + tests | ✓ 2026-05-18 |
-| 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend+tests), CONT-05/EXPE-07 | ✓ 2026-05-31 |
+| 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend), CONT-05/EXPE-07 | ✓ 2026-05-31 ⚠ falta unit-test backend (04-04) |
 | 5 — Plantillas y Editor | Parser variables, CodeMirror 6, versionado plantillas | ✓ 2026-05-31 |
 | 6 — Generación y Documentos | docxtemplater `.docx`, datosCongelados, subida/descarga | ✓ 2026-06-03 |
 | 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ○ pending |
@@ -81,12 +82,14 @@ progress:
 
 - `04-01` — NestJS ClausulasModule: schema + softDeletePlugin + `$text` index (nombre/texto weights 5/1) + compound {usuarioId,activo,labels} index, repository, service, controller (JwtAuthGuard + @Audited), Zod DTOs, 24 e2e tests (CLAU-01..03 + búsqueda + filtro labels + soft-delete + audit)
 - `04-02` — NestJS ExpedientesModule: schema with embedded `contactos[{contactoId,rol}]` + 3 indexes + softDelete, repository (findByContactoId/pushContacto/pullContacto), service (link/unlink with (contactoId,rol) uniqueness → 409, eventos, dynamic params), controller (CRUD + POST/DELETE :id/contactos). **CONT-05 closed** via bidirectional forwardRef (ContactosService.getById populates real expedientesVinculados). 24 e2e tests (EXPE-01..07 + audit + CONT-05 real-link)
-- `04-03` — Frontend Next.js: páginas cláusulas + expedientes con detalle tabbed (ContactosVinculadosTab), modal asociar contacto (AsociarContactoModal), formularios (ClausulaForm/ExpedienteForm) + tablas; UAT humano aprobado
-- `04-04` — Unit tests Jest de clausulas/expedientes/contactos (repo+service+controller) ≥80% cobertura por módulo + `jest.config.ts` coverageThreshold per-module
+- `04-03` (sin SUMMARY formal) — Frontend Next.js entregado: páginas cláusulas + expedientes con detalle tabbed (ContactosVinculadosTab), modal asociar contacto (AsociarContactoModal), formularios (ClausulaForm/ExpedienteForm) + tablas; tests Vitest de frontend verdes. *No se ejecutó como plan GSD formal.*
+- `04-04` (**diferido**) — Unit tests backend de cláusulas/expedientes NO implementados. Cobertura actual: e2e (clausulas + expedientes) + unit tests de contactos. Pendiente: unit specs repo/service/controller de cláusulas/expedientes (candidato a Phase 8 / SEC-06).
 
 **Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07, CONT-05 (closed)
 
-**Integration verified:** clausulas + expedientes e2e pass together; backend build + shared packages build green; frontend clausulas/expedientes Vitest suites green.
+**Integration verified:** cláusulas + expedientes e2e pass together; backend build + shared packages build green; frontend cláusulas/expedientes Vitest suites green.
+
+**Known gap:** faltan unit tests backend de cláusulas/expedientes (04-04 diferido). Las features están entregadas y verificadas por e2e + frontend.
 
 ## Phase 5 Summary (Complete — 2026-05-31)
 

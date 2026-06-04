@@ -91,7 +91,8 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 - **CLAU-01/02/03** — Biblioteca de cláusulas: crear/editar/borrar con texto y labels; búsqueda `$text` y filtro por label
 - **EXPE-01..06** — Expedientes: crear con nombre + parámetros + fecha auto; asociar/desasociar contactos con rol (pareja contacto+rol única → 409); detalle tabbed con placeholders de documentos/fechas/facturación
 - **CONT-05** (cerrado) — Vista inversa real: `ContactosService.getById` puebla `expedientesVinculados` vía `ExpedientesRepository` (forwardRef bidireccional)
-- **Frontend + tests** — Páginas Next.js cláusulas/expedientes con detalle tabbed y modal asociar contacto; unit tests Jest ≥80% por módulo
+- **Frontend** — Páginas Next.js cláusulas/expedientes con detalle tabbed y modal asociar contacto (tests Vitest de frontend + e2e backend)
+- **Deuda técnica (04-04 diferido)** — Faltan unit tests backend de cláusulas/expedientes; cobertura actual vía e2e. Pendiente Phase 8 / SEC-06
 
 ### Phase 5 — Plantillas y Editor (2026-05-31)
 

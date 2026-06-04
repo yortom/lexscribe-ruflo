@@ -38,8 +38,8 @@ const sampleExpediente: ExpedienteDetailResponse = {
   parametros: { honorariosBase: 500 },
   contactos: [],
   documentos: [],
+  fechas: [],
   activo: true,
-  fechaInactivacion: null,
   fechaCreacion: '2026-01-01T00:00:00Z',
   fechaActualizacion: '2026-01-01T00:00:00Z',
 };
@@ -68,7 +68,7 @@ describe('GeneracionForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useRouter).mockReturnValue(mockRouter as ReturnType<typeof useRouter>);
+    vi.mocked(useRouter).mockReturnValue(mockRouter as unknown as ReturnType<typeof useRouter>);
   });
 
   it('renderiza seccion "Datos del expediente" para variables expediente', () => {

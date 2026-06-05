@@ -3,33 +3,39 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-last_updated: "2026-06-02T17:49:40.362Z"
-last_activity: 2026-06-02
+last_updated: "2026-06-04T00:00:00.000Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 8
-  completed_phases: 4
-  total_plans: 20
-  completed_plans: 18
+  completed_phases: 6
+  total_plans: 24
+  completed_plans: 22
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 05 (plantillas-y-editor) — EXECUTING
-Plan: 4 of 4
-
 - **Milestone:** v1.0 MVP
-- **Phase:** 6
-- **Phase:** 3 — Complete (2026-05-18)
-- **Plan:** Not started
-- **Plan:** 04-02 — Complete (2026-05-28) — backend expedientes + CONT-05 closed, 24 e2e tests
-- **Plan:** 05-01 — Complete (2026-05-31) — parser shared: variable-parser, clausula-renumber, plantilla Zod schemas + shared-types, 52 vitest tests (TDD)
-- **Plan:** 05-02 — Complete (2026-05-31) — backend plantillas: StorageService (MinIO), schema+versioning, service+controller, 35 tests (7 unit + 28 e2e)
-- **Plan:** 05-03 — Complete (2026-05-31) — frontend editor: CM6 editor + VariablesPanel + InsertarClausulaModal + DeclararVariableModal + plantillas pages
-- **Plan:** 05-04 — Complete (2026-05-31) — SEC-06 coverage gate: 67 new unit tests, plantillas module 99.13% lines / 79.03% branches, full pipeline green
-- **Status:** Ready to plan
-- **Last activity:** 2026-06-02
+- **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
+- **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
+- **Next phase:** Phase 7 — Calendario y Facturación — not started
+- **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
+- **Status:** Ready to plan Phase 7
+- **Last activity:** 2026-06-04
+
+### Phases at a glance
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| 1 — Bootstrap | Monorepo, Docker, Nginx, CI/CD | ✓ 2026-04-27 |
+| 2 — Auth y bases transversales | JWT+refresh, auditoría, soft-delete, esquemas, backup | ✓ 2026-05-02 |
+| 3 — Contactos | CRUD contactos + esquema dinámico + tests | ✓ 2026-05-18 |
+| 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend), CONT-05/EXPE-07 | ✓ 2026-05-31 ⚠ falta unit-test backend (04-04) |
+| 5 — Plantillas y Editor | Parser variables, CodeMirror 6, versionado plantillas | ✓ 2026-05-31 |
+| 6 — Generación y Documentos | docxtemplater `.docx`, datosCongelados, subida/descarga | ✓ 2026-06-03 |
+| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ○ pending |
+| 8 — Hardening | Cifrado AES PII, Sentry, E2E Playwright FL-1..13 | ○ pending |
 
 ## Accumulated Context
 
@@ -70,16 +76,44 @@ Plan: 4 of 4
 
 **Requirements addressed:** CONT-01, CONT-02, CONT-03, CONT-04, CONT-05
 
-## Phase 4 Progress (Wave 1 complete)
+## Phase 4 Summary (Complete — 2026-05-31)
 
 **Plans executed:**
 
 - `04-01` — NestJS ClausulasModule: schema + softDeletePlugin + `$text` index (nombre/texto weights 5/1) + compound {usuarioId,activo,labels} index, repository, service, controller (JwtAuthGuard + @Audited), Zod DTOs, 24 e2e tests (CLAU-01..03 + búsqueda + filtro labels + soft-delete + audit)
 - `04-02` — NestJS ExpedientesModule: schema with embedded `contactos[{contactoId,rol}]` + 3 indexes + softDelete, repository (findByContactoId/pushContacto/pullContacto), service (link/unlink with (contactoId,rol) uniqueness → 409, eventos, dynamic params), controller (CRUD + POST/DELETE :id/contactos). **CONT-05 closed** via bidirectional forwardRef (ContactosService.getById populates real expedientesVinculados). 24 e2e tests (EXPE-01..07 + audit + CONT-05 real-link)
+- `04-03` (sin SUMMARY formal) — Frontend Next.js entregado: páginas cláusulas + expedientes con detalle tabbed (ContactosVinculadosTab), modal asociar contacto (AsociarContactoModal), formularios (ClausulaForm/ExpedienteForm) + tablas; tests Vitest de frontend verdes. *No se ejecutó como plan GSD formal.*
+- `04-04` (**diferido**) — Unit tests backend de cláusulas/expedientes NO implementados. Cobertura actual: e2e (clausulas + expedientes) + unit tests de contactos. Pendiente: unit specs repo/service/controller de cláusulas/expedientes (candidato a Phase 8 / SEC-06).
 
-**Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07 (backend), CONT-05 (closed)
+**Requirements addressed:** CLAU-01, CLAU-02, CLAU-03, EXPE-01..07, CONT-05 (closed)
 
-**Integration verified:** 48/48 e2e tests pass (clausulas + expedientes together), backend build + shared packages build green.
+**Integration verified:** cláusulas + expedientes e2e pass together; backend build + shared packages build green; frontend cláusulas/expedientes Vitest suites green.
+
+**Known gap:** faltan unit tests backend de cláusulas/expedientes (04-04 diferido). Las features están entregadas y verificadas por e2e + frontend.
+
+## Phase 5 Summary (Complete — 2026-05-31)
+
+**Plans executed:**
+
+- `05-01` — Parser de variables compartido (`{{objeto.campo}}` / `{{objeto.rol.campo}}`), KNOWN_TIPO_OBJETO, renumeración de cláusulas (ordinales españoles), Zod schemas plantillas (shared, 52 vitest tests TDD)
+- `05-02` — Backend PlantillasModule: StorageService (MinIO/S3), schema versionado, save parse+validate, versionado two-step, declarar-variable, conversión mammoth/docx (7 unit + 28 e2e)
+- `05-03` — Frontend editor CodeMirror 6 (highlight variables válidas/inválidas), VariablesPanel, InsertarClausulaModal (renumera), DeclararVariableModal, páginas plantillas (UAT)
+- `05-04` — Gate de cobertura SEC-06: 67 unit tests, módulo plantillas 99.13% líneas / 79.03% ramas, pipeline verde
+
+**Requirements addressed:** PLAN-01..06, CLAU-04, SEC-06 (plantillas)
+
+## Phase 6 Summary (Complete & verified — 2026-06-03)
+
+**Plans executed:**
+
+- `06-01` — Pipeline núcleo: docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, Documento schema+repo, GenerationService (buildContext → render → MinIO → datosCongelados + auto-declare campos nuevos), 7 TDD tests (DOC-01/03/04/07)
+- `06-02` — DocumentosModule: service+controller (generar/upload/download/list/delete), módulo+forwardRef, AppModule, **EXPE-07 cerrado** (documentos reales en el expediente), 27 tests (12 unit + 15 e2e) (DOC-02/04/05/06/07)
+- `06-03` — Frontend generación: HTTP client, preRellenarFormulario, GeneracionForm (secciones por tipoObjeto + contador "faltan N" + RolFaltanteModal + badge "nuevo"), página `/expedientes/[id]/documentos/nuevo`, DocumentosList (descarga/subida), UAT aprobado (DOC-01/02/03/05/06)
+- `06-04` — Repository+controller unit specs (18 tests), DOC-07 inmutabilidad reforzada, coverageThreshold documentos ≥80%, suite backend verde (DOC-01..07)
+
+**Requirements addressed:** DOC-01..07, EXPE-07 (closed)
+
+**Post-UAT fix:** docxtemplater configurado con delimitadores `{{ }}` + parser de rutas con punto (commit del fix); regression test real de render añadido. Verificación: 225 unit + tsc limpio.
 
 ## Key Decisions
 
@@ -121,6 +155,17 @@ Plan: 4 of 4
 - **MISSING_ID = '000000000000000000000000' pattern** — valid 24-char hex for "not found" branches in repository unit tests; avoids BSONError from toObjectId() (05-04)
 - **Directory-level jest threshold includes controller/DTOs** — coverageThreshold per `./src/modules/plantillas/` counts all files; controller spec required to avoid 0% dragging aggregate below 80% (05-04)
 - **Contactos branch coverage at 69.69% deferred** — pre-existing from 03-03, out of scope for 05-04; `pnpm -r run test` not affected (no --coverage in test script) (05-04)
+- **datosCongelados is same object passed to doc.render() and repo.create()** — DOC-07 immutability by design; no copy needed, one reference (06-01)
+- **docId pre-computed via new Types.ObjectId() before MinIO upload** — key includes docId; no second DB round-trip needed after upload (06-01)
+- **StorageService.getObject uses GetObjectCommand already imported in Phase 5** — only Readable from 'stream' added as new import (06-01)
+- **NuevoCampoSchema restricts tipoObjeto to expediente|contacto** — clausula/fecha not declarable in dynamic schema; same Pitfall 4 boundary as DeclararVariableSchema (06-01)
+- **GenerationService DI uses concrete class types** — NestJS reflect-metadata cannot resolve anonymous duck-typed interfaces at runtime; PlantillasService and ExpedientesRepository used as concrete tokens with @Inject(forwardRef(...)) (06-02)
+- **EXPE-07 closed via DocumentosRepository injection in ExpedientesService** — uses forwardRef at provider level to break circular DI; limit=100 paginates real documentos in expediente detail (06-02)
+- **Extension validation uses file.originalname (Pitfall 5)** — MIME_BY_EXT[ext] lookup by lowercase extension; browser-provided mimetype ignored; .exe and unknown extensions → ValidationError (06-02)
+- **coverageThreshold ./src/modules/documentos/ counts direct-child files only** — Jest directory threshold applies to files directly in the path; dto/ and generation/ subdirectories are separate entries; controller+repo+service aggregate well above 80% (06-04)
+- **DOC-07 referential independence via buildContext spread** — datosCongelados is a new plain object (parametros spread, not reference copy); mutation of source expediente after generar() does not affect persisted snapshot (06-04)
+- **preRellenarFormulario accepts pre-resolved contactoFieldsByRol from page caller** — pure function with no async side-effects; page loads and resolves contacto fields before mounting GeneracionForm (06-03)
+- **DocumentosList decoupled via expedienteId prop + useQuery** — component fetches its own data, re-fetches on invalidation; no prop-drilling of document arrays from parent tabs (06-03)
 
 ## Pending Todos / Blockers
 
@@ -148,7 +193,11 @@ Plan: 4 of 4
 | Phase 05 P01 | 6min | 3 tasks | 11 files |
 | Phase 05 P02 | 30min | 3 tasks | 17 files |
 | 05 | 04 | ~20min | 3 | 4 |
+| Phase 06 P01 | ~6min | 3 tasks | 12 files |
+| Phase 06 P02 | ~35min | 3 tasks | 12 files |
+| Phase 06 P04 | ~15min | 2 tasks | 4 files |
+| Phase 06 P03 | 90min | 4 tasks | 10 files |
 
 ## Next Up
 
-Phase 06 — Documentos (generación de documentos .docx desde plantillas + expedientes, docxtemplater).
+Phase 07 — Calendario y Facturación (eventos auto/manuales, vista calendario, pestaña facturación del expediente).

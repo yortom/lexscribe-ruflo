@@ -1,3 +1,5 @@
+import type { Documento } from './documento';
+
 export interface ContactoVinculado {
   contactoId: string;
   rol: string;
@@ -15,7 +17,7 @@ export interface Expediente {
 }
 
 export interface ExpedienteDetailResponse extends Expediente {
-  documentos: unknown[]; // Phase 6 placeholder (EXPE-07)
+  documentos: Documento[]; // Phase 6 (EXPE-07)
   fechas: unknown[]; // Phase 7 placeholder (EXPE-06)
 }
 

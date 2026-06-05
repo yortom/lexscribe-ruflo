@@ -8,3 +8,4 @@ export * from './contacto';
 export * from './clausula';
 export * from './expediente';
 export * from './plantilla';
+export * from './documento';

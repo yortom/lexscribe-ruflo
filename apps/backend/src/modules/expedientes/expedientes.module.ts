@@ -8,6 +8,7 @@ import { EsquemasModule } from '../esquemas/esquemas.module';
 import { AuditoriaModule } from '../auditoria/auditoria.module';
 import { AuthModule } from '../auth/auth.module';
 import { ContactosModule } from '../contactos/contactos.module';
+import { DocumentosModule } from '../documentos/documentos.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ContactosModule } from '../contactos/contactos.module';
     AuditoriaModule, // AuditInterceptor
     AuthModule, // JwtAuthGuard
     forwardRef(() => ContactosModule), // ContactosRepository (link valida contacto) — ciclo CONT-05
+    forwardRef(() => DocumentosModule), // DocumentosRepository (EXPE-07 poblar documentos reales) — ciclo Pitfall 3
   ],
   controllers: [ExpedientesController],
   providers: [ExpedientesService, ExpedientesRepository],

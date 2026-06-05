@@ -16,6 +16,7 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Readable } from 'stream';
 
 @Injectable()
 export class StorageService implements OnModuleInit {
@@ -97,5 +98,21 @@ export class StorageService implements OnModuleInit {
   async getPresignedUrl(key: string, ttlSeconds = 300): Promise<string> {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
     return getSignedUrl(this.s3, command, { expiresIn: ttlSeconds });
+  }
+
+  /**
+   * Download an object from MinIO into a Buffer (Phase 6 — load template .docx for docxtemplater).
+   * @param key Storage key
+   * @returns Object contents as Buffer
+   */
+  async getObject(key: string): Promise<Buffer> {
+    const response = await this.s3.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }));
+    const stream = response.Body as Readable;
+    return new Promise<Buffer>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on('data', (c: Buffer) => chunks.push(Buffer.from(c)));
+      stream.on('end', () => resolve(Buffer.concat(chunks)));
+      stream.on('error', reject);
+    });
   }
 }

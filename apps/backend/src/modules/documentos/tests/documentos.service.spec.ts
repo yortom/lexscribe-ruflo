@@ -191,6 +191,17 @@ describe('DocumentosService', () => {
   // ── Test 4 (DOC-06): uploadExistente valida extensión ────────────────────
 
   describe('uploadExistente', () => {
+    it('DOC-06: throws ValidationError (not TypeError 500) when file is missing; does NOT call putObject', async () => {
+      await expect(
+        service.uploadExistente(FAKE_UID, FAKE_EXPEDIENTE_ID, {
+          file: undefined as unknown as Express.Multer.File,
+          nombre: 'Sin archivo',
+        }),
+      ).rejects.toThrow(ValidationError);
+
+      expect(storage.putObject).not.toHaveBeenCalled();
+    });
+
     it('Test 4 (DOC-06): throws ValidationError for disallowed extension (.exe); does NOT call putObject', async () => {
       const file = makeMulderFile('malware.exe');
 

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getExpediente } from '@/lib/api/expedientes';
 import { listPlantillas, getPlantilla } from '@/lib/api/plantillas';
 import { getContacto } from '@/lib/api/contactos';
+import { getEsquema } from '@/lib/api/esquemas';
 import { GeneracionForm } from '@/components/documentos/GeneracionForm';
 import type { Plantilla } from '@lexscribe/shared-types';
 
@@ -29,6 +30,24 @@ export default function NuevoDocumentoPage({ params }: { params: { id: string } 
     queryKey: ['plantillas'],
     queryFn: () => listPlantillas(),
   });
+
+  // Esquemas dinámicos para detectar campos nuevos (D-08 / DOC-03)
+  const { data: esqExpediente } = useQuery({
+    queryKey: ['esquema', 'expediente'],
+    queryFn: () => getEsquema('expediente'),
+  });
+  const { data: esqContacto } = useQuery({
+    queryKey: ['esquema', 'contacto'],
+    queryFn: () => getEsquema('contacto'),
+  });
+
+  const esquemaCampos =
+    esqExpediente && esqContacto
+      ? {
+          expediente: esqExpediente.parametros.map((p) => p.nombre),
+          contacto: esqContacto.parametros.map((p) => p.nombre),
+        }
+      : undefined;
 
   async function handleSelectPlantilla(pid: string) {
     setPlantillaId(pid);
@@ -104,6 +123,7 @@ export default function NuevoDocumentoPage({ params }: { params: { id: string } 
           plantilla={plantilla}
           expediente={expediente}
           contactoFieldsByRol={contactoFieldsByRol}
+          esquemaCampos={esquemaCampos}
         />
       )}
     </div>

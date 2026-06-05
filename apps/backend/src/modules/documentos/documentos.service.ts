@@ -74,8 +74,13 @@ export class DocumentosService {
   async uploadExistente(
     usuarioId: string,
     expedienteId: string,
-    { file, nombre }: { file: Express.Multer.File; nombre: string },
+    { file, nombre }: { file: Express.Multer.File | undefined; nombre: string },
   ) {
+    // DOC-06: a malformed multipart request may omit the file field → @UploadedFile()
+    // is undefined. Return a 400 ValidationError instead of dereferencing undefined (500).
+    if (!file) {
+      throw new ValidationError('Falta el archivo a subir (campo "file" del formulario)');
+    }
     // Validate extension by original filename (Pitfall 5)
     const lastDot = file.originalname.lastIndexOf('.');
     const ext = lastDot !== -1 ? file.originalname.slice(lastDot).toLowerCase() : '';

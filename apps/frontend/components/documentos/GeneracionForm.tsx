@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Plantilla, ExpedienteDetailResponse } from '@lexscribe/shared-types';
 import { groupByTipoObjeto, type VariableDetectada } from '@lexscribe/shared-validation';
@@ -27,7 +27,21 @@ interface GeneracionFormProps {
   expediente: ExpedienteDetailResponse;
   /** Datos de contactos vinculados resueltos por el caller: rol -> campos */
   contactoFieldsByRol: Record<string, Record<string, unknown>>;
+  /**
+   * Nombres de los parámetros YA declarados en el esquema dinámico, por tipoObjeto.
+   * Se usa para detectar campos nuevos (D-08): una variable expediente/contacto cuyo
+   * `campo` no está en el esquema (ni es campo base) se marca como "nuevo" y se envía
+   * en `camposNuevos` para auto-declararlo al generar (DOC-03 / FL-13 entrada C).
+   * Si no se provee (esquema aún cargando), no se detectan campos nuevos.
+   */
+  esquemaCampos?: { expediente: string[]; contacto: string[] };
 }
+
+/** Campos base (no dinámicos) que nunca se consideran "nuevos". */
+const CAMPOS_BASE: Record<'expediente' | 'contacto', Set<string>> = {
+  expediente: new Set(['nombre', 'fechaCreacion']),
+  contacto: new Set(['nombre']),
+};
 
 interface CampoNuevo {
   tipoObjeto: 'expediente' | 'contacto';
@@ -49,6 +63,7 @@ export function GeneracionForm({
   plantilla,
   expediente,
   contactoFieldsByRol,
+  esquemaCampos,
 }: GeneracionFormProps) {
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
@@ -57,6 +72,24 @@ export function GeneracionForm({
   const vars = adaptVars(plantilla.variablesDetectadas ?? []);
   const preRelleno = preRellenarFormulario(vars, expediente, contactoFieldsByRol);
   const grupos = groupByTipoObjeto(vars);
+
+  // Detectar campos nuevos (D-08 / DOC-03): variables expediente|contacto cuyo `campo`
+  // no está en el esquema dinámico ni es campo base. Derivado del esquema (no es estado).
+  const camposNuevosSet = useMemo(() => {
+    const set = new Set<string>();
+    if (!esquemaCampos) return set; // esquema aún no cargado → no marcar nada
+    const esq = {
+      expediente: new Set(esquemaCampos.expediente),
+      contacto: new Set(esquemaCampos.contacto),
+    };
+    for (const v of vars) {
+      if (v.tipoObjeto !== 'expediente' && v.tipoObjeto !== 'contacto') continue;
+      if (CAMPOS_BASE[v.tipoObjeto].has(v.campo)) continue;
+      if (esq[v.tipoObjeto].has(v.campo)) continue;
+      set.add((v.rol ?? '') + '|' + v.campo);
+    }
+    return set;
+  }, [vars, esquemaCampos]);
 
   // Estado del formulario
   const [nombreDoc, setNombreDoc] = useState(`${plantilla.nombre} - ${today}`);
@@ -85,10 +118,6 @@ export function GeneracionForm({
   // Estado de modal de rol faltante
   const [rolModalAbierto, setRolModalAbierto] = useState<string | null>(null);
 
-  // Campos nuevos: set de keys (rol|'') + '|' + campo que no existen en el esquema
-  // Por ahora, detectamos campos nuevos como los que no están en esquema dinámico.
-  // El caller puede pasar schemaKeys si es necesario; por defecto no hay campos nuevos.
-  const [camposNuevosSet] = useState<Set<string>>(new Set<string>());
   const [tiposCamposNuevos, setTiposCamposNuevos] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

@@ -207,4 +207,80 @@ describe('GeneracionForm', () => {
       expect(mockRouter.push).toHaveBeenCalledWith('/expedientes/exp001');
     });
   });
+
+  it('D-08/DOC-03: marca como "nuevo" un campo expediente que no está en el esquema', () => {
+    const plantilla = makePlantilla([
+      { raw: '{{expediente.honorariosBase}}', tipoObjeto: 'expediente', rol: null, campo: 'honorariosBase', esArray: false },
+    ]);
+
+    render(
+      <GeneracionForm
+        expedienteId="exp001"
+        plantilla={plantilla}
+        expediente={sampleExpediente}
+        contactoFieldsByRol={{}}
+        esquemaCampos={{ expediente: [], contacto: [] }}
+      />,
+      { wrapper: makeWrapper() },
+    );
+
+    expect(screen.getByText('nuevo')).toBeTruthy();
+  });
+
+  it('D-08: NO marca "nuevo" cuando el campo ya está declarado en el esquema', () => {
+    const plantilla = makePlantilla([
+      { raw: '{{expediente.honorariosBase}}', tipoObjeto: 'expediente', rol: null, campo: 'honorariosBase', esArray: false },
+    ]);
+
+    render(
+      <GeneracionForm
+        expedienteId="exp001"
+        plantilla={plantilla}
+        expediente={sampleExpediente}
+        contactoFieldsByRol={{}}
+        esquemaCampos={{ expediente: ['honorariosBase'], contacto: [] }}
+      />,
+      { wrapper: makeWrapper() },
+    );
+
+    expect(screen.queryByText('nuevo')).toBeNull();
+  });
+
+  it('DOC-03: envía camposNuevos con el campo no declarado al generar', async () => {
+    vi.mocked(generarDocumento).mockResolvedValueOnce({} as never);
+
+    const plantilla = makePlantilla([
+      { raw: '{{expediente.honorariosBase}}', tipoObjeto: 'expediente', rol: null, campo: 'honorariosBase', esArray: false },
+    ]);
+
+    render(
+      <GeneracionForm
+        expedienteId="exp001"
+        plantilla={plantilla}
+        expediente={sampleExpediente}
+        contactoFieldsByRol={{}}
+        esquemaCampos={{ expediente: [], contacto: [] }}
+      />,
+      { wrapper: makeWrapper() },
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('honorariosBase'), { target: { value: '1500' } });
+
+    const btn = await screen.findByRole('button', { name: /^Generar$/ });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(generarDocumento).toHaveBeenCalledWith(
+        'exp001',
+        expect.objectContaining({
+          camposNuevos: expect.arrayContaining([
+            expect.objectContaining({
+              tipoObjeto: 'expediente',
+              nombre: 'honorariosBase',
+            }),
+          ]),
+        }),
+      );
+    });
+  });
 });

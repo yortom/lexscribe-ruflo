@@ -103,15 +103,18 @@ export class DocumentosController {
   }
 
   /**
-   * DELETE /documentos/:id
-   * Soft-delete del documento.
+   * DELETE /documentos/:id?eventosAction=conservar|eliminar
+   * Soft-delete del documento (CAL-05 / FL-9).
+   * eventosAction=eliminar also soft-deletes associated events.
+   * eventosAction=conservar (default) keeps events active.
    */
   @Delete(':id')
   @Audited('documento', 'delete')
   remove(
     @CurrentUser('id') uid: string,
     @Param('id', MongoIdPipe) id: string,
+    @Query('eventosAction') eventosAction: 'conservar' | 'eliminar' = 'conservar',
   ) {
-    return this.service.remove(uid, id);
+    return this.service.remove(uid, id, eventosAction);
   }
 }

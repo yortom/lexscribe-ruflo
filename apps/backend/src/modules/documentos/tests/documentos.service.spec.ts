@@ -13,6 +13,7 @@ import { DocumentosRepository } from '../documentos.repository';
 import { GenerationService } from '../generation/generation.service';
 import { StorageService } from '../../../common/storage/storage.service';
 import { ExpedientesService } from '../../expedientes/expedientes.service';
+import { EventosRepository } from '../../eventos/eventos.repository';
 import { ConflictError, ValidationError, NotFoundError } from '../../../common/errors';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -60,6 +61,12 @@ function makeExpedientesService(): jest.Mocked<ExpedientesService> {
   } as unknown as jest.Mocked<ExpedientesService>;
 }
 
+function makeEventosRepository(): jest.Mocked<EventosRepository> {
+  return {
+    softDeleteByDocumentoId: jest.fn().mockResolvedValue(0),
+  } as unknown as jest.Mocked<EventosRepository>;
+}
+
 function makeMulderFile(originalname: string, content = 'test'): Express.Multer.File {
   return {
     originalname,
@@ -83,18 +90,21 @@ describe('DocumentosService', () => {
   let repo: jest.Mocked<DocumentosRepository>;
   let storage: jest.Mocked<StorageService>;
   let expedientes: jest.Mocked<ExpedientesService>;
+  let eventosRepo: jest.Mocked<EventosRepository>;
 
   beforeEach(() => {
     generation = makeGenerationService();
     repo = makeDocumentosRepo();
     storage = makeStorage();
     expedientes = makeExpedientesService();
+    eventosRepo = makeEventosRepository();
 
     service = new DocumentosService(
       generation,
       repo,
       storage,
       expedientes as any, // forwardRef'd in real module
+      eventosRepo,
     );
   });
 
@@ -305,6 +315,44 @@ describe('DocumentosService', () => {
       repo.softDelete.mockResolvedValue(null);
 
       await expect(service.remove(FAKE_UID, '507f1f77bcf86cd799439099')).rejects.toThrow(NotFoundError);
+    });
+
+    // ── CAL-05: eventosAction tests ───────────────────────────────────────
+
+    it('CAL-05 (eliminar): softDeletes document then calls eventosRepo.softDeleteByDocumentoId once', async () => {
+      const documento = makeDocumento({ activo: false });
+      repo.softDelete.mockResolvedValue(documento as any);
+      eventosRepo.softDeleteByDocumentoId.mockResolvedValue(2);
+
+      const docId = documento._id.toString();
+      const result = await service.remove(FAKE_UID, docId, 'eliminar');
+
+      expect(repo.softDelete).toHaveBeenCalledWith(FAKE_UID, docId);
+      expect(eventosRepo.softDeleteByDocumentoId).toHaveBeenCalledTimes(1);
+      expect(eventosRepo.softDeleteByDocumentoId).toHaveBeenCalledWith(FAKE_UID, docId);
+      expect(result).toBe(documento);
+    });
+
+    it('CAL-05 (conservar): softDeletes document and does NOT call eventosRepo.softDeleteByDocumentoId', async () => {
+      const documento = makeDocumento({ activo: false });
+      repo.softDelete.mockResolvedValue(documento as any);
+
+      const docId = documento._id.toString();
+      const result = await service.remove(FAKE_UID, docId, 'conservar');
+
+      expect(repo.softDelete).toHaveBeenCalledWith(FAKE_UID, docId);
+      expect(eventosRepo.softDeleteByDocumentoId).not.toHaveBeenCalled();
+      expect(result).toBe(documento);
+    });
+
+    it('CAL-05 (not-found): throws NotFoundError before calling eventosRepo when document does not exist', async () => {
+      repo.softDelete.mockResolvedValue(null);
+
+      await expect(
+        service.remove(FAKE_UID, '507f1f77bcf86cd799439099', 'eliminar'),
+      ).rejects.toThrow(NotFoundError);
+
+      expect(eventosRepo.softDeleteByDocumentoId).not.toHaveBeenCalled();
     });
   });
 });

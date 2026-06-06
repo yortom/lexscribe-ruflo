@@ -38,6 +38,12 @@ const config: Config = {
       branches: 60,
       statements: 80,
     },
+    './src/modules/eventos/': {
+      lines: 80,
+      functions: 80,
+      branches: 60,
+      statements: 80,
+    },
   },
   testEnvironment: 'node',
   setupFiles: ['<rootDir>/test/setup-unit.ts'],

@@ -64,21 +64,21 @@
 
 ### Documentos: generación y subida (`DOC`)
 
-- [ ] **DOC-01** — Desde un expediente, el usuario puede generar un documento eligiendo plantilla y rellenando el formulario de variables, con pre-relleno automático desde expediente/contactos asociados. *(F-010, F-012, FL-6)*
-- [ ] **DOC-02** — Cuando una plantilla requiere un rol no presente en el expediente, el formulario obliga al usuario a asignarlo o a crear/asociar un contacto. *(F-026, FL-6 paso 4)*
-- [ ] **DOC-03** — Cuando una plantilla referencia un parámetro nuevo no existente aún en el contacto/expediente, el formulario lo solicita y al guardar lo añade al esquema dinámico. *(F-091, FL-13 entrada C)*
-- [ ] **DOC-04** — El sistema renderiza el documento con `docxtemplater`, lo guarda como `.docx` en MinIO y crea un registro `documentos` con `datosCongelados` (snapshot JSON inmutable). *(F-013, F-015, F-029)*
-- [ ] **DOC-05** — El usuario puede descargar el `.docx` generado vía URL autenticada con presigned URL de MinIO. *(Arquitectura §8.3)*
-- [ ] **DOC-06** — El usuario puede subir documentos preexistentes (`.docx`/`.pdf`/`.txt`) a un expediente sin pasar por plantilla, conservados tal cual y sin auto-relleno. *(F-017)*
-- [ ] **DOC-07** — Los cambios posteriores en contactos/expediente no afectan a documentos ya generados. *(F-015)*
+- [x] **DOC-01** — Desde un expediente, el usuario puede generar un documento eligiendo plantilla y rellenando el formulario de variables, con pre-relleno automático desde expediente/contactos asociados. *(F-010, F-012, FL-6)*
+- [x] **DOC-02** — Cuando una plantilla requiere un rol no presente en el expediente, el formulario obliga al usuario a asignarlo o a crear/asociar un contacto. *(F-026, FL-6 paso 4)*
+- [x] **DOC-03** — Cuando una plantilla referencia un parámetro nuevo no existente aún en el contacto/expediente, el formulario lo solicita y al guardar lo añade al esquema dinámico. *(F-091, FL-13 entrada C)*
+- [x] **DOC-04** — El sistema renderiza el documento con `docxtemplater`, lo guarda como `.docx` en MinIO y crea un registro `documentos` con `datosCongelados` (snapshot JSON inmutable). *(F-013, F-015, F-029)*
+- [x] **DOC-05** — El usuario puede descargar el `.docx` generado vía URL autenticada con presigned URL de MinIO. *(Arquitectura §8.3)*
+- [x] **DOC-06** — El usuario puede subir documentos preexistentes (`.docx`/`.pdf`/`.txt`) a un expediente sin pasar por plantilla, conservados tal cual y sin auto-relleno. *(F-017)*
+- [x] **DOC-07** — Los cambios posteriores en contactos/expediente no afectan a documentos ya generados. *(F-015)*
 
 ### Calendario (`CAL`)
 
-- [ ] **CAL-01** — El usuario puede añadir manualmente fechas a un documento (fecha límite, aviso o recordatorio); cada una crea un evento único en el calendario asociado al expediente. *(F-030, F-032, F-033, F-034, F-061, F-062)*
-- [ ] **CAL-02** — El usuario puede crear eventos manuales en el calendario con título, fecha inicio, fecha fin, descripción y tipología, sin necesidad de documento. *(F-063, F-064)*
-- [ ] **CAL-03** — La vista de calendario muestra todos los eventos (auto + manuales) con filtros por expediente y rango. *(F-060, F-066)*
-- [ ] **CAL-04** — El usuario puede personalizar el color de un evento. *(F-065)*
-- [ ] **CAL-05** — Al borrar un documento con eventos asociados, el sistema pregunta si conservar o eliminar los eventos del expediente. *(F-016, FL-9)*
+- [x] **CAL-01** — El usuario puede añadir manualmente fechas a un documento (fecha límite, aviso o recordatorio); cada una crea un evento único en el calendario asociado al expediente. *(F-030, F-032, F-033, F-034, F-061, F-062)*
+- [x] **CAL-02** — El usuario puede crear eventos manuales en el calendario con título, fecha inicio, fecha fin, descripción y tipología, sin necesidad de documento. *(F-063, F-064)*
+- [x] **CAL-03** — La vista de calendario muestra todos los eventos (auto + manuales) con filtros por expediente y rango. *(F-060, F-066)*
+- [x] **CAL-04** — El usuario puede personalizar el color de un evento. *(F-065)*
+- [x] **CAL-05** — Al borrar un documento con eventos asociados, el sistema pregunta si conservar o eliminar los eventos del expediente. *(F-016, FL-9)*
 
 ### Facturación (`FAC`)
 

@@ -12,6 +12,8 @@ import { ClausulasModule } from './modules/clausulas/clausulas.module';
 import { EsquemasModule } from './modules/esquemas/esquemas.module';
 import { ExpedientesModule } from './modules/expedientes/expedientes.module';
 import { PlantillasModule } from './modules/plantillas/plantillas.module';
+import { DocumentosModule } from './modules/documentos/documentos.module';
+import { EventosModule } from './modules/eventos/eventos.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { PlantillasModule } from './modules/plantillas/plantillas.module';
     EsquemasModule,
     ExpedientesModule,
     PlantillasModule,
+    DocumentosModule,
+    EventosModule,
     UsuariosModule,
     AuditoriaModule,
   ],

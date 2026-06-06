@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { ExpedienteDetailResponse } from '@lexscribe/shared-types';
 import { ContactosVinculadosTab } from './ContactosVinculadosTab';
 import { ParametrosTab } from './ParametrosTab';
+import { DocumentosList } from '../documentos/DocumentosList';
 
 type TabKey = 'contactos' | 'parametros' | 'documentos' | 'fechas' | 'facturacion';
 
@@ -49,7 +50,7 @@ export function ExpedienteTabs({ expediente }: ExpedienteTabsProps) {
         )}
         {active === 'parametros' && <ParametrosTab parametros={expediente.parametros} />}
         {active === 'documentos' && (
-          <p className="text-sm text-gray-500">Disponible en Phase 6</p>
+          <DocumentosList expedienteId={expediente._id} />
         )}
         {active === 'fechas' && <p className="text-sm text-gray-500">Disponible en Phase 7</p>}
         {active === 'facturacion' && (

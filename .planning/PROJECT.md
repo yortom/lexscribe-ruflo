@@ -78,6 +78,39 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 - **AUTH-07** — `auditoria` asíncrona (setImmediate) con `AuditInterceptor` + `@Audited` + listeners EventEmitter para create/update/delete/link/unlink/generate/login/logout
 - **AUTH-08** — Módulo `esquemas` con GET/POST/DELETE por `tipoObjeto`; `$addToSet` atómico; auditoría integrada
 
+### Phase 3 — Contactos (2026-05-18)
+
+- **CONT-01** — Crear contacto persona física/jurídica con campos base + tipología (UI + backend)
+- **CONT-02** — Listado con búsqueda por nombre/NIF y filtro por tipología, paginado
+- **CONT-03** — Parámetro personalizado del contacto registrado en esquema dinámico de `contacto` al guardar
+- **CONT-04** — Editar/soft-delete de contacto con auditoría
+- **CONT-05** — Sección "Expedientes vinculados" en el detalle del contacto (stub en Phase 3, poblado real al cerrar en Phase 4)
+
+### Phase 4 — Cláusulas y Expedientes (2026-05-31)
+
+- **CLAU-01/02/03** — Biblioteca de cláusulas: crear/editar/borrar con texto y labels; búsqueda `$text` y filtro por label
+- **EXPE-01..06** — Expedientes: crear con nombre + parámetros + fecha auto; asociar/desasociar contactos con rol (pareja contacto+rol única → 409); detalle tabbed con placeholders de documentos/fechas/facturación
+- **CONT-05** (cerrado) — Vista inversa real: `ContactosService.getById` puebla `expedientesVinculados` vía `ExpedientesRepository` (forwardRef bidireccional)
+- **Frontend** — Páginas Next.js cláusulas/expedientes con detalle tabbed y modal asociar contacto (tests Vitest de frontend + e2e backend)
+- **Deuda técnica (04-04 diferido)** — Faltan unit tests backend de cláusulas/expedientes; cobertura actual vía e2e. Pendiente Phase 8 / SEC-06
+
+### Phase 5 — Plantillas y Editor (2026-05-31)
+
+- **PLAN-01..06** — Subida `.txt`/`.docx`/pegado → plantilla (texto plano + storagePath); detección automática de variables; declarar campos nuevos; editor CodeMirror 6 con highlight + panel en vivo; versionado por nuevo registro (anterior conservada)
+- **CLAU-04** — Insertar cláusula desde biblioteca con renumeración automática (ordinales españoles)
+- **SEC-06** (plantillas) — Cobertura ≥80% en parser de variables y versionado; thresholds enforced
+
+### Phase 6 — Generación y Documentos (2026-06-03)
+
+- **DOC-01** — Formulario de generación: variables agrupadas por `tipoObjeto`, pre-relleno desde expediente/contactos (`GeneracionForm` + `preRellenarFormulario`)
+- **DOC-02** — Completitud bloqueante: backend lanza `ValidationError` si falta cualquier variable antes de render; frontend "Generar (faltan N)" + `RolFaltanteModal`
+- **DOC-03** — Variables nuevas → `esquemas.addParametro` al generar (FL-13 entrada C); badge "nuevo" + selector de tipo (D-08)
+- **DOC-04** — Render `.docx` vía `docxtemplater` (delimitadores `{{ }}` + parser dotted-path) → upload a MinIO. Bug de delimitadores encontrado en UAT y corregido (`af13eab`); regression test real en `generation.render.spec.ts`
+- **DOC-05** — Descarga vía presigned URL (`getPresignedUrl`, 300 s)
+- **DOC-06** — Subida de documentos preexistentes `.docx`/`.pdf`/`.txt` (validación por extensión)
+- **DOC-07** — `datosCongelados` inmutable: snapshot JSON resuelto, sin referencia compartida; test explícito de inmutabilidad
+- **EXPE-07** (cerrado) — `ExpedienteDetailResponse.documentos` poblado con documentos reales; pestaña Documentos con listado + descarga + subida
+
 ## Out of Scope
 
 Ver `docs/FUNCIONAL.md §7` y `REQUIREMENTS.md` sección "Out of Scope". Las exclusiones explícitas se mantienen sincronizadas con esa sección.
@@ -122,4 +155,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-03 — Phase 2 complete (auth + bases transversales, 9/9 requirements satisfied).*
+*Last updated: 2026-06-03 — Phase 6 complete (generación de documentos .docx end-to-end, DOC-01..DOC-07 + EXPE-07 validados).*

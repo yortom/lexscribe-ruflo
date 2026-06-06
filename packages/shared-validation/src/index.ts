@@ -15,3 +15,5 @@ export * from './expedientes';
 export * from './plantillas';
 export * from './variable-parser';
 export * from './clausula-renumber';
+export * from './documentos';
+export * from './eventos';

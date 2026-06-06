@@ -273,6 +273,7 @@
   fechaInicio: ISODate,
   fechaFin: ISODate | null,                    // F-064 (manual)
   color: String | null,                        // F-065 (hex o token)
+  mostrarEnCalendario: Boolean,                // F-066/D-01 — controla si el evento aparece en la vista global de calendario; siempre visible en pestaña Fechas del expediente. Default true.
   activo: Boolean,
   fechaInactivacion: ISODate | null,
   fechaCreacion: ISODate,
@@ -285,6 +286,7 @@
 - `{ fechaInicio: 1 }` — vista de calendario por rango.
 - `{ expedienteId: 1, fechaInicio: 1 }` — fechas del expediente (F-006).
 - `{ documentoId: 1 }` — para FL-9 (borrado de documento con eventos).
+- `{ usuarioId: 1, mostrarEnCalendario: 1, fechaInicio: 1 }` — filtro de la vista global de calendario (D-03).
 
 ---
 
@@ -492,4 +494,5 @@ esquemas    ──○ expedientes      (gobierna .parametros)
 | 2026-04-26 | Creación inicial del documento. Inventario de 8 colecciones (`expedientes`, `contactos`, `plantillas`, `clausulas`, `documentos`, `eventos`, `facturas`, `esquemas`) con esquema, índices, relaciones y trazabilidad a features de FUNCIONAL.md. Layout de Storage definido.                                                                                                                                                     |
 | 2026-04-26 | Resueltas decisiones de modelo: roles texto libre, **soft delete universal** (`activo` + `fechaInactivacion`), versionado de plantillas por nuevo documento (`plantillaRaizId` + `version`), nueva colección **`usuarios`** y campo `usuarioId` en todas las colecciones de negocio para preparar multi-usuario. Validación a nivel aplicación. Actualizadas convenciones, todas las colecciones, índices, relaciones y storage. |
 | 2026-05-17 | `contactos`: `documentacionFiscal` y `documentoIdentidad` quedan cifrados a nivel de aplicacion; duplicados y busqueda exacta por NIF/CIF usan `documentacionFiscalHash`.                                                                                                                                                                                                                                                        |
-| 2026-05-17 | `contactos`: indice de nombre alineado con busqueda parcial por usuario (`{ usuarioId: 1, nombre: 1 }`).                                                                                                                                                                                                                                                                                                                         |
+| 2026-05-17 | `contactos`: indice de nombre alineado con busqueda parcial por usuario (`{ usuarioId: 1, nombre: 1 }`). |
+| 2026-06-06 | `eventos`: añadido campo `mostrarEnCalendario` (Boolean, default true) — controla visibilidad del evento en la vista global de calendario sin afectar la pestaña Fechas del expediente (D-01, Phase 7 / CAL-03). Añadido índice `{ usuarioId, mostrarEnCalendario, fechaInicio }`. |                                                                                                                                                                                                                                                                                                                         |

@@ -12,10 +12,11 @@
 
 - [x] **Phase 1: Bootstrap de infraestructura** - Monorepo, docker-compose, CI/CD verde — Completed 2026-04-27
 - [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
-- [ ] **Phase 3: Contactos** - CRUD contactos con esquema dinámico
-- [ ] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados
-- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6 (completed 2026-05-31)
-- [ ] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes
+- [x] **Phase 3: Contactos** - CRUD contactos con esquema dinámico — Completed 2026-05-18
+- [x] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados — Completed 2026-05-31
+- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
+ (completed 2026-05-31)
+- [x] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes (completed 2026-06-03)
 - [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
 - [ ] **Phase 8: Hardening** - Cifrado AES, Sentry, E2E de los 13 flujos
 
@@ -73,8 +74,8 @@ Plans:
 
 Plans:
 - [x] 03-01: Módulo NestJS contactos + Mongoose schema + DTOs + repository con soft-delete
-- [ ] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
-- [ ] 03-03: Tests unitarios e integración del módulo contactos
+- [x] 03-02: Frontend: página de contactos (listado + búsqueda) y formulario crear/editar con tipología y parámetros dinámicos
+- [x] 03-03: Tests unitarios e integración del módulo contactos
 
 ### Phase 4: Cláusulas y Expedientes
 **Goal**: Biblioteca de cláusulas reutilizables operativa + gestión de expedientes con asociación de contactos. Sin generación todavía.
@@ -91,8 +92,8 @@ Plans:
 Plans:
 - [x] 04-01-backend-clausulas-PLAN.md — Módulo NestJS clausulas (schema + softDelete + $text index + repo + service + controller + DTOs + e2e CLAU-01..03) — Completed 2026-05-28
 - [x] 04-02-backend-expedientes-PLAN.md — Módulo NestJS expedientes (schema embedded contactos[] + link/unlink + forwardRef cierre CONT-05 + e2e EXPE-01..07) — Completed 2026-05-28
-- [ ] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto + UAT humano
-- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — Unit tests Jest ≥80% cobertura per-módulo + jest.config.ts coverageThreshold
+- [x] 04-03-frontend-clausulas-expedientes-PLAN.md — Páginas Next.js cláusulas + expedientes con detalle tabbed + modal asociar contacto (entregado; sin SUMMARY formal — no se ejecutó como plan GSD)
+- [ ] 04-04-tests-clausulas-expedientes-PLAN.md — **Diferido**: unit tests backend de cláusulas/expedientes NO implementados (cobertura actual: e2e). Candidato a Phase 8 / SEC-06
 
 ### Phase 5: Plantillas y Editor
 **Goal**: El usuario puede crear plantillas a partir de archivo o pegado, ver las variables detectadas y declarar campos nuevos. Cláusulas insertables con renumeración.
@@ -125,13 +126,13 @@ Plans:
   5. Descarga .docx vía endpoint autenticado con presigned URL (5 min TTL)
   6. Subida documento preexistente (.docx/.pdf/.txt) guardado en MinIO con tipo: "subido"
   7. Cambiar NIF de un contacto NO modifica .docx ya generado ni su datosCongelados
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: Pipeline generación backend: construir JSON contexto, resolver variables, docxtemplater, MinIO, datosCongelados
-- [ ] 06-02: Módulo NestJS documentos: schema, subida preexistentes, descarga con presigned URL, soft-delete con evaluación eventos
-- [ ] 06-03: Frontend: formulario generación con pre-relleno, asignación roles, declaración variables nuevas
-- [ ] 06-04: Tests pipeline generación, inmutabilidad datosCongelados, subida/descarga
+- [x] 06-01-backend-pipeline-generacion-PLAN.md — Deps docxtemplater+pizzip, StorageService.getObject, tipos+DTOs documentos, schema+repo, GenerationService (buildContext+render+MinIO+datosCongelados+auto-declare) — DOC-01/03/04/07
+- [x] 06-02-backend-modulo-documentos-PLAN.md — DocumentosService+Controller (generar/upload/download/list/delete), módulo+forwardRef, AppModule, cierre EXPE-07, e2e — DOC-02/04/05/06/07
+- [x] 06-03-frontend-formulario-generacion-PLAN.md — Cliente HTTP, pre-relleno, GeneracionForm por secciones, RolFaltanteModal, página nuevo, pestaña Documentos (descarga/subida), UAT — DOC-01/02/03/05/06
+- [x] 06-04-tests-cobertura-PLAN.md — Repository+controller specs, refuerzo DOC-07 inmutabilidad, coverageThreshold documentos >=80% — DOC-01..07 (SEC-06)
 
 ### Phase 7: Calendario y Facturación
 **Goal**: Calendario operativo con eventos auto/manuales y borrado controlado; facturación por expediente con totales y estados.
@@ -144,13 +145,13 @@ Plans:
   4. Borrar documento con eventos → modal conservar/eliminar; elección aplicada correctamente
   5. Pestaña facturación: crear/editar/eliminar entradas; coste total recalculado al modificar
   6. Cambios de estado pendiente→facturado→cobrado reflejados en UI
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: Módulo NestJS eventos: schema, CRUD, endpoints auto (desde documento) y manual, índices por fecha/expediente
-- [ ] 07-02: Módulo NestJS facturacion: schema, CRUD entradas, agregado coste total, estados
-- [ ] 07-03: Frontend: vista calendario (react-calendar o similar), pestaña fechas del expediente, modal borrado doc con eventos
-- [ ] 07-04: Frontend: pestaña facturación del expediente con entradas, totales, badges de estado
+- [x] 07-01-backend-eventos-PLAN.md — EventosModule (schema+mostrarEnCalendario D-01, repo, service, controller, Zod DTOs, @Audited) + DATOS.md update + shared evento contracts — CAL-01/02/03/04/05(backend)
+- [ ] 07-02-backend-facturacion-PLAN.md — FacturacionModule (schema, repo con getTotales $sum activo:true, service, controller, Zod DTOs) + shared factura contracts — FAC-01..05(backend)
+- [ ] 07-03-fl9-y-calendario-frontend-PLAN.md — FL-9 documentos.remove(eventosAction) + react-calendar /calendario, Fechas tab, modales Añadir fecha (FL-8) y borrado con eventos (FL-9), nav — CAL-01/03/04/05(frontend)
+- [ ] 07-04-facturacion-frontend-PLAN.md — Pestaña Facturacion (tabla inline editable, dropdown estado coloreado, total + subtotales €) — FAC-01..05(frontend)
 
 ### Phase 8: Hardening
 **Goal**: Producto listo para producción: PII cifrado, errores monitorizados, los 13 flujos verificados E2E.
@@ -179,10 +180,12 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Bootstrap de infraestructura | 5/5 | Complete | 2026-04-27 |
-| 2. Auth y bases transversales | 3/4 | In Progress|  |
-| 3. Contactos | 1/3 | In Progress|  |
-| 4. Cláusulas y Expedientes | 0/4 | Not started | - |
-| 5. Plantillas y Editor | 4/4 | Complete   | 2026-05-31 |
-| 6. Generación y Documentos | 0/4 | Not started | - |
-| 7. Calendario y Facturación | 0/4 | Not started | - |
+| 2. Auth y bases transversales | 4/4 | Complete | 2026-05-02 |
+| 3. Contactos | 3/3 | Complete | 2026-05-18 |
+| 4. Cláusulas y Expedientes | 3/4 | Complete* | 2026-05-31 |
+| 5. Plantillas y Editor | 4/4 | Complete | 2026-05-31 |
+| 6. Generación y Documentos | 4/4 | Complete | 2026-06-03 |
+| 7. Calendario y Facturación | 1/4 | In Progress|  |
 | 8. Hardening | 0/4 | Not started | - |
+
+> \* **Phase 4 — Complete (features) con deuda técnica:** backend (04-01/02) + frontend (04-03, entregado sin SUMMARY) están operativos y verificados por e2e + tests de frontend. El plan **04-04 (unit tests backend de cláusulas/expedientes) está diferido** — no existen unit specs para esos módulos (sí para contactos). Pendiente de cerrar en Phase 8 / SEC-06.

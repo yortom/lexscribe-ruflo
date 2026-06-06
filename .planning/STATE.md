@@ -2,27 +2,30 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-06-04T00:00:00.000Z"
-last_activity: 2026-06-04
+status: executing
+last_updated: "2026-06-06T09:24:31.460Z"
+last_activity: 2026-06-06
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 24
-  completed_plans: 22
+  completed_phases: 5
+  total_plans: 28
+  completed_plans: 23
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
+Phase: 07 (calendario-y-facturaci-n) — EXECUTING
+Plan: 2 of 4
+
 - **Milestone:** v1.0 MVP
 - **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
 - **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
 - **Next phase:** Phase 7 — Calendario y Facturación — not started
 - **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
-- **Status:** Ready to plan Phase 7
-- **Last activity:** 2026-06-04
+- **Status:** Ready to execute
+- **Last activity:** 2026-06-06
 
 ### Phases at a glance
 
@@ -197,6 +200,7 @@ progress:
 | Phase 06 P02 | ~35min | 3 tasks | 12 files |
 | Phase 06 P04 | ~15min | 2 tasks | 4 files |
 | Phase 06 P03 | 90min | 4 tasks | 10 files |
+| Phase 07 P01 | 45min | 3 tasks | 17 files |
 
 ## Next Up
 

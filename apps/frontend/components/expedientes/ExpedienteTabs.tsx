@@ -5,6 +5,7 @@ import { ContactosVinculadosTab } from './ContactosVinculadosTab';
 import { ParametrosTab } from './ParametrosTab';
 import { DocumentosList } from '../documentos/DocumentosList';
 import { FechasTab } from './FechasTab';
+import { FacturacionTab } from './FacturacionTab';
 
 type TabKey = 'contactos' | 'parametros' | 'documentos' | 'fechas' | 'facturacion';
 
@@ -54,9 +55,7 @@ export function ExpedienteTabs({ expediente }: ExpedienteTabsProps) {
           <DocumentosList expedienteId={expediente._id} />
         )}
         {active === 'fechas' && <FechasTab expedienteId={expediente._id} />}
-        {active === 'facturacion' && (
-          <p className="text-sm text-gray-500">Disponible en Phase 7</p>
-        )}
+        {active === 'facturacion' && <FacturacionTab expedienteId={expediente._id} />}
       </div>
     </div>
   );

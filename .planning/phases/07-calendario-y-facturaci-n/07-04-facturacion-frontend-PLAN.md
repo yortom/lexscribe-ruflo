@@ -2,7 +2,7 @@
 phase: 07-calendario-y-facturaci-n
 plan: 04
 type: execute
-wave: 3
+wave: 4
 depends_on: ["07-02", "07-03"]
 files_modified:
   - apps/frontend/lib/api/facturacion.ts

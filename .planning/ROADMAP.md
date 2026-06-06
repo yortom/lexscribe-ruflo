@@ -14,7 +14,8 @@
 - [x] **Phase 2: Auth y bases transversales** - Login, seed, audit, soft-delete, esquemas, backup — Completed 2026-05-02
 - [x] **Phase 3: Contactos** - CRUD contactos con esquema dinámico — Completed 2026-05-18
 - [x] **Phase 4: Cláusulas y Expedientes** - Biblioteca de cláusulas + expedientes con contactos asociados — Completed 2026-05-31
-- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6 (completed 2026-05-31)
+- [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
+ (completed 2026-05-31)
 - [x] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes (completed 2026-06-03)
 - [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
 - [ ] **Phase 8: Hardening** - Cifrado AES, Sentry, E2E de los 13 flujos
@@ -144,13 +145,13 @@ Plans:
   4. Borrar documento con eventos → modal conservar/eliminar; elección aplicada correctamente
   5. Pestaña facturación: crear/editar/eliminar entradas; coste total recalculado al modificar
   6. Cambios de estado pendiente→facturado→cobrado reflejados en UI
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: Módulo NestJS eventos: schema, CRUD, endpoints auto (desde documento) y manual, índices por fecha/expediente
-- [ ] 07-02: Módulo NestJS facturacion: schema, CRUD entradas, agregado coste total, estados
-- [ ] 07-03: Frontend: vista calendario (react-calendar o similar), pestaña fechas del expediente, modal borrado doc con eventos
-- [ ] 07-04: Frontend: pestaña facturación del expediente con entradas, totales, badges de estado
+- [ ] 07-01-backend-eventos-PLAN.md — EventosModule (schema+mostrarEnCalendario D-01, repo, service, controller, Zod DTOs, @Audited) + DATOS.md update + shared evento contracts — CAL-01/02/03/04/05(backend)
+- [ ] 07-02-backend-facturacion-PLAN.md — FacturacionModule (schema, repo con getTotales $sum activo:true, service, controller, Zod DTOs) + shared factura contracts — FAC-01..05(backend)
+- [ ] 07-03-fl9-y-calendario-frontend-PLAN.md — FL-9 documentos.remove(eventosAction) + react-calendar /calendario, Fechas tab, modales Añadir fecha (FL-8) y borrado con eventos (FL-9), nav — CAL-01/03/04/05(frontend)
+- [ ] 07-04-facturacion-frontend-PLAN.md — Pestaña Facturacion (tabla inline editable, dropdown estado coloreado, total + subtotales €) — FAC-01..05(frontend)
 
 ### Phase 8: Hardening
 **Goal**: Producto listo para producción: PII cifrado, errores monitorizados, los 13 flujos verificados E2E.

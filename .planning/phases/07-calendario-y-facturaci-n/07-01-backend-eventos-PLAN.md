@@ -21,6 +21,7 @@ files_modified:
   - apps/backend/src/modules/eventos/tests/eventos.service.spec.ts
   - apps/backend/src/modules/eventos/tests/eventos.repository.spec.ts
   - apps/backend/src/app.module.ts
+  - apps/backend/jest.config.ts
 autonomous: true
 requirements: [CAL-01, CAL-02, CAL-03, CAL-04, CAL-05]
 must_haves:
@@ -234,6 +235,7 @@ Existing pattern: packages/shared-validation/src/documentos.ts uses `z.object`, 
     4. Create apps/backend/src/modules/eventos/eventos.module.ts: imports MongooseModule.forFeature([{ name: Evento.name, schema: EventoSchema }]), AuditoriaModule, AuthModule; controllers [EventosController]; providers [EventosService, EventosRepository]; exports [EventosService, EventosRepository] (07-03 DocumentosModule will import EventosModule one-way — no forwardRef, Pitfall 4).
     5. apps/backend/src/app.module.ts: import EventosModule and add to imports[] array (after DocumentosModule).
     6. Create apps/backend/src/modules/eventos/tests/eventos.service.spec.ts per <behavior> with a mocked EventosRepository factory (jest.fn for create/findById/list/update/softDelete/countByDocumentoId).
+    7. apps/backend/jest.config.ts: add a coverageThreshold entry for `./src/modules/eventos/` at lines/functions >= 80% (SEC-06 continuity), mirroring the existing `./src/modules/documentos/` entry exactly (same structure/keys). Read the documentos threshold block first and copy its shape.
   </action>
   <verify>
     <automated>cd apps/backend && pnpm --filter @lexscribe/backend test -- --testPathPattern=eventos.service.spec && pnpm --filter @lexscribe/backend build</automated>
@@ -244,6 +246,7 @@ Existing pattern: packages/shared-validation/src/documentos.ts uses `z.object`, 
     - `grep "NotFoundError('evento'" apps/backend/src/modules/eventos/eventos.service.ts` matches
     - `grep "EventosModule" apps/backend/src/app.module.ts` matches in imports
     - `grep "exports:" apps/backend/src/modules/eventos/eventos.module.ts` includes EventosService and EventosRepository
+    - `grep "modules/eventos" apps/backend/jest.config.ts` matches (coverageThreshold entry added, SEC-06)
     - eventos.service.spec exits 0 and backend build exits 0
   </acceptance_criteria>
   <done>EventosController exposes POST/GET/GET count/GET :id/PATCH/DELETE with auth+audit; service throws NotFoundError correctly; module registered in AppModule and exports service+repository for FL-9; service spec green; backend builds.</done>

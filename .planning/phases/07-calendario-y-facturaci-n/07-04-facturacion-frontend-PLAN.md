@@ -2,8 +2,8 @@
 phase: 07-calendario-y-facturaci-n
 plan: 04
 type: execute
-wave: 2
-depends_on: ["07-02"]
+wave: 3
+depends_on: ["07-02", "07-03"]
 files_modified:
   - apps/frontend/lib/api/facturacion.ts
   - apps/frontend/components/expedientes/FacturacionTab.tsx
@@ -41,7 +41,7 @@ Build the frontend Facturacion tab (D-12/D-13/D-14) against the FacturacionModul
 
 Covers FAC-01 (tab from detail), FAC-02 (create entries), FAC-03 (status dropdown), FAC-04 (edit/delete inline), FAC-05 (total + breakdown display).
 
-Purpose: Complete the billing feature UI. Independent of the calendar frontend (07-03) — only shares ExpedienteTabs.tsx (an append-only placeholder replacement for the `facturacion` tab; 07-03 touches the `fechas` tab line). Includes a human-verify checkpoint for status badge colors + total recalculation (FAC-03 visual per 07-VALIDATION.md).
+Purpose: Complete the billing feature UI. Shares only `ExpedienteTabs.tsx` with 07-03 (07-03 replaces the `fechas` placeholder line, this plan replaces the `facturacion` placeholder line). **Serialized after 07-03 (depends_on includes 07-03)** so the two placeholder replacements never race; this plan first confirms 07-03's `FechasTab` wiring survived before editing the `facturacion` line. Includes a human-verify checkpoint for status badge colors + total recalculation (FAC-03 visual per 07-VALIDATION.md).
 Output: facturacion API client, FacturacionTab component, ExpedienteTabs wiring, FacturacionTab test.
 </objective>
 
@@ -114,6 +114,7 @@ Status badge colors (D-13): pendiente=amber, facturado=blue, cobrado=green (Tail
   </read_first>
   <behavior>
     - FacturacionTab.test.tsx: renders rows from a mocked listFacturas; header shows total + subtotals from mocked getTotalesFactura formatted as € es-ES; changing a row's estado calls updateEstadoFactura(id, newEstado) and invalidates the totales query.
+    - FacturacionTab.test.tsx (W7 — API client URL assertions): with global.fetch stubbed, assert getTotalesFactura(id) requests /facturas/totales/{id}, listFacturas(id) requests /facturas?expedienteId={id}, createFactura POSTs /facturas, updateEstadoFactura(id, estado) PATCHes /facturas/{id}/estado with body { estado }, and deleteFactura(id) DELETEs /facturas/{id}.
   </behavior>
   <action>
     1. Create apps/frontend/components/expedientes/FacturacionTab.tsx: 'use client'; props `{ expedienteId: string }`.
@@ -124,8 +125,8 @@ Status badge colors (D-13): pendiente=amber, facturado=blue, cobrado=green (Tail
        - "Nueva entrada" button adds a draft row (concepto/importe/fecha[default `new Date().toISOString()` → today]/numero/notas); its save calls createFactura({ expedienteId, ... }) — estado defaults pendiente server-side.
        - Status column (D-13): inline `<select>` styled as a colored badge (pendiente=amber, facturado=blue, cobrado=green) whose onChange calls updateEstadoFactura(id, value).
        - On every mutation success: invalidate both `['facturas', expedienteId]` and `['facturas','totales', expedienteId]` so the totals recalc (FAC-05).
-    2. ExpedienteTabs.tsx: replace `{active === 'facturacion' && <p>Disponible en Phase 7</p>}` with `{active === 'facturacion' && <FacturacionTab expedienteId={expediente._id} />}`. Import FacturacionTab.
-    3. Create FacturacionTab.test.tsx (vitest) per <behavior>: mock the facturacion api client, render within a QueryClientProvider, assert rows + formatted totals render and estado change triggers updateEstadoFactura.
+    2. ExpedienteTabs.tsx: FIRST confirm 07-03's `FechasTab` wiring is present (the `fechas` line already replaced) — do NOT overwrite it. Then replace `{active === 'facturacion' && <p>Disponible en Phase 7</p>}` with `{active === 'facturacion' && <FacturacionTab expedienteId={expediente._id} />}`. Import FacturacionTab. Both `FechasTab` and `FacturacionTab` imports + tab branches must coexist after this edit.
+    3. Create FacturacionTab.test.tsx (vitest) per <behavior>: (a) mock the facturacion api client, render within a QueryClientProvider, assert rows + formatted totals render and estado change triggers updateEstadoFactura; (b) add a describe('api client') block that stubs global.fetch and asserts each client function hits the correct /facturas... URL + method + body (W7).
   </action>
   <verify>
     <automated>cd apps/frontend && pnpm --filter @lexscribe/frontend test -- FacturacionTab && pnpm --filter @lexscribe/frontend build</automated>
@@ -136,6 +137,8 @@ Status badge colors (D-13): pendiente=amber, facturado=blue, cobrado=green (Tail
     - `grep "Intl.NumberFormat('es-ES'" apps/frontend/components/expedientes/FacturacionTab.tsx` matches
     - `grep "facturas','totales'" apps/frontend/components/expedientes/FacturacionTab.tsx` matches (totales query invalidated on mutation)
     - `grep "FacturacionTab" apps/frontend/components/expedientes/ExpedienteTabs.tsx` matches (placeholder replaced)
+    - `grep "FechasTab" apps/frontend/components/expedientes/ExpedienteTabs.tsx` matches (07-03 wiring preserved — no overwrite, W5)
+    - `grep "/facturas/totales/" apps/frontend/components/expedientes/FacturacionTab.test.tsx` matches (W7 API client URL assertion)
     - FacturacionTab test exits 0; frontend build exits 0
   </acceptance_criteria>
   <done>FacturacionTab renders an inline editable table with per-row status dropdown and a total + per-status breakdown header formatted in € es-ES; mutations invalidate the totals query so they recalc; tab wired into ExpedienteTabs; test green.</done>

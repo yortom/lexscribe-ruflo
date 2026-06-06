@@ -2,8 +2,8 @@
 phase: 07-calendario-y-facturaci-n
 plan: 02
 type: execute
-wave: 1
-depends_on: []
+wave: 2
+depends_on: ["07-01"]
 files_modified:
   - packages/shared-types/src/factura.ts
   - packages/shared-types/src/index.ts
@@ -21,6 +21,7 @@ files_modified:
   - apps/backend/src/modules/facturacion/tests/facturacion.service.spec.ts
   - apps/backend/src/modules/facturacion/tests/facturacion.repository.spec.ts
   - apps/backend/src/app.module.ts
+  - apps/backend/jest.config.ts
 autonomous: true
 requirements: [FAC-01, FAC-02, FAC-03, FAC-04, FAC-05]
 must_haves:
@@ -60,7 +61,7 @@ must_haves:
 <objective>
 Build the backend FacturacionModule (collection `facturas`) plus shared contracts. Covers FAC-01 (billing per expediente), FAC-02 (entries with defaults), FAC-03 (estado update), FAC-04 (edit/delete), FAC-05 (total + per-status subtotals via on-the-fly $sum aggregate).
 
-This plan includes its own Wave 0 contract work (shared-types `factura.ts` + shared-validation `facturacion.ts`) so the frontend (07-04) builds against stable contracts. Independent of 07-01 — both backend plans run in Wave 1 in parallel (no file overlap except app.module.ts and index.ts, which are append-only additions; coordinate by appending distinct lines).
+This plan includes its own Wave 0 contract work (shared-types `factura.ts` + shared-validation `facturacion.ts`) so the frontend (07-04) builds against stable contracts. **Serialized after 07-01 (wave 2, depends_on 07-01)** to avoid a concurrent write race on the three shared append-target files (`packages/shared-types/src/index.ts`, `packages/shared-validation/src/index.ts`, `apps/backend/src/app.module.ts`): 07-01 appends its `evento`/`EventosModule` lines first, then this plan appends its `factura`/`FacturacionModule` lines on top. Each contracts/module task below cross-checks that the 07-01 lines survived before appending.
 
 Purpose: A clean, audited, soft-delete-aware facturas API mirroring documentos, with the critical billing aggregate that explicitly includes `activo: true` (RESEARCH Pitfall 1 — softDeletePlugin does NOT intercept .aggregate()).
 Output: FacturacionModule registered in AppModule, shared `factura.ts` types + Zod schemas, unit tests for service + repository (incl. aggregate with activo filter).
@@ -148,6 +149,8 @@ Existing pattern (DATOS §4.7): fields concepto(req), importe(Number req), fecha
     - `grep "UpdateEstadoSchema" packages/shared-validation/src/facturacion.ts` matches
     - `grep "estado: z.enum(\['pendiente','facturado','cobrado'\]).default('pendiente')" packages/shared-validation/src/facturacion.ts` matches (default pendiente)
     - `grep "export \* from './facturacion'" packages/shared-validation/src/index.ts` matches
+    - `grep "from './evento'" packages/shared-types/src/index.ts` matches (07-01 export preserved — no overwrite)
+    - `grep "from './eventos'" packages/shared-validation/src/index.ts` matches (07-01 export preserved — no overwrite)
     - shared builds exit 0
   </acceptance_criteria>
   <done>factura.ts types + facturacion Zod schemas (incl. UpdateEstadoSchema, default pendiente) exist and build; consumers can import them.</done>
@@ -230,8 +233,9 @@ Existing pattern (DATOS §4.7): fields concepto(req), importe(Number req), fecha
        - `@Delete(':id')` `@Audited('factura','delete')` → remove(uid, id). (FAC-04)
        Use `@CurrentUser('id') uid: string`; never usuarioId in body (AUTH-04).
     4. Create apps/backend/src/modules/facturacion/facturacion.module.ts: imports MongooseModule.forFeature([{ name: Factura.name, schema: FacturaSchema }]), AuditoriaModule, AuthModule; controllers [FacturacionController]; providers [FacturacionService, FacturacionRepository]; exports [FacturacionService].
-    5. apps/backend/src/app.module.ts: import FacturacionModule, add to imports[] (after EventosModule / DocumentosModule).
-    6. Create apps/backend/src/modules/facturacion/tests/facturacion.service.spec.ts per <behavior> with a mocked FacturacionRepository.
+    5. apps/backend/src/app.module.ts: import FacturacionModule, add to imports[] (after EventosModule / DocumentosModule). First confirm `EventosModule` is still present in imports[] (07-01) before appending — do NOT overwrite the file.
+    6. apps/backend/jest.config.ts: add a coverageThreshold entry for `./src/modules/facturacion/` at lines/functions >= 80% (SEC-06 continuity), mirroring the existing `./src/modules/documentos/` entry. Append next to the eventos entry added by 07-01; confirm the eventos entry survives.
+    7. Create apps/backend/src/modules/facturacion/tests/facturacion.service.spec.ts per <behavior> with a mocked FacturacionRepository.
   </action>
   <verify>
     <automated>cd apps/backend && pnpm --filter @lexscribe/backend test -- --testPathPattern=facturacion.service.spec && pnpm --filter @lexscribe/backend build</automated>
@@ -242,6 +246,8 @@ Existing pattern (DATOS §4.7): fields concepto(req), importe(Number req), fecha
     - `grep ":id/estado" apps/backend/src/modules/facturacion/facturacion.controller.ts` matches (FAC-03 dedicated endpoint)
     - `grep "NotFoundError('factura'" apps/backend/src/modules/facturacion/facturacion.service.ts` matches
     - `grep "FacturacionModule" apps/backend/src/app.module.ts` matches in imports
+    - `grep "EventosModule" apps/backend/src/app.module.ts` matches (07-01 registration preserved — no overwrite)
+    - `grep "modules/facturacion" apps/backend/jest.config.ts` matches (coverageThreshold entry added, SEC-06)
     - facturacion.service.spec exits 0 and backend build exits 0
   </acceptance_criteria>
   <done>FacturacionController exposes POST/GET totales/GET/PATCH estado/PATCH/DELETE with auth+audit; service defaults fecha to today + throws NotFoundError; module registered in AppModule; service spec green; backend builds.</done>

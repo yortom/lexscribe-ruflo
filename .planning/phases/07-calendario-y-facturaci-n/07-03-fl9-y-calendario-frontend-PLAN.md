@@ -2,8 +2,8 @@
 phase: 07-calendario-y-facturaci-n
 plan: 03
 type: execute
-wave: 2
-depends_on: ["07-01"]
+wave: 3
+depends_on: ["07-01", "07-02"]
 files_modified:
   - apps/backend/src/modules/documentos/documentos.service.ts
   - apps/backend/src/modules/documentos/documentos.controller.ts
@@ -25,13 +25,15 @@ files_modified:
   - apps/frontend/components/documentos/AnadirFechaModal.test.tsx
   - apps/frontend/components/documentos/BorrarDocumentoModal.test.tsx
   - apps/frontend/components/calendario/CalendarioView.test.tsx
+  - apps/frontend/components/calendario/EventoModal.test.tsx
 autonomous: false
-requirements: [CAL-01, CAL-03, CAL-04, CAL-05]
+requirements: [CAL-01, CAL-02, CAL-03, CAL-04, CAL-05]
 must_haves:
   truths:
     - "DELETE /documentos/:id?eventosAction=eliminar soft-deletes the document AND its events; conservar keeps events"
     - "DocumentosList shows an 'Añadir fecha' action per row that opens a modal creating an evento (origen documento)"
     - "Deleting a document with events shows a Conservar/Eliminar modal before deleting"
+    - "EventoModal creates a manual event (origen manual) with title, dates, subtipo, color, optional expedienteId (CAL-02)"
     - "Global /calendario page renders react-calendar with event dots, filters by expediente + date range, shows only mostrarEnCalendario=true"
     - "Expediente Fechas tab lists ALL events (incl. non-visible) with a visibility toggle"
     - "A 'Calendario' nav link exists in the app layout"
@@ -66,7 +68,7 @@ must_haves:
 <objective>
 Wire the calendar end to end: (1) modify the backend `documentos.service.remove()` for FL-9 (D-11) to accept `eventosAction` and import EventosModule one-way; (2) build the frontend — global `/calendario` page (D-03), Fechas tab (D-04), "Añadir fecha" modal (FL-8/D-05/D-06), FL-9 delete-with-events modal (D-10), and nav link.
 
-Covers CAL-01 (frontend add-date), CAL-03 (calendar view + Fechas tab), CAL-04 (color preset via modal), CAL-05 (FL-9 delete flow, backend + frontend).
+Covers CAL-01 (frontend add-date), CAL-02 (manual events via EventoModal), CAL-03 (calendar view + Fechas tab), CAL-04 (color preset via modal), CAL-05 (FL-9 delete flow, backend + frontend).
 
 Purpose: Complete the calendar feature against the EventosModule API from 07-01. Includes a human-verify checkpoint for react-calendar visual rendering (CAL-03/CAL-04 visual polish is manual per 07-VALIDATION.md).
 Output: Modified documentos service/controller/module, eventos API client, calendar components, /calendario page, Fechas tab, FL-8 + FL-9 modals, nav link, frontend tests.
@@ -148,6 +150,7 @@ Color palette (D-09, RESEARCH Open Q2): ['#3b82f6','#ef4444','#22c55e','#f59e0b'
   </read_first>
   <behavior>
     - CalendarioView.test.tsx: given eventos with fechaInicio on specific days, tileContent renders a dot (span) on those days in month view and nothing on event-less days.
+    - EventoModal.test.tsx (CAL-02): submitting the modal calls createEvento with origen 'manual', the entered titulo/fechaInicio/fechaFin/descripcion/subtipo/color, mostrarEnCalendario true, and the optional expedienteId; calls onCreated + onClose on success.
   </behavior>
   <action>
     1. Install dep: `pnpm --filter @lexscribe/frontend add react-calendar@6.0.1` (adds to apps/frontend/package.json).
@@ -160,7 +163,7 @@ Color palette (D-09, RESEARCH Open Q2): ['#3b82f6','#ef4444','#22c55e','#f59e0b'
        Types from @lexscribe/shared-types and @lexscribe/shared-validation.
     3. Create apps/frontend/components/calendario/CalendarioView.tsx EXACTLY per RESEARCH Pattern 4: `'use client'`, `import 'react-calendar/dist/Calendar.css'`, `import Calendar from 'react-calendar'`, build `eventDates` Set, `tileContent` rendering a `<span className="block w-1.5 h-1.5 rounded-full bg-blue-500 mx-auto mt-0.5" />` on event days (view==='month' only), `locale="es-ES"`. Props: `{ eventos: Evento[]; value: Date; onChange: (d: Date) => void; onDayClick: (d: Date) => void }`.
     4. Create apps/frontend/components/calendario/EventosList.tsx: 'use client'; renders the list panel of events for the selected day/range — each row shows titulo, fechaInicio (toLocaleDateString es-ES), subtipo/origen badge, and a color swatch (using evento.color). Props `{ eventos: Evento[] }`.
-    5. Create apps/frontend/components/calendario/EventoModal.tsx (D-08 manual event): inline modal (RolFaltanteModal pattern) capturing titulo, fechaInicio, fechaFin (optional), descripcion, subtipo, color (preset palette buttons from the 8 hex colors), expedienteId (optional). On submit calls createEvento with `origen: 'manual'` and `mostrarEnCalendario: true`. Props include `onClose` and `onCreated`.
+    5. Create apps/frontend/components/calendario/EventoModal.tsx (D-08 manual event): inline modal (RolFaltanteModal pattern) capturing titulo, fechaInicio, fechaFin (optional), descripcion, subtipo, color (preset palette buttons from the 8 hex colors), expedienteId (optional). On submit calls createEvento with `origen: 'manual'` and `mostrarEnCalendario: true`. Props include `onClose` and `onCreated`. ALSO create apps/frontend/components/calendario/EventoModal.test.tsx (vitest, mock the eventos api client) per the EventoModal <behavior> above — assert createEvento is called with origen 'manual' and the entered field values (CAL-02 coverage).
     6. Create apps/frontend/app/(app)/calendario/page.tsx (D-03): 'use client' page. State: selected Date, expediente filter (text/select of expediente id), date range (fechaDesde/fechaHasta). useQuery `['eventos','calendario',filters]` → `listEventos({ soloCalendario: true, expedienteId, fechaDesde, fechaHasta })`. Render CalendarioView + EventosList + a `(+)` button opening EventoModal. To avoid SSR CSS issues (Pitfall 2), either keep this file `'use client'` or load CalendarioView via `dynamic(() => import(...), { ssr: false })`.
     7. apps/frontend/app/(app)/layout.tsx: add `<a href="/calendario">Calendario</a>` to the nav (after Plantillas).
     8. Create apps/frontend/components/expedientes/FechasTab.tsx (D-04): 'use client'; props `{ expedienteId: string }`. useQuery `['eventos','expediente',expedienteId]` → `listEventos({ expedienteId })` (NO soloCalendario — shows ALL). Render a flat list sorted by fechaInicio asc (RESEARCH Open Q3), each row with titulo, fecha, origen/subtipo, and a visibility toggle (checkbox/switch) that calls `updateEvento(id, { mostrarEnCalendario: !current })` via useMutation + invalidateQueries.
@@ -168,7 +171,7 @@ Color palette (D-09, RESEARCH Open Q2): ['#3b82f6','#ef4444','#22c55e','#f59e0b'
     10. Create apps/frontend/components/calendario/CalendarioView.test.tsx (vitest + Testing Library) per <behavior>: render with 1-2 eventos, assert dots appear on the correct day tiles.
   </action>
   <verify>
-    <automated>cd apps/frontend && pnpm --filter @lexscribe/frontend test -- CalendarioView && pnpm --filter @lexscribe/frontend build</automated>
+    <automated>cd apps/frontend && pnpm --filter @lexscribe/frontend test -- CalendarioView EventoModal && pnpm --filter @lexscribe/frontend build</automated>
   </verify>
   <acceptance_criteria>
     - `grep "react-calendar" apps/frontend/package.json` matches
@@ -178,7 +181,8 @@ Color palette (D-09, RESEARCH Open Q2): ['#3b82f6','#ef4444','#22c55e','#f59e0b'
     - `grep "Calendario" apps/frontend/app/(app)/layout.tsx` matches (nav link)
     - `grep "FechasTab" apps/frontend/components/expedientes/ExpedienteTabs.tsx` matches (placeholder replaced)
     - `grep "mostrarEnCalendario" apps/frontend/components/expedientes/FechasTab.tsx` matches (visibility toggle)
-    - CalendarioView test exits 0; frontend build exits 0
+    - `grep "origen: 'manual'" apps/frontend/components/calendario/EventoModal.test.tsx` (or double-quote form) matches (CAL-02 asserted)
+    - CalendarioView + EventoModal tests exit 0; frontend build exits 0
   </acceptance_criteria>
   <done>react-calendar installed; eventos API client complete; CalendarioView/EventosList/EventoModal built; /calendario page filters by expediente+range showing only visible events; Fechas tab shows all events with visibility toggle; nav link added; CalendarioView test green.</done>
 </task>
@@ -249,6 +253,7 @@ Color palette (D-09, RESEARCH Open Q2): ['#3b82f6','#ef4444','#22c55e','#f59e0b'
 
 <success_criteria>
 - CAL-01 (frontend): "Añadir fecha" modal creates a documento-origin event.
+- CAL-02: EventoModal creates a manual event (origen manual) — asserted by EventoModal.test.tsx.
 - CAL-03: /calendario shows only mostrarEnCalendario=true events with expediente+range filters; Fechas tab shows all with toggle.
 - CAL-04: manual events get a preset color visible in the calendar/list.
 - CAL-05: deleting a document with events prompts conservar/eliminar and applies the choice (backend remove honors eventosAction).

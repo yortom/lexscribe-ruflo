@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-06T12:40:08.969Z"
+last_updated: "2026-06-06T17:53:20.831Z"
 last_activity: 2026-06-06
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 28
-  completed_plans: 24
+  completed_plans: 25
 ---
 
 # Lexscribe — State
@@ -17,7 +17,7 @@ progress:
 ## Current Position
 
 Phase: 07 (calendario-y-facturaci-n) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 - **Milestone:** v1.0 MVP
 - **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
@@ -174,6 +174,12 @@ Plan: 3 of 4
 - **preRellenarFormulario accepts pre-resolved contactoFieldsByRol from page caller** — pure function with no async side-effects; page loads and resolves contacto fields before mounting GeneracionForm (06-03)
 - **DocumentosList decoupled via expedienteId prop + useQuery** — component fetches its own data, re-fetches on invalidation; no prop-drilling of document arrays from parent tabs (06-03)
 
+- **EventosModule imported one-way into DocumentosModule** -- no forwardRef needed (EventosModule does not import DocumentosModule); avoids circular dependency (07-03)
+- **remove() fail-safe ordering: softDelete document first, then softDeleteByDocumentoId** -- if secondary throws, document is inactive and events remain active; accepted safe state per DATOS section 6 compensation (07-03)
+- **Pre-delete count check in DocumentosList** -- countEventosByDocumento called on Eliminar click; if total > 0 show BorrarDocumentoModal; avoids unnecessary modal when total=0 (07-03)
+- **FechasTab flat list sorted by fechaInicio asc** -- no nesting; resolves RESEARCH Open Q3; shows ALL events with visibility toggle (07-03)
+- **8-color preset palette in EventoModal** -- hex values from RESEARCH Open Q2 stored as evento.color field (07-03)
+
 ## Pending Todos / Blockers
 
 - User must configure GitHub repository secrets before CI/CD pipelines activate:
@@ -206,6 +212,7 @@ Plan: 3 of 4
 | Phase 06 P03 | 90min | 4 tasks | 10 files |
 | Phase 07 P01 | 45min | 3 tasks | 17 files |
 | Phase 07 P02 | 9min | 3 tasks | 17 files |
+| Phase 07 P03 | ~3h | 4 tasks | 21 files |
 
 ## Next Up
 

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-06T09:24:31.460Z"
+last_updated: "2026-06-06T12:40:08.969Z"
 last_activity: 2026-06-06
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 28
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Lexscribe — State
@@ -17,7 +17,7 @@ progress:
 ## Current Position
 
 Phase: 07 (calendario-y-facturaci-n) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 - **Milestone:** v1.0 MVP
 - **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
@@ -160,6 +160,10 @@ Plan: 2 of 4
 - **Contactos branch coverage at 69.69% deferred** — pre-existing from 03-03, out of scope for 05-04; `pnpm -r run test` not affected (no --coverage in test script) (05-04)
 - **datosCongelados is same object passed to doc.render() and repo.create()** — DOC-07 immutability by design; no copy needed, one reference (06-01)
 - **docId pre-computed via new Types.ObjectId() before MinIO upload** — key includes docId; no second DB round-trip needed after upload (06-01)
+- **getTotales aggregate explicitly adds activo:true to $match** — softDeletePlugin does NOT hook .aggregate(); must filter manually (07-02)
+- **Per-value Math.round(x*100)/100 rounding in billing totals** — prevents IEEE 754 floating-point drift when summing decimal importes (07-02)
+- **PATCH /facturas/:id/estado is a dedicated endpoint** — UpdateEstadoSchema only allows estado field; mutable fields (concepto/importe/etc.) use PATCH /facturas/:id (07-02)
+- **GET totales/:expedienteId route declared before :id** — avoids NestJS route shadowing; literal route segments must precede parameterized ones (07-02)
 - **StorageService.getObject uses GetObjectCommand already imported in Phase 5** — only Readable from 'stream' added as new import (06-01)
 - **NuevoCampoSchema restricts tipoObjeto to expediente|contacto** — clausula/fecha not declarable in dynamic schema; same Pitfall 4 boundary as DeclararVariableSchema (06-01)
 - **GenerationService DI uses concrete class types** — NestJS reflect-metadata cannot resolve anonymous duck-typed interfaces at runtime; PlantillasService and ExpedientesRepository used as concrete tokens with @Inject(forwardRef(...)) (06-02)
@@ -201,6 +205,7 @@ Plan: 2 of 4
 | Phase 06 P04 | ~15min | 2 tasks | 4 files |
 | Phase 06 P03 | 90min | 4 tasks | 10 files |
 | Phase 07 P01 | 45min | 3 tasks | 17 files |
+| Phase 07 P02 | 9min | 3 tasks | 17 files |
 
 ## Next Up
 

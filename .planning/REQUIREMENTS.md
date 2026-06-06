@@ -82,11 +82,11 @@
 
 ### Facturación (`FAC`)
 
-- [ ] **FAC-01** — Cada expediente tiene una pestaña de facturación accesible desde su detalle. *(F-070, F-008)*
-- [ ] **FAC-02** — El usuario puede registrar entradas con concepto, importe, fecha (default hoy), número/referencia opcional, notas opcional. *(F-072)*
-- [ ] **FAC-03** — Cada entrada tiene estado `pendiente` / `facturado` / `cobrado`, actualizable manualmente; default `pendiente`. *(F-073)*
-- [ ] **FAC-04** — El usuario puede editar y eliminar entradas en cualquier momento. *(F-074)*
-- [ ] **FAC-05** — La pestaña muestra el coste total acumulado del expediente (suma de entradas activas), recalculado automáticamente. *(F-071)*
+- [x] **FAC-01** — Cada expediente tiene una pestaña de facturación accesible desde su detalle. *(F-070, F-008)*
+- [x] **FAC-02** — El usuario puede registrar entradas con concepto, importe, fecha (default hoy), número/referencia opcional, notas opcional. *(F-072)*
+- [x] **FAC-03** — Cada entrada tiene estado `pendiente` / `facturado` / `cobrado`, actualizable manualmente; default `pendiente`. *(F-073)*
+- [x] **FAC-04** — El usuario puede editar y eliminar entradas en cualquier momento. *(F-074)*
+- [x] **FAC-05** — La pestaña muestra el coste total acumulado del expediente (suma de entradas activas), recalculado automáticamente. *(F-071)*
 
 ### Seguridad y hardening (`SEC`)
 

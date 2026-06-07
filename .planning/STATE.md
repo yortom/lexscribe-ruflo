@@ -2,30 +2,30 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-06-06T17:53:20.831Z"
-last_activity: 2026-06-06
+status: verifying
+last_updated: "2026-06-07T07:55:39.033Z"
+last_activity: 2026-06-07
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 28
-  completed_plans: 25
+  completed_plans: 26
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
-Phase: 07 (calendario-y-facturaci-n) — EXECUTING
-Plan: 4 of 4
+Phase: 07 (calendario-y-facturaci-n) — COMPLETE
+Plan: 4 of 4 (all done)
 
 - **Milestone:** v1.0 MVP
-- **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
-- **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
-- **Next phase:** Phase 7 — Calendario y Facturación — not started
+- **Phases complete:** 7 of 8 (Phases 1–7 — features delivered) — 26 of 28 plans formally executed
+- **Last phase done:** Phase 7 — Calendario y Facturación — Complete (2026-06-07)
+- **Next phase:** Phase 8 — Hardening
 - **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
-- **Status:** Ready to execute
-- **Last activity:** 2026-06-06
+- **Status:** Phase complete — ready for verification
+- **Last activity:** 2026-06-07
 
 ### Phases at a glance
 
@@ -37,7 +37,7 @@ Plan: 4 of 4
 | 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend), CONT-05/EXPE-07 | ✓ 2026-05-31 ⚠ falta unit-test backend (04-04) |
 | 5 — Plantillas y Editor | Parser variables, CodeMirror 6, versionado plantillas | ✓ 2026-05-31 |
 | 6 — Generación y Documentos | docxtemplater `.docx`, datosCongelados, subida/descarga | ✓ 2026-06-03 |
-| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ○ pending |
+| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ✓ 2026-06-07 |
 | 8 — Hardening | Cifrado AES PII, Sentry, E2E Playwright FL-1..13 | ○ pending |
 
 ## Accumulated Context
@@ -179,6 +179,8 @@ Plan: 4 of 4
 - **Pre-delete count check in DocumentosList** -- countEventosByDocumento called on Eliminar click; if total > 0 show BorrarDocumentoModal; avoids unnecessary modal when total=0 (07-03)
 - **FechasTab flat list sorted by fechaInicio asc** -- no nesting; resolves RESEARCH Open Q3; shows ALL events with visibility toggle (07-03)
 - **8-color preset palette in EventoModal** -- hex values from RESEARCH Open Q2 stored as evento.color field (07-03)
+- **Double React Query invalidation on billing mutation** -- both ['facturas', expedienteId] and ['facturas','totales', expedienteId] invalidated on every mutation so totals header recalculates immediately (FAC-05) (07-04)
+- **FechasTab wiring preserved before facturacion placeholder replacement** -- 07-03 FechasTab import confirmed present in ExpedienteTabs before editing the facturacion line; both tabs coexist (07-04)
 
 ## Pending Todos / Blockers
 
@@ -213,7 +215,8 @@ Plan: 4 of 4
 | Phase 07 P01 | 45min | 3 tasks | 17 files |
 | Phase 07 P02 | 9min | 3 tasks | 17 files |
 | Phase 07 P03 | ~3h | 4 tasks | 21 files |
+| Phase 07 P04 | 30min | 3 tasks | 4 files |
 
 ## Next Up
 
-Phase 07 — Calendario y Facturación (eventos auto/manuales, vista calendario, pestaña facturación del expediente).
+Phase 08 — Hardening (cifrado AES PII, Sentry, E2E Playwright FL-1..FL-13).

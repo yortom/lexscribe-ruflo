@@ -17,7 +17,7 @@
 - [x] **Phase 5: Plantillas y Editor** - Crear/editar plantillas con detección automática y CodeMirror 6
  (completed 2026-05-31)
 - [x] **Phase 6: Generación y Documentos** - Generar .docx end-to-end + subida de documentos preexistentes (completed 2026-06-03)
-- [ ] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente
+- [x] **Phase 7: Calendario y Facturación** - Eventos auto/manuales y facturación por expediente (completed 2026-06-07)
 - [ ] **Phase 8: Hardening** - Cifrado AES, Sentry, E2E de los 13 flujos
 
 ## Phase Details
@@ -151,7 +151,7 @@ Plans:
 - [x] 07-01-backend-eventos-PLAN.md — EventosModule (schema+mostrarEnCalendario D-01, repo, service, controller, Zod DTOs, @Audited) + DATOS.md update + shared evento contracts — CAL-01/02/03/04/05(backend)
 - [x] 07-02-backend-facturacion-PLAN.md — FacturacionModule (schema, repo con getTotales $sum activo:true, service, controller, Zod DTOs) + shared factura contracts — FAC-01..05(backend)
 - [x] 07-03-fl9-y-calendario-frontend-PLAN.md — FL-9 documentos.remove(eventosAction) + react-calendar /calendario, Fechas tab, modales Añadir fecha (FL-8) y borrado con eventos (FL-9), nav — CAL-01/03/04/05(frontend)
-- [ ] 07-04-facturacion-frontend-PLAN.md — Pestaña Facturacion (tabla inline editable, dropdown estado coloreado, total + subtotales €) — FAC-01..05(frontend)
+- [x] 07-04-facturacion-frontend-PLAN.md — Pestaña Facturacion (tabla inline editable, dropdown estado coloreado, total + subtotales €) — FAC-01..05(frontend)
 
 ### Phase 8: Hardening
 **Goal**: Producto listo para producción: PII cifrado, errores monitorizados, los 13 flujos verificados E2E.
@@ -185,7 +185,7 @@ Plans:
 | 4. Cláusulas y Expedientes | 3/4 | Complete* | 2026-05-31 |
 | 5. Plantillas y Editor | 4/4 | Complete | 2026-05-31 |
 | 6. Generación y Documentos | 4/4 | Complete | 2026-06-03 |
-| 7. Calendario y Facturación | 3/4 | In Progress|  |
+| 7. Calendario y Facturación | 4/4 | Complete   | 2026-06-07 |
 | 8. Hardening | 0/4 | Not started | - |
 
 > \* **Phase 4 — Complete (features) con deuda técnica:** backend (04-01/02) + frontend (04-03, entregado sin SUMMARY) están operativos y verificados por e2e + tests de frontend. El plan **04-04 (unit tests backend de cláusulas/expedientes) está diferido** — no existen unit specs para esos módulos (sí para contactos). Pendiente de cerrar en Phase 8 / SEC-06.

@@ -52,6 +52,11 @@ const config: Config = {
     },
   },
   testEnvironment: 'node',
+  // MongoMemoryServer.create() downloads the mongod binary on a cold CI cache,
+  // which routinely exceeds Jest's default 5s hook timeout. Give beforeAll
+  // hooks and tests enough headroom so the first suite to trigger the download
+  // doesn't fail (e.g. soft-delete.plugin.spec.ts).
+  testTimeout: 30000,
   setupFiles: ['<rootDir>/test/setup-unit.ts'],
   moduleNameMapper: {
     '^@lexscribe/(.*)$': '<rootDir>/../../packages/$1/src',

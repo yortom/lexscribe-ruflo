@@ -3,6 +3,7 @@
  * Verifies that submitting the modal calls createEvento with origen 'manual'
  * and the entered field values.
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventoModal } from './EventoModal';
 

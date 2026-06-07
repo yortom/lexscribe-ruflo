@@ -37,11 +37,14 @@ export class FacturacionService {
 
   /** FAC-04: update mutable fields. Throws NotFoundError if not found. */
   async update(usuarioId: string, id: string, dto: UpdateFacturaInput) {
-    const patch: Record<string, unknown> = { ...dto };
-    if ((dto as any).fecha) {
-      patch['fecha'] = new Date((dto as any).fecha);
-    }
-    const updated = await this.repo.update(usuarioId, id, patch as any);
+    const { fecha, ...rest } = dto;
+    const patch: Partial<
+      Pick<CreateFacturaInput, 'concepto' | 'importe' | 'numero' | 'notas'> & { fecha?: Date }
+    > = {
+      ...rest,
+      ...(fecha ? { fecha: new Date(fecha) } : {}),
+    };
+    const updated = await this.repo.update(usuarioId, id, patch);
     if (!updated) throw new NotFoundError('factura', id);
     return updated;
   }

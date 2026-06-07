@@ -2,7 +2,8 @@
  * CalendarioView tests (CAL-03 frontend).
  * Verifies that tileContent renders event dots on days with events and nothing on empty days.
  */
-import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render } from '@testing-library/react';
 import { CalendarioView } from './CalendarioView';
 import type { Evento } from '@lexscribe/shared-types';
 

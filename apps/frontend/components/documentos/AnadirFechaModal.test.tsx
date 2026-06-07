@@ -3,6 +3,7 @@
  * Verifies that submitting the modal calls createEvento with origen='documento',
  * the given documentoId + expedienteId, subtipo, fechaInicio, and mostrarEnCalendario.
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AnadirFechaModal } from './AnadirFechaModal';
 

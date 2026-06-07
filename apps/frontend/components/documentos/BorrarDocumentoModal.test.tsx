@@ -3,6 +3,7 @@
  * Verifies that the modal shows event count and correct buttons,
  * and that clicking each button calls onConfirm with the correct action.
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BorrarDocumentoModal } from './BorrarDocumentoModal';
 

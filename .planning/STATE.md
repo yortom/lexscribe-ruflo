@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-06-07T07:55:39.033Z"
+status: planning
+last_updated: "2026-06-07T08:03:32.414Z"
 last_activity: 2026-06-07
 progress:
   total_phases: 8
@@ -16,15 +16,15 @@ progress:
 
 ## Current Position
 
-Phase: 07 (calendario-y-facturaci-n) — COMPLETE
-Plan: 4 of 4 (all done)
+Phase: 8
+Plan: Not started
 
 - **Milestone:** v1.0 MVP
 - **Phases complete:** 7 of 8 (Phases 1–7 — features delivered) — 26 of 28 plans formally executed
 - **Last phase done:** Phase 7 — Calendario y Facturación — Complete (2026-06-07)
 - **Next phase:** Phase 8 — Hardening
 - **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
-- **Status:** Phase complete — ready for verification
+- **Status:** Ready to plan
 - **Last activity:** 2026-06-07
 
 ### Phases at a glance

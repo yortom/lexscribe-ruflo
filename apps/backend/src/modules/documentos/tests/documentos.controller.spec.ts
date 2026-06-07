@@ -169,13 +169,13 @@ describe('DocumentosController', () => {
   // ── DELETE :id ────────────────────────────────────────────────────────────
 
   describe('remove', () => {
-    it('delegates to service.remove(uid, id)', async () => {
+    it("delegates to service.remove(uid, id, 'conservar') by default (FL-9)", async () => {
       const expected = { _id: docId, activo: false };
       service.remove.mockResolvedValue(expected);
 
       const result = await controller.remove(uid, docId);
 
-      expect(service.remove).toHaveBeenCalledWith(uid, docId);
+      expect(service.remove).toHaveBeenCalledWith(uid, docId, 'conservar');
       expect(result).toBe(expected);
     });
   });

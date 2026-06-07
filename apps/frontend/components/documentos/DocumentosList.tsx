@@ -9,14 +9,19 @@ import {
   deleteDocumento,
   ApiError,
 } from '@/lib/api/documentos';
+import { countEventosByDocumento } from '@/lib/api/eventos';
+import { AnadirFechaModal } from './AnadirFechaModal';
+import { BorrarDocumentoModal } from './BorrarDocumentoModal';
 
 interface DocumentosListProps {
   expedienteId: string;
 }
 
 /**
- * Pestaña Documentos del expediente (EXPE-07 / DOC-05 / DOC-06).
+ * Pestaña Documentos del expediente (EXPE-07 / DOC-05 / DOC-06 / CAL-01 / CAL-05).
  * Lista documentos reales (generados y subidos) con descarga, subida y eliminación.
+ * FL-8: "Añadir fecha" per row opens AnadirFechaModal (CAL-01).
+ * FL-9: "Eliminar" pre-checks event count; if events exist shows BorrarDocumentoModal (CAL-05).
  */
 export function DocumentosList({ expedienteId }: DocumentosListProps) {
   const qc = useQueryClient();
@@ -25,15 +30,24 @@ export function DocumentosList({ expedienteId }: DocumentosListProps) {
   const [uploadNombre, setUploadNombre] = useState('');
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  // FL-8 state: which document is having a date added
+  const [addDateFor, setAddDateFor] = useState<string | null>(null);
+
+  // FL-9 state: which document is pending delete + event count for modal
+  const [deleteFor, setDeleteFor] = useState<{ id: string; count: number } | null>(null);
+  const [checkingDelete, setCheckingDelete] = useState<string | null>(null); // doc id being checked
+
   const { data, isLoading } = useQuery({
     queryKey: ['documentos', expedienteId],
     queryFn: () => listDocumentos(expedienteId),
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id: string) => deleteDocumento(id),
+    mutationFn: ({ id, action }: { id: string; action: 'conservar' | 'eliminar' }) =>
+      deleteDocumento(id, action),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documentos', expedienteId] });
+      qc.invalidateQueries({ queryKey: ['eventos', 'expediente', expedienteId] });
     },
   });
 
@@ -62,6 +76,34 @@ export function DocumentosList({ expedienteId }: DocumentosListProps) {
         setUploadError((err as Error).message);
       }
     }
+  }
+
+  /**
+   * FL-9 pre-delete flow (Pitfall 3):
+   * 1. Count active events for document.
+   * 2. If total > 0 → show conservar/eliminar modal.
+   * 3. If total === 0 → delete directly with default 'conservar'.
+   */
+  async function handleDeleteClick(docId: string) {
+    setCheckingDelete(docId);
+    try {
+      const { total } = await countEventosByDocumento(docId);
+      if (total > 0) {
+        setDeleteFor({ id: docId, count: total });
+      } else {
+        deleteMut.mutate({ id: docId, action: 'conservar' });
+      }
+    } catch (err) {
+      alert((err as Error).message);
+    } finally {
+      setCheckingDelete(null);
+    }
+  }
+
+  function handleDeleteConfirm(action: 'conservar' | 'eliminar') {
+    if (!deleteFor) return;
+    deleteMut.mutate({ id: deleteFor.id, action });
+    setDeleteFor(null);
   }
 
   return (
@@ -115,13 +157,22 @@ export function DocumentosList({ expedienteId }: DocumentosListProps) {
                 >
                   Descargar
                 </button>
+                {/* FL-8: Añadir fecha button (CAL-01) */}
                 <button
                   type="button"
-                  disabled={deleteMut.isPending}
-                  onClick={() => deleteMut.mutate(doc._id)}
+                  onClick={() => setAddDateFor(doc._id)}
+                  className="text-sm text-green-600 hover:text-green-800"
+                >
+                  Añadir fecha
+                </button>
+                {/* FL-9: Eliminar button with pre-check (CAL-05) */}
+                <button
+                  type="button"
+                  disabled={deleteMut.isPending || checkingDelete === doc._id}
+                  onClick={() => handleDeleteClick(doc._id)}
                   className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
                 >
-                  Eliminar
+                  {checkingDelete === doc._id ? 'Verificando...' : 'Eliminar'}
                 </button>
               </div>
             </li>
@@ -167,6 +218,29 @@ export function DocumentosList({ expedienteId }: DocumentosListProps) {
           </p>
         )}
       </div>
+
+      {/* FL-8 modal: Añadir fecha (CAL-01) */}
+      {addDateFor && (
+        <AnadirFechaModal
+          documentoId={addDateFor}
+          expedienteId={expedienteId}
+          onClose={() => setAddDateFor(null)}
+          onCreated={() => {
+            qc.invalidateQueries({ queryKey: ['eventos', 'expediente', expedienteId] });
+            qc.invalidateQueries({ queryKey: ['eventos', 'calendario'] });
+            setAddDateFor(null);
+          }}
+        />
+      )}
+
+      {/* FL-9 modal: Conservar/Eliminar eventos (CAL-05) */}
+      {deleteFor && (
+        <BorrarDocumentoModal
+          count={deleteFor.count}
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeleteFor(null)}
+        />
+      )}
     </div>
   );
 }

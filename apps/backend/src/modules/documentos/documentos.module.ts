@@ -18,6 +18,7 @@ import { StorageModule } from '../../common/storage/storage.module';
 import { PlantillasModule } from '../plantillas/plantillas.module';
 import { ExpedientesModule } from '../expedientes/expedientes.module';
 import { ContactosModule } from '../contactos/contactos.module';
+import { EventosModule } from '../eventos/eventos.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ContactosModule } from '../contactos/contactos.module';
     PlantillasModule,                       // PlantillasService.getById (sin forwardRef — no hay ciclo)
     forwardRef(() => ExpedientesModule),    // ExpedientesService.linkContacto/getById (ciclo con ExpedientesModule)
     forwardRef(() => ContactosModule),      // ContactosRepository (modal D-06, opcional)
+    EventosModule,                          // EventosRepository (FL-9 softDeleteByDocumentoId — one-way, no forwardRef — Pitfall 4)
   ],
   controllers: [DocumentosController],
   providers: [DocumentosService, DocumentosRepository, GenerationService],

@@ -19,6 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <a href="/clausulas">Cláusulas</a>
             <a href="/expedientes">Expedientes</a>
             <a href="/plantillas">Plantillas</a>
+            <a href="/calendario">Calendario</a>
           </nav>
         </header>
         <main className="flex-1 px-6 py-6">{children}</main>

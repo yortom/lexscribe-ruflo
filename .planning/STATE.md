@@ -3,26 +3,29 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-last_updated: "2026-06-04T00:00:00.000Z"
-last_activity: 2026-06-04
+last_updated: "2026-06-07T08:03:32.414Z"
+last_activity: 2026-06-07
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 24
-  completed_plans: 22
+  total_plans: 28
+  completed_plans: 26
 ---
 
 # Lexscribe — State
 
 ## Current Position
 
+Phase: 8
+Plan: Not started
+
 - **Milestone:** v1.0 MVP
-- **Phases complete:** 6 of 8 (Phases 1–6 — features delivered) — 22 of 24 plans formally executed
-- **Last phase done:** Phase 6 — Generación y Documentos — Complete & verified (2026-06-03)
-- **Next phase:** Phase 7 — Calendario y Facturación — not started
+- **Phases complete:** 7 of 8 (Phases 1–7 — features delivered) — 26 of 28 plans formally executed
+- **Last phase done:** Phase 7 — Calendario y Facturación — Complete (2026-06-07)
+- **Next phase:** Phase 8 — Hardening
 - **Known gap:** Phase 4 plans 04-03 (frontend) y 04-04 (tests) no se ejecutaron como planes formales; las páginas cláusulas/expedientes existen y tienen tests de frontend (Vitest) + e2e backend, pero **faltan unit tests backend de cláusulas/expedientes** (diferido, candidato a cerrar en Phase 8 / SEC-06)
-- **Status:** Ready to plan Phase 7
-- **Last activity:** 2026-06-04
+- **Status:** Ready to plan
+- **Last activity:** 2026-06-07
 
 ### Phases at a glance
 
@@ -34,7 +37,7 @@ progress:
 | 4 — Cláusulas y Expedientes | Cláusulas + expedientes (backend+frontend), CONT-05/EXPE-07 | ✓ 2026-05-31 ⚠ falta unit-test backend (04-04) |
 | 5 — Plantillas y Editor | Parser variables, CodeMirror 6, versionado plantillas | ✓ 2026-05-31 |
 | 6 — Generación y Documentos | docxtemplater `.docx`, datosCongelados, subida/descarga | ✓ 2026-06-03 |
-| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ○ pending |
+| 7 — Calendario y Facturación | Eventos auto/manuales + facturación por expediente | ✓ 2026-06-07 |
 | 8 — Hardening | Cifrado AES PII, Sentry, E2E Playwright FL-1..13 | ○ pending |
 
 ## Accumulated Context
@@ -157,6 +160,10 @@ progress:
 - **Contactos branch coverage at 69.69% deferred** — pre-existing from 03-03, out of scope for 05-04; `pnpm -r run test` not affected (no --coverage in test script) (05-04)
 - **datosCongelados is same object passed to doc.render() and repo.create()** — DOC-07 immutability by design; no copy needed, one reference (06-01)
 - **docId pre-computed via new Types.ObjectId() before MinIO upload** — key includes docId; no second DB round-trip needed after upload (06-01)
+- **getTotales aggregate explicitly adds activo:true to $match** — softDeletePlugin does NOT hook .aggregate(); must filter manually (07-02)
+- **Per-value Math.round(x*100)/100 rounding in billing totals** — prevents IEEE 754 floating-point drift when summing decimal importes (07-02)
+- **PATCH /facturas/:id/estado is a dedicated endpoint** — UpdateEstadoSchema only allows estado field; mutable fields (concepto/importe/etc.) use PATCH /facturas/:id (07-02)
+- **GET totales/:expedienteId route declared before :id** — avoids NestJS route shadowing; literal route segments must precede parameterized ones (07-02)
 - **StorageService.getObject uses GetObjectCommand already imported in Phase 5** — only Readable from 'stream' added as new import (06-01)
 - **NuevoCampoSchema restricts tipoObjeto to expediente|contacto** — clausula/fecha not declarable in dynamic schema; same Pitfall 4 boundary as DeclararVariableSchema (06-01)
 - **GenerationService DI uses concrete class types** — NestJS reflect-metadata cannot resolve anonymous duck-typed interfaces at runtime; PlantillasService and ExpedientesRepository used as concrete tokens with @Inject(forwardRef(...)) (06-02)
@@ -166,6 +173,14 @@ progress:
 - **DOC-07 referential independence via buildContext spread** — datosCongelados is a new plain object (parametros spread, not reference copy); mutation of source expediente after generar() does not affect persisted snapshot (06-04)
 - **preRellenarFormulario accepts pre-resolved contactoFieldsByRol from page caller** — pure function with no async side-effects; page loads and resolves contacto fields before mounting GeneracionForm (06-03)
 - **DocumentosList decoupled via expedienteId prop + useQuery** — component fetches its own data, re-fetches on invalidation; no prop-drilling of document arrays from parent tabs (06-03)
+
+- **EventosModule imported one-way into DocumentosModule** -- no forwardRef needed (EventosModule does not import DocumentosModule); avoids circular dependency (07-03)
+- **remove() fail-safe ordering: softDelete document first, then softDeleteByDocumentoId** -- if secondary throws, document is inactive and events remain active; accepted safe state per DATOS section 6 compensation (07-03)
+- **Pre-delete count check in DocumentosList** -- countEventosByDocumento called on Eliminar click; if total > 0 show BorrarDocumentoModal; avoids unnecessary modal when total=0 (07-03)
+- **FechasTab flat list sorted by fechaInicio asc** -- no nesting; resolves RESEARCH Open Q3; shows ALL events with visibility toggle (07-03)
+- **8-color preset palette in EventoModal** -- hex values from RESEARCH Open Q2 stored as evento.color field (07-03)
+- **Double React Query invalidation on billing mutation** -- both ['facturas', expedienteId] and ['facturas','totales', expedienteId] invalidated on every mutation so totals header recalculates immediately (FAC-05) (07-04)
+- **FechasTab wiring preserved before facturacion placeholder replacement** -- 07-03 FechasTab import confirmed present in ExpedienteTabs before editing the facturacion line; both tabs coexist (07-04)
 
 ## Pending Todos / Blockers
 
@@ -197,7 +212,11 @@ progress:
 | Phase 06 P02 | ~35min | 3 tasks | 12 files |
 | Phase 06 P04 | ~15min | 2 tasks | 4 files |
 | Phase 06 P03 | 90min | 4 tasks | 10 files |
+| Phase 07 P01 | 45min | 3 tasks | 17 files |
+| Phase 07 P02 | 9min | 3 tasks | 17 files |
+| Phase 07 P03 | ~3h | 4 tasks | 21 files |
+| Phase 07 P04 | 30min | 3 tasks | 4 files |
 
 ## Next Up
 
-Phase 07 — Calendario y Facturación (eventos auto/manuales, vista calendario, pestaña facturación del expediente).
+Phase 08 — Hardening (cifrado AES PII, Sentry, E2E Playwright FL-1..FL-13).

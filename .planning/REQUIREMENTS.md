@@ -74,19 +74,19 @@
 
 ### Calendario (`CAL`)
 
-- [ ] **CAL-01** — El usuario puede añadir manualmente fechas a un documento (fecha límite, aviso o recordatorio); cada una crea un evento único en el calendario asociado al expediente. *(F-030, F-032, F-033, F-034, F-061, F-062)*
-- [ ] **CAL-02** — El usuario puede crear eventos manuales en el calendario con título, fecha inicio, fecha fin, descripción y tipología, sin necesidad de documento. *(F-063, F-064)*
-- [ ] **CAL-03** — La vista de calendario muestra todos los eventos (auto + manuales) con filtros por expediente y rango. *(F-060, F-066)*
-- [ ] **CAL-04** — El usuario puede personalizar el color de un evento. *(F-065)*
-- [ ] **CAL-05** — Al borrar un documento con eventos asociados, el sistema pregunta si conservar o eliminar los eventos del expediente. *(F-016, FL-9)*
+- [x] **CAL-01** — El usuario puede añadir manualmente fechas a un documento (fecha límite, aviso o recordatorio); cada una crea un evento único en el calendario asociado al expediente. *(F-030, F-032, F-033, F-034, F-061, F-062)*
+- [x] **CAL-02** — El usuario puede crear eventos manuales en el calendario con título, fecha inicio, fecha fin, descripción y tipología, sin necesidad de documento. *(F-063, F-064)*
+- [x] **CAL-03** — La vista de calendario muestra todos los eventos (auto + manuales) con filtros por expediente y rango. *(F-060, F-066)*
+- [x] **CAL-04** — El usuario puede personalizar el color de un evento. *(F-065)*
+- [x] **CAL-05** — Al borrar un documento con eventos asociados, el sistema pregunta si conservar o eliminar los eventos del expediente. *(F-016, FL-9)*
 
 ### Facturación (`FAC`)
 
-- [ ] **FAC-01** — Cada expediente tiene una pestaña de facturación accesible desde su detalle. *(F-070, F-008)*
-- [ ] **FAC-02** — El usuario puede registrar entradas con concepto, importe, fecha (default hoy), número/referencia opcional, notas opcional. *(F-072)*
-- [ ] **FAC-03** — Cada entrada tiene estado `pendiente` / `facturado` / `cobrado`, actualizable manualmente; default `pendiente`. *(F-073)*
-- [ ] **FAC-04** — El usuario puede editar y eliminar entradas en cualquier momento. *(F-074)*
-- [ ] **FAC-05** — La pestaña muestra el coste total acumulado del expediente (suma de entradas activas), recalculado automáticamente. *(F-071)*
+- [x] **FAC-01** — Cada expediente tiene una pestaña de facturación accesible desde su detalle. *(F-070, F-008)*
+- [x] **FAC-02** — El usuario puede registrar entradas con concepto, importe, fecha (default hoy), número/referencia opcional, notas opcional. *(F-072)*
+- [x] **FAC-03** — Cada entrada tiene estado `pendiente` / `facturado` / `cobrado`, actualizable manualmente; default `pendiente`. *(F-073)*
+- [x] **FAC-04** — El usuario puede editar y eliminar entradas en cualquier momento. *(F-074)*
+- [x] **FAC-05** — La pestaña muestra el coste total acumulado del expediente (suma de entradas activas), recalculado automáticamente. *(F-071)*
 
 ### Seguridad y hardening (`SEC`)
 

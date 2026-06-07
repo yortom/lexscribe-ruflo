@@ -111,6 +111,16 @@ Categorías: `INF` (infraestructura) · `AUTH` (auth + transversales) · `CONT` 
 - **DOC-07** — `datosCongelados` inmutable: snapshot JSON resuelto, sin referencia compartida; test explícito de inmutabilidad
 - **EXPE-07** (cerrado) — `ExpedienteDetailResponse.documentos` poblado con documentos reales; pestaña Documentos con listado + descarga + subida
 
+### Phase 7 — Calendario y Facturación (2026-06-07)
+
+- **CAL-01** — "Añadir fecha" a documento → evento en `eventos` con `origen='documento'` + subtipo; visible en Fechas del expediente (FL-8 / `AnadirFechaModal`)
+- **CAL-02** — Evento manual desde botón "+ Nuevo evento" con título, fechas, tipología y color (paleta de 8 presets en `EventoModal`)
+- **CAL-03** — Listado filtrado para calendario (`soloCalendario`) + Fechas tab; filtros por expediente y rango de fechas
+- **CAL-04** — Color por evento persistido y renderizado como punto en `/calendario` (react-calendar `tileContent`)
+- **CAL-05** — Borrado controlado FL-9: `documentos.service.remove(uid, id, eventosAction)` conserva o elimina eventos asociados (`EventosModule` importado one-way; `BorrarDocumentoModal` conservar/eliminar con pre-conteo)
+- **FAC-01..05** — `FacturacionModule` (colección `facturas`): facturación por expediente, entradas con `estado` default `pendiente` y `fecha` default hoy, actualización de estado dedicada, edición/borrado, total general + subtotales por estado vía agregado `$sum` (con guard `activo:true` + redondeo IEEE-754). Frontend `FacturacionTab`: tabla editable inline, dropdown de estado coloreado, recálculo en vivo de totales
+- **Regresión cruzada corregida** — spec de `documentos.controller` actualizada para el tercer argumento `eventosAction` de FL-9 (capturada por el regression gate de Phase 7)
+
 ## Out of Scope
 
 Ver `docs/FUNCIONAL.md §7` y `REQUIREMENTS.md` sección "Out of Scope". Las exclusiones explícitas se mantienen sincronizadas con esa sección.
@@ -155,4 +165,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-06-03 — Phase 6 complete (generación de documentos .docx end-to-end, DOC-01..DOC-07 + EXPE-07 validados).*
+*Last updated: 2026-06-07 — Phase 7 complete (calendario con eventos auto/manuales + borrado controlado FL-9; facturación por expediente con totales y estados; CAL-01..05 + FAC-01..05 validados).*

@@ -12,6 +12,7 @@ import { GenerationService } from './generation/generation.service';
 import { DocumentosRepository } from './documentos.repository';
 import { StorageService } from '../../common/storage/storage.service';
 import { ExpedientesService } from '../expedientes/expedientes.service';
+import { EventosRepository } from '../eventos/eventos.repository';
 import { ConflictError, NotFoundError, ValidationError } from '../../common/errors';
 import type { GenerateDocumentoInput, QueryDocumentoInput } from '@lexscribe/shared-validation';
 
@@ -39,6 +40,7 @@ export class DocumentosService {
     private readonly storage: StorageService,
     @Inject(forwardRef(() => ExpedientesService))
     private readonly expedientes: ExpedientesService,
+    private readonly eventosRepo: EventosRepository,
   ) {}
 
   /**
@@ -134,12 +136,29 @@ export class DocumentosService {
   }
 
   /**
-   * Soft-delete a document.
-   * TODO Phase 7 FL-9: evaluar eventos asociados al borrar documento
+   * Soft-delete a document (CAL-05 / FL-9).
+   * Safe ordering (DATOS §6): soft-delete document first (fail-safe); then conditionally
+   * soft-delete events. If step 2 throws, document is already inactive and events remain
+   * active — accepted safe state (orphaned events are invisible since they reference a
+   * soft-deleted document; a future admin sweep can clean them up per DATOS §6).
+   *
+   * @param eventosAction 'conservar' keeps events active; 'eliminar' soft-deletes them.
    */
-  async remove(usuarioId: string, id: string) {
+  async remove(
+    usuarioId: string,
+    id: string,
+    eventosAction: 'conservar' | 'eliminar' = 'conservar',
+  ) {
+    // Step 1: Soft-delete the document (primary operation — fail-safe ordering)
     const del = await this.repo.softDelete(usuarioId, id);
     if (!del) throw new NotFoundError('documento', id);
+
+    // Step 2: Conditionally soft-delete associated events (compensation if this throws:
+    // document already inactive; events remain active — acceptable safe state per DATOS §6)
+    if (eventosAction === 'eliminar') {
+      await this.eventosRepo.softDeleteByDocumentoId(usuarioId, id);
+    }
+
     return del;
   }
 }

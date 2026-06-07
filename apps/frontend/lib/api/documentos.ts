@@ -134,9 +134,13 @@ export function listDocumentos(
 }
 
 /**
- * Soft-delete de documento.
- * DELETE /documentos/:id
+ * Soft-delete de documento (CAL-05 / FL-9).
+ * DELETE /documentos/:id?eventosAction=conservar|eliminar
+ * eventosAction='eliminar' also soft-deletes associated events.
  */
-export function deleteDocumento(id: string): Promise<void> {
-  return apiFetch<void>(`/documentos/${id}`, { method: 'DELETE' });
+export function deleteDocumento(
+  id: string,
+  eventosAction: 'conservar' | 'eliminar' = 'conservar',
+): Promise<void> {
+  return apiFetch<void>(`/documentos/${id}?eventosAction=${eventosAction}`, { method: 'DELETE' });
 }

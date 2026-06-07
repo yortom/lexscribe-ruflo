@@ -25,7 +25,16 @@ export const QueryEventoSchema = z.object({
   documentoId: z.string().length(24).optional(),
   fechaDesde: z.string().datetime().optional(),
   fechaHasta: z.string().datetime().optional(),
-  soloCalendario: z.coerce.boolean().optional(),
+  // Query flag arrives as a string; z.coerce.boolean() would parse "false" as
+  // true (Boolean("false") === true). Parse "true"/"false" explicitly.
+  soloCalendario: z
+    .preprocess((v) => {
+      if (typeof v === 'boolean') return v;
+      if (v === 'true') return true;
+      if (v === 'false') return false;
+      return v;
+    }, z.boolean())
+    .optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(200).default(50),
 });

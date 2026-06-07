@@ -23,14 +23,23 @@ export function CalendarioView({
   onChange,
   onDayClick,
 }: CalendarioViewProps) {
-  // Build a Set of ISO date strings for O(1) lookup (compare day only)
-  const eventDates = new Set(
-    eventos.map((e) => new Date(e.fechaInicio).toDateString()),
+  // All-day events are stored as UTC midnight (e.g. 2026-06-07T00:00:00.000Z).
+  // Compare by calendar-day key to avoid an off-by-one shift in timezones west
+  // of UTC: take the event's UTC date portion, and each tile's LOCAL date
+  // portion (react-calendar tile dates are local). Both yield the picked day
+  // (YYYY-MM-DD) consistently across timezones.
+  const eventDayKeys = new Set(
+    eventos.map((e) => new Date(e.fechaInicio).toISOString().slice(0, 10)),
   );
+
+  const localDayKey = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate(),
+    ).padStart(2, '0')}`;
 
   const tileContent: TileContentFunc = ({ date, view }) => {
     if (view !== 'month') return null;
-    if (eventDates.has(date.toDateString())) {
+    if (eventDayKeys.has(localDayKey(date))) {
       return (
         <span className="block w-1.5 h-1.5 rounded-full bg-blue-500 mx-auto mt-0.5" />
       );
